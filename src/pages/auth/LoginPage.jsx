@@ -122,20 +122,7 @@ export default function LoginPage() {
             <Link to="/register" style={{ color: '#026CDF', fontWeight: 600, textDecoration: 'none' }}>Create Account</Link>
           </p>
 
-          {/* Demo credentials hint */}
-          {/* <div style={{ marginTop: '20px', background: '#EFF6FF', border: '1px solid #BFDBFE', borderRadius: '8px', padding: '12px 14px', textAlign: 'center' }}>
-            <p style={{ color: '#1E40AF', fontSize: '12px', margin: '0 0 4px', fontWeight: 600 }}>Default Admin Account</p>
-            <p style={{ color: '#1E40AF', fontSize: '12px', margin: '0 0 8px', fontFamily: 'monospace' }}>
-              admin@tickapp.com &bull; Admin@1234
-            </p>
-            <button
-              type="button"
-              onClick={() => setForm({ email: 'admin@tickapp.com', password: 'Admin@1234' })}
-              style={{ background: '#2563EB', color: '#FFFFFF', border: 'none', borderRadius: '4px', padding: '4px 10px', fontSize: '11px', fontWeight: 600, cursor: 'pointer' }}
-            >
-              Fill Demo Credentials
-            </button>
-          </div> */}
+
         </div>
       </div>
 
