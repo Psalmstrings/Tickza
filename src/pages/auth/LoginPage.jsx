@@ -21,7 +21,7 @@ export default function LoginPage() {
     e.preventDefault();
     if (!form.email || !form.password) { setError('Please fill in all fields.'); return; }
     setLoading(true); setError('');
-    try { await login(form.email, form.password); navigate('/home', { replace: true }); }
+    try { await login(form.email.trim(), form.password); navigate('/home', { replace: true }); }
     catch (err) { setError(err.response?.data?.message || 'Login failed. Check your credentials.'); }
     finally { setLoading(false); }
   };
