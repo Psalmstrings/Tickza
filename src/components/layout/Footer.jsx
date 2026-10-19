@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import TicketmasterLogo from '../ui/TicketmasterLogo.jsx';
+import TickzaLogo from '../ui/TickzaLogo.jsx';
 import { ShieldCheck, HelpCircle, Ticket, Heart } from 'lucide-react';
 
 export default function Footer() {
@@ -111,18 +111,6 @@ export default function Footer() {
               <li><Link to="/my-events" style={{ color: '#C0C0C0', fontSize: '13px', textDecoration: 'none' }}>Organizer Dashboard</Link></li>
             </ul>
           </div>
-
-          {/* <div>
-            <h5 style={{ color: '#FFFFFF', fontSize: '14px', fontWeight: 700, marginBottom: '14px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-              Educational Project
-            </h5>
-            <p style={{ color: '#A0A0A0', fontSize: '12px', lineHeight: 1.5, margin: '0 0 10px 0' }}>
-              This platform is a comprehensive educational full-stack implementation replicating Ticketmaster's user experience, design system, and ticketing architecture.
-            </p>
-            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', backgroundColor: 'rgba(255,255,255,0.08)', padding: '6px 12px', borderRadius: '20px', fontSize: '11px', color: '#D0D0D0' }}>
-              Built with React + Node.js + MongoDB
-            </div>
-          </div> */}
         </div>
 
         {/* Bottom Copyright & Disclaimer Row */}
@@ -140,8 +128,8 @@ export default function Footer() {
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <TicketmasterLogo color="#FFFFFF" height={20} />
-            <span>© 2026 TickApp</span>
+            <TickzaLogo color="#FFFFFF" height={20} />
+            <span>© 2026 Tickza. All rights reserved.</span>
           </div>
 
           <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>

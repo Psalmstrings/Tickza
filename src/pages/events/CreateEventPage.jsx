@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import AppLayout from '../../components/layout/AppLayout.jsx';
-import TicketmasterSpinner from '../../components/ui/TicketmasterSpinner.jsx';
+import TickzaSpinner from '../../components/ui/TickzaSpinner.jsx';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { useToast } from '../../components/ui/Toast.jsx';
 import api from '../../lib/axios.js';
@@ -27,7 +27,7 @@ const CATEGORIES = ['Concerts', 'Sports', 'Arts & Theater', 'Family', 'Conferenc
 
 const STEPS = [
   { id: 0, label: 'Details', desc: 'Title & Venue' },
-  { id: 1, label: 'Pricing', desc: 'Ticket Tiers' },
+  { id: 1, label: 'Admission', desc: 'Tickets & Passes' },
   { id: 2, label: 'Media', desc: 'Banner & Map' },
   { id: 3, label: 'Publish', desc: 'Review & Go Live' },
 ];
@@ -52,6 +52,13 @@ export default function CreateEventPage() {
   const [currentStep, setCurrentStep] = useState(0);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
+
+  // Admission Type & Free Event Settings
+  const [admissionType, setAdmissionType] = useState('PAID');
+  const [registrationCapacity, setRegistrationCapacity] = useState(500);
+  const [freePassName, setFreePassName] = useState('Free Event Pass');
+  const [registrationStartDate, setRegistrationStartDate] = useState('');
+  const [registrationEndDate, setRegistrationEndDate] = useState('');
 
   // Step 1: Details
   const [form, setForm] = useState({
@@ -146,9 +153,14 @@ export default function CreateEventPage() {
       if (!form.startDate) return 'Start date is required.';
     }
     if (currentStep === 1) {
-      if (ticketTypes.length === 0) return 'Add at least one ticket tier.';
-      if (ticketTypes.some((t) => !t.name.trim())) return 'All ticket tiers require a name.';
-      if (ticketTypes.some((t) => Number(t.quantity) <= 0)) return 'Quantity must be at least 1.';
+      if (admissionType === 'FREE') {
+        if (!freePassName.trim()) return 'Free pass name is required.';
+        if (Number(registrationCapacity) <= 0) return 'Registration capacity must be at least 1.';
+      } else {
+        if (ticketTypes.length === 0) return 'Add at least one ticket tier.';
+        if (ticketTypes.some((t) => !t.name.trim())) return 'All ticket tiers require a name.';
+        if (ticketTypes.some((t) => Number(t.quantity) <= 0)) return 'Quantity must be at least 1.';
+      }
     }
     return '';
   };
@@ -176,24 +188,45 @@ export default function CreateEventPage() {
     try {
       const payload = {
         ...form,
+        admissionType,
+        freePassName: admissionType === 'FREE' ? (freePassName.trim() || 'Free Event Pass') : undefined,
+        registrationCapacity: admissionType === 'FREE' ? (Number(registrationCapacity) || 500) : undefined,
+        registrationStartDate: admissionType === 'FREE' && registrationStartDate ? registrationStartDate : undefined,
+        registrationEndDate: admissionType === 'FREE' && registrationEndDate ? registrationEndDate : undefined,
         coverImageUrl: coverImageUrl || 'https://images.unsplash.com/photo-1540039155733-5bb30b53aa14?w=1200&auto=format&fit=crop&q=80',
         seatMapUrl: seatMapUrl || null,
-        ticketTypes: ticketTypes.map((t) => ({
-          name: t.name,
-          format: t.format || 'INDIVIDUAL',
-          description: t.description || '',
-          price: Number(t.price) || 0,
-          currency: 'NGN',
-          quantity: Number(t.quantity) || 100,
-          admittedPerTicket: Number(t.admittedPerTicket) || 1,
-          section: t.section || 'General',
-          row: t.row || '',
-          benefits: typeof t.benefits === 'string'
-            ? t.benefits.split(',').map((b) => b.trim()).filter(Boolean)
-            : (Array.isArray(t.benefits) ? t.benefits : []),
-          transferable: t.transferable,
-          resellable: t.resellable,
-        })),
+        ticketTypes: admissionType === 'FREE'
+          ? [
+              {
+                name: freePassName.trim() || 'Free Event Pass',
+                format: 'INDIVIDUAL',
+                description: 'Complimentary Free Event Pass',
+                price: 0,
+                currency: 'NGN',
+                quantity: Number(registrationCapacity) || 500,
+                admittedPerTicket: 1,
+                section: 'General',
+                row: 'Free Pass',
+                transferable: true,
+                resellable: false,
+              },
+            ]
+          : ticketTypes.map((t) => ({
+              name: t.name,
+              format: t.format || 'INDIVIDUAL',
+              description: t.description || '',
+              price: Number(t.price) || 0,
+              currency: 'NGN',
+              quantity: Number(t.quantity) || 100,
+              admittedPerTicket: Number(t.admittedPerTicket) || 1,
+              section: t.section || 'General',
+              row: t.row || '',
+              benefits: typeof t.benefits === 'string'
+                ? t.benefits.split(',').map((b) => b.trim()).filter(Boolean)
+                : (Array.isArray(t.benefits) ? t.benefits : []),
+              transferable: t.transferable,
+              resellable: t.resellable,
+            })),
         status: isApproved ? status : 'PENDING_APPROVAL',
       };
 
@@ -208,8 +241,12 @@ export default function CreateEventPage() {
     }
   };
 
-  const totalCapacity = ticketTypes.reduce((acc, t) => acc + (Number(t.quantity) || 0), 0);
-  const potentialGross = ticketTypes.reduce((acc, t) => acc + (Number(t.quantity) || 0) * (Number(t.price) || 0), 0);
+  const totalCapacity = admissionType === 'FREE'
+    ? (Number(registrationCapacity) || 0)
+    : ticketTypes.reduce((acc, t) => acc + (Number(t.quantity) || 0), 0);
+  const potentialGross = admissionType === 'FREE'
+    ? 0
+    : ticketTypes.reduce((acc, t) => acc + (Number(t.quantity) || 0) * (Number(t.price) || 0), 0);
 
   return (
     <AppLayout>
@@ -442,171 +479,303 @@ export default function CreateEventPage() {
             </div>
           )}
 
-          {/* STEP 2: PRICING & TICKET TIERS */}
+          {/* STEP 2: ADMISSION & TICKETS */}
           {currentStep === 1 && (
             <div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                <div>
-                  <h3 style={{ fontSize: '16px', fontWeight: 800, color: '#1F1F1F', margin: 0 }}>Configure Ticket Tiers</h3>
-                  <p style={{ fontSize: '12px', color: '#6B6B6B', margin: 0 }}>Create reserved seating, VIP lounges, or General Admission</p>
-                </div>
-                <button
-                  type="button"
-                  onClick={addTicketType}
-                  className="btn-outline"
-                  style={{ padding: '6px 14px', fontSize: '13px' }}
-                >
-                  <Plus size={14} /> Add Tier
-                </button>
-              </div>
-
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '24px' }}>
-                {ticketTypes.map((tt, idx) => (
-                  <div
-                    key={tt._key}
+              {/* Admission Type Toggle */}
+              <div style={{ marginBottom: '24px' }}>
+                <label className="input-label" style={{ marginBottom: '8px', display: 'block' }}>Admission Type *</label>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '14px' }}>
+                  <button
+                    type="button"
+                    onClick={() => setAdmissionType('PAID')}
                     style={{
-                      border: '1px solid #E5E5E5',
-                      borderRadius: '12px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'flex-start',
                       padding: '16px',
-                      backgroundColor: '#FAFAFA',
+                      borderRadius: '12px',
+                      border: admissionType === 'PAID' ? '2px solid #026CDF' : '1px solid #E5E5E5',
+                      backgroundColor: admissionType === 'PAID' ? '#EFF6FF' : '#FFFFFF',
+                      cursor: 'pointer',
+                      textAlign: 'left',
+                      transition: 'all 0.15s ease',
                     }}
                   >
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                      <span style={{ fontSize: '13px', fontWeight: 700, color: '#026CDF' }}>
-                        Tier #{idx + 1}
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', marginBottom: '6px' }}>
+                      <span style={{ fontSize: '15px', fontWeight: 800, color: admissionType === 'PAID' ? '#026CDF' : '#1F1F1F' }}>
+                        💳 Paid Event
                       </span>
-                      {ticketTypes.length > 1 && (
-                        <button
-                          type="button"
-                          onClick={() => removeTicketType(idx)}
-                          style={{ background: 'none', border: 'none', color: '#DC2626', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', fontSize: '12px' }}
-                        >
-                          <Trash2 size={14} /> Remove
-                        </button>
-                      )}
+                      {admissionType === 'PAID' && <CheckCircle2 size={18} color="#026CDF" />}
                     </div>
+                    <p style={{ margin: 0, fontSize: '12px', color: '#6B6B6B', lineHeight: 1.4 }}>
+                      Attendees purchase tickets with pricing tiers, promo codes, and payment verification.
+                    </p>
+                  </button>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px', marginBottom: '12px' }}>
-                      <div>
-                        <label className="input-label">Tier Name *</label>
-                        <input
-                          type="text"
-                          value={tt.name}
-                          onChange={(e) => updateTicketType(idx, 'name', e.target.value)}
-                          className="input"
-                          placeholder="e.g. VIP Front Row"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="input-label">Ticket Format</label>
-                        <select
-                          value={tt.format || 'INDIVIDUAL'}
-                          onChange={(e) => {
-                            const fmt = e.target.value;
-                            const defaultCap = fmt === 'GROUP_BUNDLE' ? 5 : fmt === 'RESERVED_TABLE' ? 8 : 1;
-                            updateTicketType(idx, 'format', fmt);
-                            updateTicketType(idx, 'admittedPerTicket', defaultCap);
-                          }}
-                          className="input"
-                        >
-                          <option value="INDIVIDUAL">👤 Individual Admission</option>
-                          <option value="GROUP_BUNDLE">👥 Group / Bundle Pass</option>
-                          <option value="RESERVED_TABLE">🍾 Reserved Table</option>
-                          <option value="CUSTOM">✨ Custom Ticket</option>
-                        </select>
-                      </div>
-
-                      <div>
-                        <label className="input-label">Price (₦ NGN) *</label>
-                        <input
-                          type="number"
-                          min="0"
-                          step="100"
-                          value={tt.price}
-                          onChange={(e) => updateTicketType(idx, 'price', e.target.value)}
-                          className="input"
-                          placeholder="e.g. 5000"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="input-label">Quantity Available *</label>
-                        <input
-                          type="number"
-                          min="1"
-                          value={tt.quantity}
-                          onChange={(e) => updateTicketType(idx, 'quantity', e.target.value)}
-                          className="input"
-                        />
-                      </div>
+                  <button
+                    type="button"
+                    onClick={() => setAdmissionType('FREE')}
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'flex-start',
+                      padding: '16px',
+                      borderRadius: '12px',
+                      border: admissionType === 'FREE' ? '2px solid #059669' : '1px solid #E5E5E5',
+                      backgroundColor: admissionType === 'FREE' ? '#ECFDF5' : '#FFFFFF',
+                      cursor: 'pointer',
+                      textAlign: 'left',
+                      transition: 'all 0.15s ease',
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', marginBottom: '6px' }}>
+                      <span style={{ fontSize: '15px', fontWeight: 800, color: admissionType === 'FREE' ? '#059669' : '#1F1F1F' }}>
+                        🎉 Free Event (RSVP Pass)
+                      </span>
+                      {admissionType === 'FREE' && <CheckCircle2 size={18} color="#059669" />}
                     </div>
+                    <p style={{ margin: 0, fontSize: '12px', color: '#6B6B6B', lineHeight: 1.4 }}>
+                      Zero payment required. Attendees register and receive a free digital QR admission pass.
+                    </p>
+                  </button>
+                </div>
+              </div>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px', marginBottom: '12px' }}>
-                      <div>
-                        <label className="input-label">Admitted Capacity (Per Ticket) *</label>
-                        <input
-                          type="number"
-                          min="1"
-                          value={tt.admittedPerTicket || 1}
-                          onChange={(e) => updateTicketType(idx, 'admittedPerTicket', e.target.value)}
-                          className="input"
-                          placeholder="1 for single, 5 for group"
-                        />
-                      </div>
+              {admissionType === 'FREE' ? (
+                /* FREE EVENT REGISTRATION SETTINGS */
+                <div style={{ border: '1px solid #A7F3D0', backgroundColor: '#F0FDF4', borderRadius: '12px', padding: '20px', marginBottom: '24px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
+                    <Sparkles size={20} color="#059669" />
+                    <div>
+                      <h3 style={{ fontSize: '16px', fontWeight: 800, color: '#065F46', margin: 0 }}>Free Event Registration Settings</h3>
+                      <p style={{ fontSize: '12px', color: '#047857', margin: 0 }}>Attendees will register online and receive admission passes with secure QR codes.</p>
+                    </div>
+                  </div>
 
-                      <div>
-                        <label className="input-label">Section Tag</label>
-                        <input
-                          type="text"
-                          value={tt.section}
-                          onChange={(e) => updateTicketType(idx, 'section', e.target.value)}
-                          className="input"
-                          placeholder="General, VIP Deck, Table Area"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="input-label">Row Tag</label>
-                        <input
-                          type="text"
-                          value={tt.row}
-                          onChange={(e) => updateTicketType(idx, 'row', e.target.value)}
-                          className="input"
-                          placeholder="GA, Front Row"
-                        />
-                      </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px', marginBottom: '16px' }}>
+                    <div>
+                      <label className="input-label">Pass Name *</label>
+                      <input
+                        type="text"
+                        value={freePassName}
+                        onChange={(e) => setFreePassName(e.target.value)}
+                        className="input"
+                        placeholder="e.g. Free Event Pass, Guest RSVP"
+                        required
+                      />
                     </div>
 
                     <div>
-                      <label className="input-label">Benefits / Inclusions (comma or newline separated)</label>
+                      <label className="input-label">Registration Capacity *</label>
                       <input
-                        type="text"
-                        value={tt.benefits || ''}
-                        onChange={(e) => updateTicketType(idx, 'benefits', e.target.value)}
+                        type="number"
+                        min="1"
+                        value={registrationCapacity}
+                        onChange={(e) => setRegistrationCapacity(Math.max(1, parseInt(e.target.value, 10) || 1))}
                         className="input"
-                        placeholder="e.g. Priority entrance, complimentary drink, dedicated hostess"
+                        placeholder="e.g. 500"
+                        required
                       />
                     </div>
                   </div>
-                ))}
-              </div>
 
-              {/* Total Calculation Card */}
-              <div style={{ backgroundColor: '#F8F9FA', borderRadius: '12px', padding: '16px 20px', border: '1px solid #E5E5E5', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div>
-                  <span style={{ fontSize: '11px', fontWeight: 700, color: '#6B6B6B', textTransform: 'uppercase' }}>Total Capacity</span>
-                  <p style={{ margin: '2px 0 0', fontSize: '18px', fontWeight: 800, color: '#1F1F1F' }}>
-                    {totalCapacity} Packages / Passes
-                  </p>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px' }}>
+                    <div>
+                      <label className="input-label">Registration Opens (Optional)</label>
+                      <input
+                        type="datetime-local"
+                        value={registrationStartDate}
+                        onChange={(e) => setRegistrationStartDate(e.target.value)}
+                        className="input"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="input-label">Registration Closes (Optional)</label>
+                      <input
+                        type="datetime-local"
+                        value={registrationEndDate}
+                        onChange={(e) => setRegistrationEndDate(e.target.value)}
+                        className="input"
+                      />
+                    </div>
+                  </div>
+
+                  <div style={{ marginTop: '16px', padding: '12px 14px', backgroundColor: '#FFFFFF', borderRadius: '8px', border: '1px solid #D1FAE5', display: 'flex', gap: '10px', alignItems: 'center' }}>
+                    <Info size={18} color="#059669" style={{ flexShrink: 0 }} />
+                    <span style={{ fontSize: '12px', color: '#065F46' }}>
+                      A <strong>FREE</strong> admission badge will be displayed across Tickza listings. Free passes are separated from revenue metrics and require no payment gateway.
+                    </span>
+                  </div>
                 </div>
-                <div>
-                  <span style={{ fontSize: '11px', fontWeight: 700, color: '#6B6B6B', textTransform: 'uppercase' }}>Est. Total Gross</span>
-                  <p style={{ margin: '2px 0 0', fontSize: '18px', fontWeight: 800, color: '#026CDF' }}>
-                    ₦{potentialGross.toLocaleString()}
-                  </p>
-                </div>
-              </div>
+              ) : (
+                /* PAID EVENT TICKET TIERS */
+                <>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                    <div>
+                      <h3 style={{ fontSize: '16px', fontWeight: 800, color: '#1F1F1F', margin: 0 }}>Configure Ticket Tiers</h3>
+                      <p style={{ fontSize: '12px', color: '#6B6B6B', margin: 0 }}>Create reserved seating, VIP lounges, or General Admission</p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={addTicketType}
+                      className="btn-outline"
+                      style={{ padding: '6px 14px', fontSize: '13px' }}
+                    >
+                      <Plus size={14} /> Add Tier
+                    </button>
+                  </div>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '24px' }}>
+                    {ticketTypes.map((tt, idx) => (
+                      <div
+                        key={tt._key}
+                        style={{
+                          border: '1px solid #E5E5E5',
+                          borderRadius: '12px',
+                          padding: '16px',
+                          backgroundColor: '#FAFAFA',
+                        }}
+                      >
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                          <span style={{ fontSize: '13px', fontWeight: 700, color: '#026CDF' }}>
+                            Tier #{idx + 1}
+                          </span>
+                          {ticketTypes.length > 1 && (
+                            <button
+                              type="button"
+                              onClick={() => removeTicketType(idx)}
+                              style={{ background: 'none', border: 'none', color: '#DC2626', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', fontSize: '12px' }}
+                            >
+                              <Trash2 size={14} /> Remove
+                            </button>
+                          )}
+                        </div>
+
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px', marginBottom: '12px' }}>
+                          <div>
+                            <label className="input-label">Tier Name *</label>
+                            <input
+                              type="text"
+                              value={tt.name}
+                              onChange={(e) => updateTicketType(idx, 'name', e.target.value)}
+                              className="input"
+                              placeholder="e.g. VIP Front Row"
+                            />
+                          </div>
+
+                          <div>
+                            <label className="input-label">Ticket Format</label>
+                            <select
+                              value={tt.format || 'INDIVIDUAL'}
+                              onChange={(e) => {
+                                const fmt = e.target.value;
+                                const defaultCap = fmt === 'GROUP_BUNDLE' ? 5 : fmt === 'RESERVED_TABLE' ? 8 : 1;
+                                updateTicketType(idx, 'format', fmt);
+                                updateTicketType(idx, 'admittedPerTicket', defaultCap);
+                              }}
+                              className="input"
+                            >
+                              <option value="INDIVIDUAL">👤 Individual Admission</option>
+                              <option value="GROUP_BUNDLE">👥 Group / Bundle Pass</option>
+                              <option value="RESERVED_TABLE">🍾 Reserved Table</option>
+                              <option value="CUSTOM">✨ Custom Ticket</option>
+                            </select>
+                          </div>
+
+                          <div>
+                            <label className="input-label">Price (₦ NGN) *</label>
+                            <input
+                              type="number"
+                              min="0"
+                              step="100"
+                              value={tt.price}
+                              onChange={(e) => updateTicketType(idx, 'price', e.target.value)}
+                              className="input"
+                              placeholder="e.g. 5000"
+                            />
+                          </div>
+
+                          <div>
+                            <label className="input-label">Quantity Available *</label>
+                            <input
+                              type="number"
+                              min="1"
+                              value={tt.quantity}
+                              onChange={(e) => updateTicketType(idx, 'quantity', e.target.value)}
+                              className="input"
+                            />
+                          </div>
+                        </div>
+
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px', marginBottom: '12px' }}>
+                          <div>
+                            <label className="input-label">Admitted Capacity (Per Ticket) *</label>
+                            <input
+                              type="number"
+                              min="1"
+                              value={tt.admittedPerTicket || 1}
+                              onChange={(e) => updateTicketType(idx, 'admittedPerTicket', e.target.value)}
+                              className="input"
+                              placeholder="1 for single, 5 for group"
+                            />
+                          </div>
+
+                          <div>
+                            <label className="input-label">Section Tag</label>
+                            <input
+                              type="text"
+                              value={tt.section}
+                              onChange={(e) => updateTicketType(idx, 'section', e.target.value)}
+                              className="input"
+                              placeholder="General, VIP Deck, Table Area"
+                            />
+                          </div>
+
+                          <div>
+                            <label className="input-label">Row Tag</label>
+                            <input
+                              type="text"
+                              value={tt.row}
+                              onChange={(e) => updateTicketType(idx, 'row', e.target.value)}
+                              className="input"
+                              placeholder="GA, Front Row"
+                            />
+                          </div>
+                        </div>
+
+                        <div>
+                          <label className="input-label">Benefits / Inclusions (comma or newline separated)</label>
+                          <input
+                            type="text"
+                            value={tt.benefits || ''}
+                            onChange={(e) => updateTicketType(idx, 'benefits', e.target.value)}
+                            className="input"
+                            placeholder="e.g. Priority entrance, complimentary drink, dedicated hostess"
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Total Calculation Card */}
+                  <div style={{ backgroundColor: '#F8F9FA', borderRadius: '12px', padding: '16px 20px', border: '1px solid #E5E5E5', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div>
+                      <span style={{ fontSize: '11px', fontWeight: 700, color: '#6B6B6B', textTransform: 'uppercase' }}>Total Capacity</span>
+                      <p style={{ margin: '2px 0 0', fontSize: '18px', fontWeight: 800, color: '#1F1F1F' }}>
+                        {totalCapacity} Packages / Passes
+                      </p>
+                    </div>
+                    <div>
+                      <span style={{ fontSize: '11px', fontWeight: 700, color: '#6B6B6B', textTransform: 'uppercase' }}>Est. Total Gross</span>
+                      <p style={{ margin: '2px 0 0', fontSize: '18px', fontWeight: 800, color: '#026CDF' }}>
+                        ₦{potentialGross.toLocaleString()}
+                      </p>
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
           )}
 
@@ -641,7 +810,7 @@ export default function CreateEventPage() {
                   ) : (
                     <div>
                       {uploadingCover ? (
-                        <TicketmasterSpinner size="md" message="Uploading to Cloudinary..." />
+                        <TickzaSpinner size="md" message="Uploading to Cloudinary..." />
                       ) : (
                         <>
                           <Upload size={32} color="#026CDF" style={{ marginBottom: '8px' }} />
@@ -717,15 +886,29 @@ export default function CreateEventPage() {
                     📍 {form.venue} {form.address ? `• ${form.address}` : ''} | 📅 {form.startDate} at {form.startTime}
                   </p>
 
-                  <h4 style={{ fontSize: '14px', fontWeight: 700, margin: '0 0 8px 0' }}>Ticket Tiers:</h4>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '8px' }}>
-                    {ticketTypes.map((t) => (
-                      <div key={t._key} style={{ padding: '8px 12px', backgroundColor: '#F8F9FA', borderRadius: '8px', border: '1px solid #E5E5E5' }}>
-                        <p style={{ margin: 0, fontSize: '13px', fontWeight: 700 }}>{t.name}</p>
-                        <p style={{ margin: 0, fontSize: '12px', color: '#026CDF', fontWeight: 600 }}>${t.price} ({t.quantity} tickets)</p>
+                  {admissionType === 'FREE' ? (
+                    <div style={{ padding: '14px 16px', backgroundColor: '#ECFDF5', borderRadius: '10px', border: '1px solid #A7F3D0' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                        <span style={{ fontSize: '14px', fontWeight: 800, color: '#065F46' }}>🎉 {freePassName}</span>
+                        <span style={{ backgroundColor: '#059669', color: '#FFFFFF', fontSize: '11px', fontWeight: 800, padding: '2px 8px', borderRadius: '4px' }}>FREE</span>
                       </div>
-                    ))}
-                  </div>
+                      <p style={{ margin: 0, fontSize: '12px', color: '#047857' }}>
+                        Capacity: {registrationCapacity} attendees • Zero registration fees • Digital QR pass admission
+                      </p>
+                    </div>
+                  ) : (
+                    <>
+                      <h4 style={{ fontSize: '14px', fontWeight: 700, margin: '0 0 8px 0' }}>Ticket Tiers:</h4>
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '8px' }}>
+                        {ticketTypes.map((t) => (
+                          <div key={t._key} style={{ padding: '8px 12px', backgroundColor: '#F8F9FA', borderRadius: '8px', border: '1px solid #E5E5E5' }}>
+                            <p style={{ margin: 0, fontSize: '13px', fontWeight: 700 }}>{t.name}</p>
+                            <p style={{ margin: 0, fontSize: '12px', color: '#026CDF', fontWeight: 600 }}>₦{Number(t.price).toLocaleString()} ({t.quantity} tickets)</p>
+                          </div>
+                        ))}
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
 
@@ -773,7 +956,7 @@ export default function CreateEventPage() {
                   style={{ padding: '12px 24px' }}
                 >
                   {submitting ? (
-                    <TicketmasterSpinner size="sm" color="#FFFFFF" message="Publishing..." />
+                    <TickzaSpinner size="sm" color="#FFFFFF" message="Publishing..." />
                   ) : isApproved ? (
                     'Publish Event Live'
                   ) : (

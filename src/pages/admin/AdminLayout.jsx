@@ -10,11 +10,13 @@ import {
   ArrowLeft,
   Shield,
   ExternalLink,
+  DollarSign,
 } from 'lucide-react';
-import TicketmasterLogo from '../../components/ui/TicketmasterLogo.jsx';
+import TickzaLogo from '../../components/ui/TickzaLogo.jsx';
 
 const NAV_ITEMS = [
   { to: '/admin', icon: <BarChart3 size={16} />, label: 'Analytics', end: true },
+  { to: '/admin/financials', icon: <DollarSign size={16} />, label: 'Financials & Payouts' },
   { to: '/admin/users', icon: <Users size={16} />, label: 'Users & Approval' },
   { to: '/admin/events', icon: <Calendar size={16} />, label: 'Events' },
   { to: '/admin/tickets', icon: <Ticket size={16} />, label: 'Tickets' },
@@ -41,7 +43,7 @@ export default function AdminLayout() {
         <div className="tm-container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: '64px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
             <Link to="/home" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
-              <TicketmasterLogo height={24} color="#026CDF" />
+              <TickzaLogo height={24} color="#026CDF" />
             </Link>
             <div style={{ width: '1px', height: '20px', backgroundColor: '#E5E5E5' }} />
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', backgroundColor: '#EFF6FF', color: '#026CDF', padding: '3px 10px', borderRadius: '4px', fontSize: '11px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.04em' }}>

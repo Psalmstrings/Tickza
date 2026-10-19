@@ -1,6 +1,6 @@
 import React from 'react';
-import TicketmasterSpinner from './TicketmasterSpinner.jsx';
+import TickzaSpinner from './TickzaSpinner.jsx';
 
 export default function LoadingSpinner(props) {
-  return <TicketmasterSpinner {...props} />;
+  return <TickzaSpinner {...props} />;
 }

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import AppLayout from '../../components/layout/AppLayout.jsx';
-import TicketmasterSpinner from '../../components/ui/TicketmasterSpinner.jsx';
+import TickzaSpinner from '../../components/ui/TickzaSpinner.jsx';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { useToast } from '../../components/ui/Toast.jsx';
 import api from '../../lib/axios.js';
@@ -94,7 +94,7 @@ export default function ResalePage() {
               </div>
 
               <h1 style={{ fontSize: '24px', fontWeight: 800, color: '#1F1F1F', margin: 0 }}>
-                Ticketmaster Resale Marketplace
+                Tickza Resale Marketplace
               </h1>
               <p style={{ fontSize: '13px', color: '#6B6B6B', margin: '4px 0 0' }}>
                 Verified tickets listed directly by fans and event attendees.
@@ -112,7 +112,7 @@ export default function ResalePage() {
       <div className="tm-container" style={{ padding: '32px 20px', maxWidth: '840px' }}>
         {loading ? (
           <div style={{ padding: '60px 0', textAlign: 'center' }}>
-            <TicketmasterSpinner size="md" message="Loading resale exchange..." />
+            <TickzaSpinner size="md" message="Loading resale exchange..." />
           </div>
         ) : listings.length === 0 ? (
           <div

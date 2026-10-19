@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import AppLayout from '../../components/layout/AppLayout.jsx';
 import EventCard from '../../components/events/EventCard.jsx';
 import EventCardSkeleton from '../../components/events/EventCardSkeleton.jsx';
-import TicketmasterSpinner from '../../components/ui/TicketmasterSpinner.jsx';
+import TickzaSpinner from '../../components/ui/TickzaSpinner.jsx';
 import api from '../../lib/axios.js';
 import {
   ChevronRight,

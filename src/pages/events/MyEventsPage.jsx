@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import AppLayout from '../../components/layout/AppLayout.jsx';
-import TicketmasterSpinner from '../../components/ui/TicketmasterSpinner.jsx';
+import TickzaSpinner from '../../components/ui/TickzaSpinner.jsx';
 import StatusBadge from '../../components/ui/StatusBadge.jsx';
 import { useAuth } from '../../context/AuthContext.jsx';
 import api from '../../lib/axios.js';
@@ -111,7 +111,7 @@ export default function MyEventsPage() {
         {/* Events List Section */}
         {loading ? (
           <div style={{ padding: '60px 0', textAlign: 'center' }}>
-            <TicketmasterSpinner size="md" message="Loading your events..." />
+            <TickzaSpinner size="md" message="Loading your events..." />
           </div>
         ) : events.length === 0 ? (
           <div
@@ -129,7 +129,7 @@ export default function MyEventsPage() {
               No organized events yet
             </h3>
             <p style={{ fontSize: '14px', color: '#6B6B6B', margin: '0 0 20px 0', lineHeight: 1.5 }}>
-              Launch your first concert tour, sports exhibition, or show in 4 steps with Ticketmaster's wizard.
+              Launch your first concert tour, sports exhibition, or show in 4 steps with Tickza's wizard.
             </p>
             <Link to="/create" className="btn-primary" style={{ padding: '12px 24px', borderRadius: '8px' }}>
               Create Your First Event

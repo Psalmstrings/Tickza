@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import AppLayout from '../../components/layout/AppLayout.jsx';
-import TicketmasterSpinner from '../../components/ui/TicketmasterSpinner.jsx';
+import TickzaSpinner from '../../components/ui/TickzaSpinner.jsx';
 import StatusBadge from '../../components/ui/StatusBadge.jsx';
 import { useToast } from '../../components/ui/Toast.jsx';
 import api from '../../lib/axios.js';
@@ -130,7 +130,7 @@ export default function TransfersPage() {
       <div className="tm-container" style={{ padding: '32px 20px', maxWidth: '720px' }}>
         {loading ? (
           <div style={{ padding: '60px 0', textAlign: 'center' }}>
-            <TicketmasterSpinner size="md" message="Loading transfer records..." />
+            <TickzaSpinner size="md" message="Loading transfer records..." />
           </div>
         ) : currentList.length === 0 ? (
           <div

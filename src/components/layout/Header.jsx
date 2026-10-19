@@ -17,7 +17,7 @@ import {
   Sparkles,
   Settings,
 } from 'lucide-react';
-import TicketmasterLogo from '..//ui/TicketmasterLogo.jsx';
+import TickzaLogo from '../ui/TickzaLogo.jsx';
 import { useAuth } from '../../context/AuthContext.jsx';
 
 const CITIES = ['All Cities', 'New York', 'Los Angeles', 'London', 'Lagos', 'Chicago', 'Houston', 'Atlanta'];
@@ -127,7 +127,7 @@ export default function Header() {
         {/* Left: Logo & Primary Category Nav */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '28px' }}>
           <Link to="/home" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
-            <TicketmasterLogo height={36} color="#ffffff" />
+            <TickzaLogo height={36} color="#ffffff" />
           </Link>
 
           {/* Desktop Categories */}

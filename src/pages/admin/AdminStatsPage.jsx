@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Users, Clock, CheckCircle, XCircle, BarChart3, Calendar, Ticket, ShoppingBag } from 'lucide-react';
-import TicketmasterSpinner from '../../components/ui/TicketmasterSpinner.jsx';
+import TickzaSpinner from '../../components/ui/TickzaSpinner.jsx';
 import api from '../../lib/axios.js';
 
 export default function AdminStatsPage() {
@@ -41,7 +41,7 @@ export default function AdminStatsPage() {
 
       {loading ? (
         <div style={{ padding: '60px', textAlign: 'center' }}>
-          <TicketmasterSpinner size="md" message="Loading analytics..." />
+          <TickzaSpinner size="md" message="Loading analytics..." />
         </div>
       ) : (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px' }}>

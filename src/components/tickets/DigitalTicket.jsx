@@ -1,6 +1,6 @@
 import React from 'react';
 import { Calendar, MapPin, QrCode, ArrowLeft, Send, DollarSign, Share2, ShieldCheck, CheckCircle2 } from 'lucide-react';
-import TicketmasterLogo from '../ui/TicketmasterLogo.jsx';
+import TickzaLogo from '../ui/TickzaLogo.jsx';
 
 export default function DigitalTicket({
   ticket,
@@ -27,7 +27,7 @@ export default function DigitalTicket({
   const section = ticket.section || ticketType.section || 'General';
   const row = ticket.row || ticketType.row || 'GA';
   const seat = ticket.seat || 'Open';
-  const ticketNumber = ticket.ticketNumber || 'TICK-TM-000000';
+  const ticketNumber = ticket.ticketNumber || 'TICK-TZ-000000';
 
   const imageUrl =
     event.coverImage?.url ||
@@ -76,7 +76,7 @@ export default function DigitalTicket({
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <TicketmasterLogo color="#FFFFFF" height={22} />
+            <TickzaLogo color="#FFFFFF" height={22} />
             <span style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.05em', opacity: 0.9 }}>
               DIGITAL WALLET
             </span>

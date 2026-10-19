@@ -45,19 +45,22 @@ export default function EventCard({
   const weekdayStr = dateObj ? dateObj.toLocaleDateString('en-US', { weekday: 'short' }) : '';
   const timeStr = event.startTime || (dateObj ? dateObj.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }) : '');
 
-  // Calculate price
+  // Calculate minimum price
   let minPrice = event.minPrice;
   if (minPrice === undefined && Array.isArray(event.ticketTypes) && event.ticketTypes.length > 0) {
     const prices = event.ticketTypes.map(t => t.price).filter(p => typeof p === 'number');
     if (prices.length > 0) minPrice = Math.min(...prices);
   }
 
+  // Calculate admission type
+  const isFreeEvent = event.admissionType === 'FREE' || event.isFree || minPrice === 0;
+
   const priceDisplay =
-    minPrice === undefined || minPrice === null
-      ? 'See Tickets'
-      : minPrice === 0
+    isFreeEvent
       ? 'FREE'
-      : `From $${minPrice}`;
+      : minPrice === undefined || minPrice === null
+      ? 'See Tickets'
+      : `From ₦${minPrice.toLocaleString()}`;
 
   const handleCardClick = () => {
     navigate(`/events/${id}`);
@@ -135,6 +138,28 @@ export default function EventCard({
         >
           {category}
         </div>
+
+        {/* Free Event Badge */}
+        {isFreeEvent && (
+          <div
+            style={{
+              position: 'absolute',
+              bottom: 10,
+              left: 10,
+              backgroundColor: '#059669',
+              color: '#FFFFFF',
+              fontSize: '11px',
+              fontWeight: 800,
+              letterSpacing: '0.04em',
+              padding: '3px 8px',
+              borderRadius: '4px',
+              zIndex: 2,
+              boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
+            }}
+          >
+            FREE PASS
+          </div>
+        )}
 
         {/* Favorite Heart Button */}
         {showFavorite && (
@@ -312,13 +337,16 @@ export default function EventCard({
             fontSize: '13px',
             borderRadius: '6px',
             marginLeft: 'auto',
+            color: isFreeEvent ? '#059669' : undefined,
+            borderColor: isFreeEvent ? '#A7F3D0' : undefined,
+            backgroundColor: isFreeEvent ? '#F0FDF4' : undefined,
           }}
           onClick={(e) => {
             e.stopPropagation();
             navigate(`/events/${id}`);
           }}
         >
-          See Tickets <ArrowRight size={13} />
+          {isFreeEvent ? 'Get Free Pass' : 'See Tickets'} <ArrowRight size={13} />
         </button>
       </div>
     </div>

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import confetti from 'canvas-confetti';
 import AppLayout from '../../components/layout/AppLayout.jsx';
-import TicketmasterSpinner from '../../components/ui/TicketmasterSpinner.jsx';
+import TickzaSpinner from '../../components/ui/TickzaSpinner.jsx';
 import StatusBadge from '../../components/ui/StatusBadge.jsx';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { useToast } from '../../components/ui/Toast.jsx';
@@ -43,6 +43,18 @@ export default function EventDetailPage() {
   const [purchasing, setPurchasing] = useState(false);
   const [orderComplete, setOrderComplete] = useState(null);
 
+  // Free registration state
+  const [showFreeRegModal, setShowFreeRegModal] = useState(false);
+  const [registeringFree, setRegisteringFree] = useState(false);
+  const [freeRegistrationComplete, setFreeRegistrationComplete] = useState(null);
+  const [attendeeForm, setAttendeeForm] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    notes: '',
+  });
+
   // Promo code state
   const [promoCodeInput, setPromoCodeInput] = useState('');
   const [appliedPromo, setAppliedPromo] = useState(null);
@@ -52,6 +64,18 @@ export default function EventDetailPage() {
   useEffect(() => {
     fetchEvent();
   }, [id]);
+
+  useEffect(() => {
+    if (user) {
+      setAttendeeForm(prev => ({
+        ...prev,
+        firstName: prev.firstName || user.firstName || '',
+        lastName: prev.lastName || user.lastName || '',
+        email: prev.email || user.email || '',
+        phone: prev.phone || user.phone || '',
+      }));
+    }
+  }, [user]);
 
   const fetchEvent = async () => {
     setLoading(true);
@@ -142,7 +166,23 @@ export default function EventDetailPage() {
         promoCode: appliedPromo?.code || '',
       });
 
-      // Celebration confetti
+      // If paid order requiring Paystack checkout
+      if (data.requiresPayment && data.paymentData) {
+        const { authorizationUrl, reference } = data.paymentData;
+        toast.success('Order placed. Redirecting to Paystack checkout...');
+        
+        // If live Paystack authorization URL is provided, redirect to Paystack
+        if (authorizationUrl && authorizationUrl.startsWith('https://checkout.paystack.com/')) {
+          window.location.href = authorizationUrl;
+          return;
+        }
+
+        // Otherwise navigate to internal verification callback
+        navigate(`/tickets/verify-payment?reference=${encodeURIComponent(reference)}`);
+        return;
+      }
+
+      // Free or instant fulfillment
       try {
         confetti({
           particleCount: 80,
@@ -163,11 +203,60 @@ export default function EventDetailPage() {
     }
   };
 
+  const handleOpenFreeRegistration = () => {
+    if (!user) {
+      navigate('/login');
+      return;
+    }
+    const isFull = event.registrationCapacity && (event.registeredCount || 0) >= event.registrationCapacity;
+    if (isFull) {
+      toast.error('Registration is currently full for this event.');
+      return;
+    }
+    setFreeRegistrationComplete(null);
+    setShowFreeRegModal(true);
+  };
+
+  const handleConfirmFreeRegistration = async (e) => {
+    e?.preventDefault();
+    if (!attendeeForm.firstName.trim() || !attendeeForm.lastName.trim() || !attendeeForm.email.trim()) {
+      toast.error('First name, last name, and email are required.');
+      return;
+    }
+
+    setRegisteringFree(true);
+    try {
+      const { data } = await api.post(`/events/${event._id || event.id}/register`, {
+        firstName: attendeeForm.firstName.trim(),
+        lastName: attendeeForm.lastName.trim(),
+        email: attendeeForm.email.trim(),
+        phone: attendeeForm.phone.trim(),
+        notes: attendeeForm.notes.trim(),
+      });
+
+      try {
+        confetti({
+          particleCount: 100,
+          spread: 80,
+          origin: { y: 0.6 },
+        });
+      } catch (err) {}
+
+      setFreeRegistrationComplete(data.data);
+      setEvent(prev => prev ? ({ ...prev, registeredCount: (prev.registeredCount || 0) + 1 }) : prev);
+      toast.success(data.message || 'Free registration confirmed! Your pass is ready.');
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to complete registration.');
+    } finally {
+      setRegisteringFree(false);
+    }
+  };
+
   if (loading) {
     return (
       <AppLayout>
         <div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <TicketmasterSpinner size="lg" message="Loading event information..." />
+          <TickzaSpinner size="lg" message="Loading event information..." />
         </div>
       </AppLayout>
     );
@@ -189,7 +278,9 @@ export default function EventDetailPage() {
   );
 
   const ticketTypes = event.ticketTypes || [];
-  const isSoldOut = ticketTypes.length > 0 && ticketTypes.every((t) => (t.availableQuantity || t.quantity) <= 0);
+  const isFreeEvent = event.admissionType === 'FREE' || event.isFree;
+  const isFreeEventCapacityFull = isFreeEvent && event.registrationCapacity && (event.registeredCount || 0) >= event.registrationCapacity;
+  const isSoldOut = !isFreeEvent && ticketTypes.length > 0 && ticketTypes.every((t) => (t.availableQuantity || t.quantity) <= 0);
 
   // Price calculations
   const unitPrice = selectedType ? (selectedType.price || 0) : 0;
@@ -244,6 +335,11 @@ export default function EventDetailPage() {
             <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'flex-end', gap: '20px' }}>
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                  {isFreeEvent && (
+                    <span style={{ backgroundColor: '#059669', color: '#FFFFFF', fontSize: '11px', fontWeight: 800, textTransform: 'uppercase', padding: '3px 8px', borderRadius: '4px', letterSpacing: '0.04em' }}>
+                      FREE ADMISSION
+                    </span>
+                  )}
                   <span style={{ backgroundColor: '#026CDF', color: '#FFFFFF', fontSize: '11px', fontWeight: 800, textTransform: 'uppercase', padding: '3px 8px', borderRadius: '4px', letterSpacing: '0.04em' }}>
                     {event.category || 'Concert'}
                   </span>
@@ -316,9 +412,9 @@ export default function EventDetailPage() {
         </div>
       </div>
 
-      {/* ===== TWO-COLUMN MAIN CONTENT ===== */}
+      {/* ===== TWO-COLUMN MAIN CONTENT (RESPONSIVE) ===== */}
       <div className="tm-container" style={{ padding: '36px 20px' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1.8fr) minmax(320px, 1.2fr)', gap: '32px', alignItems: 'start' }}>
+        <div className="event-details-layout">
           {/* Left Column: Event Details & Venue Info */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '28px' }}>
             {/* About the Event */}
@@ -382,7 +478,7 @@ export default function EventDetailPage() {
             </div>
           </div>
 
-          {/* Right Column: Ticket Selector Panel */}
+          {/* Right Column: Ticket Selector / Free Pass Panel */}
           <div
             style={{
               position: 'sticky',
@@ -394,185 +490,256 @@ export default function EventDetailPage() {
               boxShadow: '0 4px 20px rgba(0,0,0,0.06)',
             }}
           >
-            <h2 style={{ fontSize: '18px', fontWeight: 800, color: '#1F1F1F', margin: '0 0 16px 0' }}>
-              Select Ticket Options
-            </h2>
-
-            {/* Ticket Tier Cards List */}
-            {ticketTypes.length === 0 ? (
-              <p style={{ color: '#6B6B6B', fontSize: '14px' }}>No tickets currently available for this event.</p>
-            ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '20px' }}>
-                {ticketTypes.map((tt) => {
-                  const ttId = tt._id || tt.id;
-                  const isSelected = selectedType && (selectedType._id || selectedType.id) === ttId;
-                  const available = tt.availableQuantity !== undefined ? tt.availableQuantity : tt.quantity;
-                  const isTierSoldOut = available <= 0;
-                  const format = tt.format || 'INDIVIDUAL';
-                  const capacity = tt.admittedPerTicket || 1;
-
-                  return (
-                    <div
-                      key={ttId}
-                      onClick={() => !isTierSoldOut && setSelectedType(tt)}
-                      style={{
-                        padding: '14px 16px',
-                        borderRadius: '12px',
-                        border: isSelected ? '2px solid #026CDF' : '1px solid #E5E5E5',
-                        backgroundColor: isSelected ? '#EBF3FD' : isTierSoldOut ? '#F9FAFB' : '#FFFFFF',
-                        cursor: isTierSoldOut ? 'not-allowed' : 'pointer',
-                        opacity: isTierSoldOut ? 0.6 : 1,
-                        transition: 'all 0.15s ease',
-                      }}
-                    >
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                        <div style={{ flex: 1, paddingRight: 10 }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                            <p style={{ fontSize: '15px', fontWeight: 700, color: '#1F1F1F', margin: 0 }}>
-                              {tt.name}
-                            </p>
-                            {format === 'RESERVED_TABLE' && (
-                              <span style={{ fontSize: 10, background: '#FEF3C7', color: '#92400E', padding: '2px 6px', borderRadius: 4, fontWeight: 700 }}>
-                                TABLE
-                              </span>
-                            )}
-                            {format === 'GROUP_BUNDLE' && (
-                              <span style={{ fontSize: 10, background: '#E0E7FF', color: '#3730A3', padding: '2px 6px', borderRadius: 4, fontWeight: 700 }}>
-                                GROUP
-                              </span>
-                            )}
-                            {isSelected && <CheckCircle2 size={16} color="#026CDF" />}
-                          </div>
-
-                          <p style={{ fontSize: '12px', color: '#6B6B6B', margin: '3px 0 0 0' }}>
-                            {format === 'RESERVED_TABLE'
-                              ? `Reserved Table • Admits ${capacity} Guests`
-                              : format === 'GROUP_BUNDLE'
-                              ? `Group Pass • Admits ${capacity} Persons`
-                              : 'Individual Entry'}
-                            {tt.section ? ` • Section ${tt.section}` : ''}
-                          </p>
-
-                          {tt.description && (
-                            <p style={{ fontSize: '12px', color: '#4B5563', margin: '4px 0 0 0' }}>
-                              {tt.description}
-                            </p>
-                          )}
-
-                          {Array.isArray(tt.benefits) && tt.benefits.length > 0 && (
-                            <div style={{ marginTop: 6, display: 'flex', flexWrap: 'wrap', gap: 4 }}>
-                              {tt.benefits.map((b, i) => (
-                                <span key={i} style={{ fontSize: 10.5, background: '#ECFDF5', color: '#047857', padding: '1px 6px', borderRadius: 4, fontWeight: 600 }}>
-                                  ✓ {b}
-                                </span>
-                              ))}
-                            </div>
-                          )}
-
-                          <p style={{ fontSize: '11px', color: available < 20 ? '#DC2626' : '#059669', margin: '6px 0 0 0', fontWeight: 600 }}>
-                            {isTierSoldOut ? 'Sold Out' : `${available} ${format === 'RESERVED_TABLE' ? 'tables' : format === 'GROUP_BUNDLE' ? 'bundles' : 'tickets'} remaining`}
-                          </p>
-                        </div>
-
-                        <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                          <span style={{ fontSize: '18px', fontWeight: 800, color: '#026CDF' }}>
-                            {tt.price === 0 ? 'FREE' : `₦${tt.price.toLocaleString()}`}
-                          </span>
-                          {capacity > 1 && tt.price > 0 && (
-                            <div style={{ fontSize: 11, color: '#6B7280' }}>
-                              ~₦{Math.round(tt.price / capacity).toLocaleString()}/person
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-
-            {/* Quantity Stepper */}
-            {selectedType && !isSoldOut && (
-              <div style={{ marginBottom: '20px', padding: '14px', backgroundColor: '#F8F9FA', borderRadius: '10px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <div>
-                    <span style={{ fontSize: '14px', fontWeight: 700, color: '#1F1F1F' }}>
-                      {selectedType.format === 'RESERVED_TABLE' ? 'Number of Tables' : selectedType.format === 'GROUP_BUNDLE' ? 'Number of Bundles' : 'Ticket Quantity'}
-                    </span>
-                    {capacityPerUnit > 1 && (
-                      <div style={{ fontSize: 12, color: '#4F46E5', fontWeight: 600 }}>
-                        Admits {totalAttendeesAdmitted} attendees total
-                      </div>
-                    )}
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                    <button
-                      onClick={() => setQuantity((q) => Math.max(selectedType.minPerOrder || 1, q - 1))}
-                      disabled={quantity <= (selectedType.minPerOrder || 1)}
-                      style={{
-                        width: '32px',
-                        height: '32px',
-                        borderRadius: '6px',
-                        border: '1px solid #D1D5DB',
-                        backgroundColor: '#FFFFFF',
-                        fontSize: '16px',
-                        fontWeight: 700,
-                        cursor: quantity <= (selectedType.minPerOrder || 1) ? 'not-allowed' : 'pointer',
-                        opacity: quantity <= (selectedType.minPerOrder || 1) ? 0.4 : 1,
-                      }}
-                    >
-                      -
-                    </button>
-                    <span style={{ fontSize: '16px', fontWeight: 800, minWidth: '24px', textAlign: 'center' }}>
-                      {quantity}
-                    </span>
-                    <button
-                      onClick={() => setQuantity((q) => Math.min(selectedType.maxPerCustomer || selectedType.availableQuantity || 10, q + 1))}
-                      disabled={quantity >= (selectedType.maxPerCustomer || selectedType.availableQuantity || 10)}
-                      style={{
-                        width: '32px',
-                        height: '32px',
-                        borderRadius: '6px',
-                        border: '1px solid #D1D5DB',
-                        backgroundColor: '#FFFFFF',
-                        fontSize: '16px',
-                        fontWeight: 700,
-                        cursor: 'pointer',
-                      }}
-                    >
-                      +
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Pricing Summary */}
-            {selectedType && (
-              <div style={{ marginBottom: '20px', borderTop: '1px solid #F0F0F0', paddingTop: '16px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', color: '#6B6B6B', marginBottom: '6px' }}>
-                  <span>{selectedType.name} (₦{unitPrice.toLocaleString()} × {quantity})</span>
-                  <span>₦{subtotal.toLocaleString()}</span>
-                </div>
-
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '16px', fontWeight: 800, color: '#1F1F1F', borderTop: '1px solid #E5E5E5', paddingTop: '10px', marginTop: '10px' }}>
-                  <span>Total Due</span>
-                  <span style={{ color: '#026CDF' }}>
-                    {totalAmount === 0 ? 'FREE' : `₦${totalAmount.toLocaleString()}`}
+            {isFreeEvent ? (
+              /* FREE EVENT REGISTRATION PANEL */
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+                  <h2 style={{ fontSize: '18px', fontWeight: 800, color: '#1F1F1F', margin: 0 }}>
+                    Free Registration
+                  </h2>
+                  <span style={{ backgroundColor: '#ECFDF5', color: '#059669', border: '1px solid #A7F3D0', fontSize: '12px', fontWeight: 800, padding: '3px 8px', borderRadius: '4px' }}>
+                    FREE
                   </span>
                 </div>
-              </div>
-            )}
 
-            {/* Primary Action Button */}
-            <button
-              className="btn-primary"
-              style={{ width: '100%', padding: '14px', borderRadius: '10px', fontSize: '15px' }}
-              disabled={isSoldOut || !selectedType}
-              onClick={handleOpenCheckout}
-            >
-              {isSoldOut ? 'SOLD OUT' : totalAmount === 0 ? 'CLAIM FREE TICKET' : `GET TICKETS • ₦${totalAmount.toLocaleString()}`}
-            </button>
+                <div style={{ padding: '16px', borderRadius: '12px', backgroundColor: '#F0FDF4', border: '1px solid #A7F3D0', marginBottom: '20px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
+                    <h3 style={{ margin: 0, fontSize: '16px', fontWeight: 800, color: '#065F46' }}>
+                      {event.freePassName || 'Free Event Pass'}
+                    </h3>
+                    <span style={{ fontSize: '16px', fontWeight: 800, color: '#059669' }}>₦0</span>
+                  </div>
+                  <p style={{ margin: '0 0 10px 0', fontSize: '12.5px', color: '#047857', lineHeight: 1.5 }}>
+                    Zero ticket fees. Register to instantly receive your digital admission pass with an authentic Tickza QR code.
+                  </p>
+
+                  {event.registrationCapacity && (
+                    <div style={{ paddingTop: '8px', borderTop: '1px dashed #A7F3D0', display: 'flex', justifyContent: 'space-between', fontSize: '12px', color: '#065F46', fontWeight: 600 }}>
+                      <span>Availability:</span>
+                      <span>
+                        {Math.max(0, event.registrationCapacity - (event.registeredCount || 0))} of {event.registrationCapacity} spots left
+                      </span>
+                    </div>
+                  )}
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '24px', fontSize: '13px', color: '#4B4B4B' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <CheckCircle2 size={16} color="#059669" /> Free digital QR admission pass issued instantly
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <CheckCircle2 size={16} color="#059669" /> Real-time QR check-in & verification at venue
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <CheckCircle2 size={16} color="#059669" /> Stored safely in your Tickza tickets wallet
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <CheckCircle2 size={16} color="#059669" /> No credit card, bank details, or checkout fees
+                  </div>
+                </div>
+
+                {isFreeEventCapacityFull ? (
+                  <button
+                    disabled
+                    className="btn-secondary"
+                    style={{ width: '100%', padding: '14px', borderRadius: '10px', fontSize: '15px', opacity: 0.6, cursor: 'not-allowed' }}
+                  >
+                    REGISTRATION FULL
+                  </button>
+                ) : (
+                  <button
+                    className="btn-primary"
+                    style={{ width: '100%', padding: '14px', borderRadius: '10px', fontSize: '15px', backgroundColor: '#059669', borderColor: '#059669' }}
+                    onClick={handleOpenFreeRegistration}
+                  >
+                    REGISTER FOR FREE • ₦0
+                  </button>
+                )}
+              </div>
+            ) : (
+              /* PAID TICKET OPTIONS */
+              <>
+                <h2 style={{ fontSize: '18px', fontWeight: 800, color: '#1F1F1F', margin: '0 0 16px 0' }}>
+                  Select Ticket Options
+                </h2>
+
+                {/* Ticket Tier Cards List */}
+                {ticketTypes.length === 0 ? (
+                  <p style={{ color: '#6B6B6B', fontSize: '14px' }}>No tickets currently available for this event.</p>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '20px' }}>
+                    {ticketTypes.map((tt) => {
+                      const ttId = tt._id || tt.id;
+                      const isSelected = selectedType && (selectedType._id || selectedType.id) === ttId;
+                      const available = tt.availableQuantity !== undefined ? tt.availableQuantity : tt.quantity;
+                      const isTierSoldOut = available <= 0;
+                      const format = tt.format || 'INDIVIDUAL';
+                      const capacity = tt.admittedPerTicket || 1;
+
+                      return (
+                        <div
+                          key={ttId}
+                          onClick={() => !isTierSoldOut && setSelectedType(tt)}
+                          style={{
+                            padding: '14px 16px',
+                            borderRadius: '12px',
+                            border: isSelected ? '2px solid #026CDF' : '1px solid #E5E5E5',
+                            backgroundColor: isSelected ? '#EBF3FD' : isTierSoldOut ? '#F9FAFB' : '#FFFFFF',
+                            cursor: isTierSoldOut ? 'not-allowed' : 'pointer',
+                            opacity: isTierSoldOut ? 0.6 : 1,
+                            transition: 'all 0.15s ease',
+                          }}
+                        >
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                            <div style={{ flex: 1, paddingRight: 10 }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                                <p style={{ fontSize: '15px', fontWeight: 700, color: '#1F1F1F', margin: 0 }}>
+                                  {tt.name}
+                                </p>
+                                {format === 'RESERVED_TABLE' && (
+                                  <span style={{ fontSize: 10, background: '#FEF3C7', color: '#92400E', padding: '2px 6px', borderRadius: 4, fontWeight: 700 }}>
+                                    TABLE
+                                  </span>
+                                )}
+                                {format === 'GROUP_BUNDLE' && (
+                                  <span style={{ fontSize: 10, background: '#E0E7FF', color: '#3730A3', padding: '2px 6px', borderRadius: 4, fontWeight: 700 }}>
+                                    GROUP
+                                  </span>
+                                )}
+                                {isSelected && <CheckCircle2 size={16} color="#026CDF" />}
+                              </div>
+
+                              <p style={{ fontSize: '12px', color: '#6B6B6B', margin: '3px 0 0 0' }}>
+                                {format === 'RESERVED_TABLE'
+                                  ? `Reserved Table • Admits ${capacity} Guests`
+                                  : format === 'GROUP_BUNDLE'
+                                  ? `Group Pass • Admits ${capacity} Persons`
+                                  : 'Individual Entry'}
+                                {tt.section ? ` • Section ${tt.section}` : ''}
+                              </p>
+
+                              {tt.description && (
+                                <p style={{ fontSize: '12px', color: '#4B5563', margin: '4px 0 0 0' }}>
+                                  {tt.description}
+                                </p>
+                              )}
+
+                              {Array.isArray(tt.benefits) && tt.benefits.length > 0 && (
+                                <div style={{ marginTop: 6, display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+                                  {tt.benefits.map((b, i) => (
+                                    <span key={i} style={{ fontSize: 10.5, background: '#ECFDF5', color: '#047857', padding: '1px 6px', borderRadius: 4, fontWeight: 600 }}>
+                                      ✓ {b}
+                                    </span>
+                                  ))}
+                                </div>
+                              )}
+
+                              <p style={{ fontSize: '11px', color: available < 20 ? '#DC2626' : '#059669', margin: '6px 0 0 0', fontWeight: 600 }}>
+                                {isTierSoldOut ? 'Sold Out' : `${available} ${format === 'RESERVED_TABLE' ? 'tables' : format === 'GROUP_BUNDLE' ? 'bundles' : 'tickets'} remaining`}
+                              </p>
+                            </div>
+
+                            <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                              <span style={{ fontSize: '18px', fontWeight: 800, color: '#026CDF' }}>
+                                {tt.price === 0 ? 'FREE' : `₦${tt.price.toLocaleString()}`}
+                              </span>
+                              {capacity > 1 && tt.price > 0 && (
+                                <div style={{ fontSize: 11, color: '#6B7280' }}>
+                                  ~₦{Math.round(tt.price / capacity).toLocaleString()}/person
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+
+                {/* Quantity Stepper */}
+                {selectedType && !isSoldOut && (
+                  <div style={{ marginBottom: '20px', padding: '14px', backgroundColor: '#F8F9FA', borderRadius: '10px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <div>
+                        <span style={{ fontSize: '14px', fontWeight: 700, color: '#1F1F1F' }}>
+                          {selectedType.format === 'RESERVED_TABLE' ? 'Number of Tables' : selectedType.format === 'GROUP_BUNDLE' ? 'Number of Bundles' : 'Ticket Quantity'}
+                        </span>
+                        {capacityPerUnit > 1 && (
+                          <div style={{ fontSize: 12, color: '#4F46E5', fontWeight: 600 }}>
+                            Admits {totalAttendeesAdmitted} attendees total
+                          </div>
+                        )}
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        <button
+                          onClick={() => setQuantity((q) => Math.max(selectedType.minPerOrder || 1, q - 1))}
+                          disabled={quantity <= (selectedType.minPerOrder || 1)}
+                          style={{
+                            width: '32px',
+                            height: '32px',
+                            borderRadius: '6px',
+                            border: '1px solid #D1D5DB',
+                            backgroundColor: '#FFFFFF',
+                            fontSize: '16px',
+                            fontWeight: 700,
+                            cursor: quantity <= (selectedType.minPerOrder || 1) ? 'not-allowed' : 'pointer',
+                            opacity: quantity <= (selectedType.minPerOrder || 1) ? 0.4 : 1,
+                          }}
+                        >
+                          -
+                        </button>
+                        <span style={{ fontSize: '16px', fontWeight: 800, minWidth: '24px', textAlign: 'center' }}>
+                          {quantity}
+                        </span>
+                        <button
+                          onClick={() => setQuantity((q) => Math.min(selectedType.maxPerCustomer || selectedType.availableQuantity || 10, q + 1))}
+                          disabled={quantity >= (selectedType.maxPerCustomer || selectedType.availableQuantity || 10)}
+                          style={{
+                            width: '32px',
+                            height: '32px',
+                            borderRadius: '6px',
+                            border: '1px solid #D1D5DB',
+                            backgroundColor: '#FFFFFF',
+                            fontSize: '16px',
+                            fontWeight: 700,
+                            cursor: 'pointer',
+                          }}
+                        >
+                          +
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Pricing Summary */}
+                {selectedType && (
+                  <div style={{ marginBottom: '20px', borderTop: '1px solid #F0F0F0', paddingTop: '16px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', color: '#6B6B6B', marginBottom: '6px' }}>
+                      <span>{selectedType.name} (₦{unitPrice.toLocaleString()} × {quantity})</span>
+                      <span>₦{subtotal.toLocaleString()}</span>
+                    </div>
+
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '16px', fontWeight: 800, color: '#1F1F1F', borderTop: '1px solid #E5E5E5', paddingTop: '10px', marginTop: '10px' }}>
+                      <span>Total Due</span>
+                      <span style={{ color: '#026CDF' }}>
+                        {totalAmount === 0 ? 'FREE' : `₦${totalAmount.toLocaleString()}`}
+                      </span>
+                    </div>
+                  </div>
+                )}
+
+                {/* Primary Action Button */}
+                <button
+                  className="btn-primary"
+                  style={{ width: '100%', padding: '14px', borderRadius: '10px', fontSize: '15px' }}
+                  disabled={isSoldOut || !selectedType}
+                  onClick={handleOpenCheckout}
+                >
+                  {isSoldOut ? 'SOLD OUT' : totalAmount === 0 ? 'CLAIM FREE TICKET' : `GET TICKETS • ₦${totalAmount.toLocaleString()}`}
+                </button>
+              </>
+            )}
           </div>
         </div>
       </div>
@@ -863,12 +1030,233 @@ export default function EventDetailPage() {
                     style={{ width: '100%', padding: '14px', borderRadius: '10px', fontSize: '15px' }}
                   >
                     {purchasing ? (
-                      <TicketmasterSpinner size="sm" color="#FFFFFF" message="Processing order..." />
+                      <TickzaSpinner size="sm" color="#FFFFFF" message="Processing order..." />
                     ) : (
                       `Place Order • ${totalAmount === 0 ? 'FREE' : `₦${totalAmount.toLocaleString()}`}`
                     )}
                   </button>
                 </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ===== FREE EVENT REGISTRATION MODAL ===== */}
+      {showFreeRegModal && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            backgroundColor: 'rgba(0,0,0,0.7)',
+            backdropFilter: 'blur(5px)',
+            zIndex: 3000,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '16px',
+          }}
+          onClick={() => !registeringFree && setShowFreeRegModal(false)}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              backgroundColor: '#FFFFFF',
+              borderRadius: '20px',
+              maxWidth: '480px',
+              width: '100%',
+              overflow: 'hidden',
+              boxShadow: '0 20px 50px rgba(0,0,0,0.25)',
+            }}
+          >
+            {freeRegistrationComplete ? (
+              /* Free Pass Confirmation Screen */
+              <div style={{ padding: '36px 24px', textAlign: 'center' }}>
+                <div
+                  style={{
+                    width: '64px',
+                    height: '64px',
+                    borderRadius: '50%',
+                    backgroundColor: '#ECFDF5',
+                    color: '#059669',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    margin: '0 auto 16px',
+                  }}
+                >
+                  <CheckCircle2 size={38} />
+                </div>
+
+                <h3 style={{ fontSize: '22px', fontWeight: 800, color: '#1F1F1F', margin: '0 0 6px 0' }}>
+                  Pass Confirmed! 🎉
+                </h3>
+                <p style={{ fontSize: '14px', color: '#6B6B6B', margin: '0 0 20px 0' }}>
+                  Your free admission pass for <strong>{event.title}</strong> has been secured.
+                </p>
+
+                {/* Digital Pass Preview Card */}
+                <div style={{ backgroundColor: '#F0FDF4', borderRadius: '12px', padding: '16px', textAlign: 'center', marginBottom: '20px', border: '1px solid #A7F3D0' }}>
+                  <span style={{ fontSize: '11px', fontWeight: 800, color: '#047857', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                    {event.freePassName || 'Free Event Pass'}
+                  </span>
+                  <p style={{ margin: '4px 0 2px', fontSize: '15px', fontWeight: 800, color: '#065F46' }}>
+                    {attendeeForm.firstName} {attendeeForm.lastName}
+                  </p>
+                  <p style={{ margin: '0 0 12px', fontSize: '12px', color: '#047857', fontFamily: 'monospace' }}>
+                    Ref: {freeRegistrationComplete.pass?.registrationRef || freeRegistrationComplete.ticket?.registrationRef || freeRegistrationComplete.ticket?.ticketNumber || 'TICKZA-FREE'}
+                  </p>
+
+                  {freeRegistrationComplete.pass?.qrCodeDataUrl ? (
+                    <img
+                      src={freeRegistrationComplete.pass.qrCodeDataUrl}
+                      alt="Tickza Verified QR Code"
+                      style={{
+                        width: '160px',
+                        height: '160px',
+                        margin: '0 auto',
+                        display: 'block',
+                        borderRadius: '8px',
+                        backgroundColor: '#FFFFFF',
+                        padding: '8px',
+                        boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+                      }}
+                    />
+                  ) : (
+                    <div style={{ padding: '20px', backgroundColor: '#FFFFFF', borderRadius: '8px', color: '#059669', fontWeight: 600, fontSize: '13px' }}>
+                      QR Pass generated & stored in your wallet
+                    </div>
+                  )}
+
+                  <p style={{ margin: '12px 0 0', fontSize: '11px', color: '#065F46' }}>
+                    🔒 Scan at venue turnstile for admission verification.
+                  </p>
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                  <button
+                    className="btn-primary"
+                    style={{ padding: '14px', borderRadius: '10px', fontSize: '15px', backgroundColor: '#059669', borderColor: '#059669' }}
+                    onClick={() => navigate('/tickets')}
+                  >
+                    View in My Tickets <ArrowRight size={16} />
+                  </button>
+                  <button
+                    className="btn-secondary"
+                    style={{ padding: '12px', borderRadius: '10px' }}
+                    onClick={() => {
+                      setShowFreeRegModal(false);
+                      setFreeRegistrationComplete(null);
+                    }}
+                  >
+                    Done
+                  </button>
+                </div>
+              </div>
+            ) : (
+              /* Free Registration Form */
+              <div>
+                <div style={{ padding: '20px 24px', borderBottom: '1px solid #E5E5E5', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div>
+                    <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 800 }}>Free Event Registration</h3>
+                    <p style={{ margin: '2px 0 0', fontSize: '12px', color: '#6B6B6B' }}>Reserve your complimentary admission pass</p>
+                  </div>
+                  <button
+                    onClick={() => setShowFreeRegModal(false)}
+                    style={{ background: 'none', border: 'none', fontSize: '20px', cursor: 'pointer', color: '#6B6B6B' }}
+                  >
+                    ×
+                  </button>
+                </div>
+
+                <form onSubmit={handleConfirmFreeRegistration} style={{ padding: '20px 24px' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '14px' }}>
+                    <div>
+                      <label className="input-label">First Name *</label>
+                      <input
+                        type="text"
+                        required
+                        className="input"
+                        value={attendeeForm.firstName}
+                        onChange={(e) => setAttendeeForm({ ...attendeeForm, firstName: e.target.value })}
+                        placeholder="John"
+                      />
+                    </div>
+                    <div>
+                      <label className="input-label">Last Name *</label>
+                      <input
+                        type="text"
+                        required
+                        className="input"
+                        value={attendeeForm.lastName}
+                        onChange={(e) => setAttendeeForm({ ...attendeeForm, lastName: e.target.value })}
+                        placeholder="Doe"
+                      />
+                    </div>
+                  </div>
+
+                  <div style={{ marginBottom: '14px' }}>
+                    <label className="input-label">Email Address *</label>
+                    <input
+                      type="email"
+                      required
+                      className="input"
+                      value={attendeeForm.email}
+                      onChange={(e) => setAttendeeForm({ ...attendeeForm, email: e.target.value })}
+                      placeholder="john@example.com"
+                    />
+                  </div>
+
+                  <div style={{ marginBottom: '14px' }}>
+                    <label className="input-label">Phone Number (Optional)</label>
+                    <input
+                      type="tel"
+                      className="input"
+                      value={attendeeForm.phone}
+                      onChange={(e) => setAttendeeForm({ ...attendeeForm, phone: e.target.value })}
+                      placeholder="+234 800 000 0000"
+                    />
+                  </div>
+
+                  <div style={{ marginBottom: '18px' }}>
+                    <label className="input-label">Special Requests / Dietary Notes (Optional)</label>
+                    <input
+                      type="text"
+                      className="input"
+                      value={attendeeForm.notes}
+                      onChange={(e) => setAttendeeForm({ ...attendeeForm, notes: e.target.value })}
+                      placeholder="Wheelchair access, dietary preferences, etc."
+                    />
+                  </div>
+
+                  {/* Summary Box */}
+                  <div style={{ padding: '14px', backgroundColor: '#F0FDF4', borderRadius: '10px', marginBottom: '20px', border: '1px solid #A7F3D0' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', color: '#065F46', marginBottom: 4 }}>
+                      <span>Admission Type</span>
+                      <strong style={{ color: '#059669' }}>FREE PASS</strong>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '16px', fontWeight: 800, borderTop: '1px solid #D1FAE5', paddingTop: 8, marginTop: 4 }}>
+                      <span style={{ color: '#065F46' }}>Total Amount</span>
+                      <span style={{ color: '#059669' }}>₦0.00</span>
+                    </div>
+                    <p style={{ margin: '6px 0 0', fontSize: '11px', color: '#047857' }}>
+                      No payment required. Your authenticated digital QR pass will be issued immediately upon confirmation.
+                    </p>
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={registeringFree}
+                    className="btn-primary"
+                    style={{ width: '100%', padding: '14px', borderRadius: '10px', fontSize: '15px', backgroundColor: '#059669', borderColor: '#059669' }}
+                  >
+                    {registeringFree ? (
+                      <TickzaSpinner size="sm" color="#FFFFFF" message="Generating QR pass..." />
+                    ) : (
+                      'Confirm Free Registration • ₦0'
+                    )}
+                  </button>
+                </form>
               </div>
             )}
           </div>

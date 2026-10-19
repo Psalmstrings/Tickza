@@ -47,6 +47,11 @@ export default function OrganizerEditEventPage() {
     countdownEnabled: true,
     multiDay: false,
     coverImageUrl: '',
+    admissionType: 'PAID',
+    registrationCapacity: 500,
+    freePassName: 'Free Event Pass',
+    registrationStartDate: '',
+    registrationEndDate: '',
   });
 
   const [originalEvent, setOriginalEvent] = useState(null);
@@ -76,6 +81,11 @@ export default function OrganizerEditEventPage() {
           countdownEnabled: ev.countdownEnabled !== false,
           multiDay: Boolean(ev.multiDay),
           coverImageUrl: ev.coverImage?.url || ev.coverImageUrl || '',
+          admissionType: ev.admissionType || 'PAID',
+          registrationCapacity: ev.registrationCapacity || 500,
+          freePassName: ev.freePassName || 'Free Event Pass',
+          registrationStartDate: ev.registrationStartDate ? new Date(ev.registrationStartDate).toISOString().slice(0, 16) : '',
+          registrationEndDate: ev.registrationEndDate ? new Date(ev.registrationEndDate).toISOString().slice(0, 16) : '',
         });
       })
       .catch((err) => {
@@ -143,6 +153,11 @@ export default function OrganizerEditEventPage() {
         countdownEnabled: form.countdownEnabled,
         multiDay: form.multiDay,
         coverImageUrl: form.coverImageUrl,
+        admissionType: form.admissionType,
+        registrationCapacity: Number(form.registrationCapacity) || 0,
+        freePassName: form.freePassName ? form.freePassName.trim() : 'Free Event Pass',
+        registrationStartDate: form.registrationStartDate || null,
+        registrationEndDate: form.registrationEndDate || null,
       };
 
       const { data } = await api.put(`/organizer/events/${id}`, payload);
@@ -289,6 +304,89 @@ export default function OrganizerEditEventPage() {
                   placeholder="Provide complete details about event program, schedule, VIP access, and rules."
                 />
               </div>
+            </div>
+
+            {/* Admission Type & Registration Settings */}
+            <div className="org-card" style={{ padding: 22 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+                <div>
+                  <h3 style={{ fontSize: 15, fontWeight: 700, margin: 0, color: '#0B1026' }}>
+                    Admission Type & Registration
+                  </h3>
+                  <p style={{ margin: '2px 0 0', fontSize: 12, color: '#6B6B6B' }}>
+                    Choose between paid ticket sales and complimentary free registration.
+                  </p>
+                </div>
+                {form.admissionType === 'FREE' && (
+                  <span style={{ backgroundColor: '#059669', color: '#FFFFFF', fontSize: '11px', fontWeight: 800, padding: '3px 8px', borderRadius: '4px' }}>
+                    FREE EVENT
+                  </span>
+                )}
+              </div>
+
+              <div className="org-grid-2" style={{ marginBottom: form.admissionType === 'FREE' ? 16 : 0 }}>
+                <div className="org-form-group">
+                  <label className="org-label">Admission Model</label>
+                  <select
+                    className="org-select"
+                    value={form.admissionType}
+                    onChange={(e) => setForm({ ...form, admissionType: e.target.value })}
+                  >
+                    <option value="PAID">💳 Paid Event (Ticket Pricing Tiers)</option>
+                    <option value="FREE">🎉 Free Event (RSVP & QR Passes)</option>
+                  </select>
+                </div>
+
+                {form.admissionType === 'FREE' && (
+                  <div className="org-form-group">
+                    <label className="org-label">Free Pass Title</label>
+                    <input
+                      className="org-input"
+                      value={form.freePassName}
+                      onChange={(e) => setForm({ ...form, freePassName: e.target.value })}
+                      placeholder="e.g. Free Event Pass"
+                    />
+                  </div>
+                )}
+              </div>
+
+              {form.admissionType === 'FREE' && (
+                <div style={{ backgroundColor: '#F0FDF4', border: '1px solid #A7F3D0', borderRadius: 8, padding: 14 }}>
+                  <div className="org-grid-3">
+                    <div className="org-form-group">
+                      <label className="org-label">Capacity Limit</label>
+                      <input
+                        type="number"
+                        min="1"
+                        className="org-input"
+                        value={form.registrationCapacity}
+                        onChange={(e) => setForm({ ...form, registrationCapacity: e.target.value })}
+                      />
+                    </div>
+                    <div className="org-form-group">
+                      <label className="org-label">Registration Opens</label>
+                      <input
+                        type="datetime-local"
+                        className="org-input"
+                        value={form.registrationStartDate}
+                        onChange={(e) => setForm({ ...form, registrationStartDate: e.target.value })}
+                      />
+                    </div>
+                    <div className="org-form-group">
+                      <label className="org-label">Registration Closes</label>
+                      <input
+                        type="datetime-local"
+                        className="org-input"
+                        value={form.registrationEndDate}
+                        onChange={(e) => setForm({ ...form, registrationEndDate: e.target.value })}
+                      />
+                    </div>
+                  </div>
+                  <p style={{ margin: '8px 0 0', fontSize: 12, color: '#047857' }}>
+                    Currently Registered: <strong>{originalEvent?.registeredCount || 0}</strong> / {form.registrationCapacity} attendees.
+                  </p>
+                </div>
+              )}
             </div>
 
             {/* Date & Schedule Card */}

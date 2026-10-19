@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { User, Mail, Phone, Lock, Eye, EyeOff, CheckCircle } from 'lucide-react';
 import api from '../../lib/axios.js';
-import TicketmasterLogo from '../../components/ui/TicketmasterLogo.jsx';
+import TickzaLogo from '../../components/ui/TickzaLogo.jsx';
 
 function Field({ label, icon, type = 'text', value, onChange, placeholder, children }) {
   return (
@@ -65,7 +65,7 @@ export default function RegisterPage() {
           </div>
           <h2 style={{ color: '#1F1F1F', fontSize: '24px', fontWeight: 800, margin: '0 0 10px' }}>Account Created!</h2>
           <p style={{ color: '#6B6B6B', fontSize: '14px', lineHeight: '1.6', margin: 0, maxWidth: '300px' }}>
-            Welcome to TickApp! Your account is pending admin approval. You can browse events right away.
+            Welcome to Tickza! Your account is pending admin approval. You can browse events right away.
           </p>
         </div>
       </div>
@@ -80,10 +80,10 @@ export default function RegisterPage() {
         {/* Blue brand header */}
         <div style={{ background: '#026CDF', padding: '28px 32px 24px', textAlign: 'center' }}>
           <div>
-            <TicketmasterLogo height={36} color="#ffffff" />
+            <TickzaLogo height={36} color="#ffffff" />
           </div>
           <h1 style={{ color: '#FFFFFF', fontSize: '20px', fontWeight: 900, margin: '0 0 2px' }}>Create Account</h1>
-          <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: '13px', margin: 0 }}>Join TickApp and start exploring events</p>
+          <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: '13px', margin: 0 }}>Join Tickza and start exploring events</p>
         </div>
 
         <div style={{ padding: '28px 28px 32px', overflowY: 'auto' }}>

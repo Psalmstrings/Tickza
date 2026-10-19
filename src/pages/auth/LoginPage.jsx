@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Mail, Lock, Eye, EyeOff, X, CheckCircle } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext.jsx';
-import TicketmasterLogo from '../../components/ui/TicketmasterLogo.jsx';
+import TickzaLogo from '../../components/ui/TickzaLogo.jsx';
 import api from '../../lib/axios.js';
 
 export default function LoginPage() {
@@ -44,16 +44,15 @@ export default function LoginPage() {
         {/* Blue brand header */}
         <div style={{ background: '#026CDF', padding: '32px 32px 28px', textAlign: 'center' }}>
           <div>
-            <TicketmasterLogo height={36} color="#ffffff" />
+            <TickzaLogo height={36} color="#ffffff" />
           </div>
-          {/* <h1 style={{ color: '#FFFFFF', fontSize: '24px', fontWeight: 900, margin: '0 0 4px', letterSpacing: '-0.3px' }}>TickApp</h1> */}
           <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: '13px', margin: 0 }}>Your events, your tickets</p>
         </div>
 
         {/* Form body */}
         <div style={{ padding: '32px' }}>
           <h2 style={{ color: '#1F1F1F', fontSize: '20px', fontWeight: 700, margin: '0 0 4px' }}>Welcome back</h2>
-          <p style={{ color: '#6B6B6B', fontSize: '14px', margin: '0 0 24px' }}>Sign in to continue to TickApp</p>
+          <p style={{ color: '#6B6B6B', fontSize: '14px', margin: '0 0 24px' }}>Sign in to continue to Tickza</p>
 
           {error && (
             <div style={{ background: '#FEF2F2', border: '1px solid #FECACA', borderRadius: '8px', padding: '12px 14px', marginBottom: '18px', color: '#DC2626', fontSize: '13px' }}>

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import AppLayout from '../../components/layout/AppLayout.jsx';
-import TicketmasterSpinner from '../../components/ui/TicketmasterSpinner.jsx';
+import TickzaSpinner from '../../components/ui/TickzaSpinner.jsx';
 import StatusBadge from '../../components/ui/StatusBadge.jsx';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { useToast } from '../../components/ui/Toast.jsx';
@@ -111,7 +111,7 @@ export default function TicketDetailPage() {
     return (
       <AppLayout>
         <div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <TicketmasterSpinner size="lg" message="Loading ticket details..." />
+          <TickzaSpinner size="lg" message="Loading ticket details..." />
         </div>
       </AppLayout>
     );
@@ -199,7 +199,7 @@ export default function TicketDetailPage() {
                   borderRadius: '4px',
                 }}
               >
-                Ticketmaster Verified
+                Tickza Verified
               </span>
               <StatusBadge status={ticket.status} />
             </div>

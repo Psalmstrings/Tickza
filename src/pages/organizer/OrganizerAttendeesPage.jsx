@@ -15,6 +15,9 @@ export default function OrganizerAttendeesPage() {
 
   const [search, setSearch] = useState('');
   const [checkedInFilter, setCheckedInFilter] = useState('');
+  const [admissionFilter, setAdmissionFilter] = useState('');
+  const [eventFilter, setEventFilter] = useState('');
+  const [stats, setStats] = useState(null);
   const [selectedAttendee, setSelectedAttendee] = useState(null);
 
   // Complimentary modal state
@@ -32,23 +35,26 @@ export default function OrganizerAttendeesPage() {
       const params = new URLSearchParams({ page: p, limit: 50 });
       if (search) params.append('search', search);
       if (checkedInFilter) params.append('checkedIn', checkedInFilter);
+      if (admissionFilter) params.append('admissionType', admissionFilter);
+      if (eventFilter) params.append('eventId', eventFilter);
 
       const { data } = await api.get(`/organizer/attendees?${params}`);
       setAttendees(data.data || []);
       setTotal(data.total || 0);
       setPages(data.pages || 1);
+      if (data.stats) setStats(data.stats);
     } catch {
       setAttendees([]);
     } finally {
       setLoading(false);
     }
-  }, [search, checkedInFilter]);
+  }, [search, checkedInFilter, admissionFilter, eventFilter]);
 
   useEffect(() => {
     fetchAttendees(page);
   }, [fetchAttendees, page]);
 
-  // Load events for complimentary ticket issuance
+  // Load events for complimentary ticket issuance and event filter
   useEffect(() => {
     api.get('/organizer/events')
       .then(({ data }) => {
@@ -77,15 +83,17 @@ export default function OrganizerAttendeesPage() {
   // Export Attendees to CSV
   const handleExportCSV = () => {
     if (attendees.length === 0) return;
-    const headers = ['Ticket Number', 'First Name', 'Last Name', 'Email', 'Phone', 'Event', 'Tier', 'Price', 'Checked In', 'Check In Time'];
+    const headers = ['Ticket Number', 'Registration Ref', 'Admission Type', 'First Name', 'Last Name', 'Email', 'Phone', 'Event', 'Tier', 'Price', 'Checked In', 'Check In Time'];
     const rows = attendees.map(t => [
       t.ticketNumber || '',
+      t.registrationRef || '',
+      t.admissionType || (t.price === 0 ? 'FREE' : 'PAID'),
       t.ownerId?.firstName || '',
       t.ownerId?.lastName || '',
       t.ownerId?.email || '',
       t.ownerId?.phone || '',
       t.eventId?.title || '',
-      t.ticketTypeId?.name || '',
+      t.ticketTypeId?.name || (t.admissionType === 'FREE' ? 'Free Pass' : 'Standard'),
       t.price || 0,
       t.checkedInAt ? 'YES' : 'NO',
       t.checkedInAt ? new Date(t.checkedInAt).toLocaleString() : ''
@@ -158,22 +166,105 @@ export default function OrganizerAttendeesPage() {
         </div>
       </div>
 
+      {/* Summary Statistics Cards */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 14, marginBottom: 20 }}>
+        <div className="org-card" style={{ padding: '16px 20px' }}>
+          <div style={{ fontSize: 11, fontWeight: 700, color: '#64748B', textTransform: 'uppercase' }}>Total Registered</div>
+          <div style={{ fontSize: 24, fontWeight: 800, color: '#0F172A', marginTop: 4 }}>
+            {stats?.totalRegistrations ?? total}
+          </div>
+          <div style={{ fontSize: 11, color: '#64748B', marginTop: 2 }}>
+            Across matching attendees
+          </div>
+        </div>
+
+        <div className="org-card" style={{ padding: '16px 20px' }}>
+          <div style={{ fontSize: 11, fontWeight: 700, color: '#059669', textTransform: 'uppercase' }}>Checked In</div>
+          <div style={{ fontSize: 24, fontWeight: 800, color: '#059669', marginTop: 4 }}>
+            {stats?.checkedIn ?? attendees.filter(a => a.checkedInAt).length}
+          </div>
+          <div style={{ fontSize: 11, color: '#047857', marginTop: 2 }}>
+            Verified at entrance
+          </div>
+        </div>
+
+        <div className="org-card" style={{ padding: '16px 20px' }}>
+          <div style={{ fontSize: 11, fontWeight: 700, color: '#D97706', textTransform: 'uppercase' }}>Not Yet Arrived</div>
+          <div style={{ fontSize: 24, fontWeight: 800, color: '#D97706', marginTop: 4 }}>
+            {stats?.notCheckedIn ?? Math.max(0, total - (stats?.checkedIn || attendees.filter(a => a.checkedInAt).length))}
+          </div>
+          <div style={{ fontSize: 11, color: '#B45309', marginTop: 2 }}>
+            Awaiting arrival
+          </div>
+        </div>
+
+        <div className="org-card" style={{ padding: '16px 20px' }}>
+          <div style={{ fontSize: 11, fontWeight: 700, color: '#026CDF', textTransform: 'uppercase' }}>Attendance Rate</div>
+          <div style={{ fontSize: 24, fontWeight: 800, color: '#026CDF', marginTop: 4 }}>
+            {stats?.attendancePercentage !== undefined ? `${stats.attendancePercentage}%` : '0%'}
+          </div>
+          <div style={{ fontSize: 11, color: '#0369A1', marginTop: 2 }}>
+            Admitted percentage
+          </div>
+        </div>
+
+        <div className="org-card" style={{ padding: '16px 20px' }}>
+          <div style={{ fontSize: 11, fontWeight: 700, color: '#7C3AED', textTransform: 'uppercase' }}>Admission Breakdown</div>
+          <div style={{ fontSize: 15, fontWeight: 800, color: '#4C1D95', marginTop: 6, display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+            <span>🎉 {stats?.freeRegistrations ?? attendees.filter(a => a.admissionType === 'FREE' || a.price === 0).length} Free</span>
+            <span>•</span>
+            <span>💳 {stats?.paidTicketsSold ?? attendees.filter(a => a.admissionType !== 'FREE' && a.price > 0).length} Paid</span>
+          </div>
+          <div style={{ fontSize: 11, color: '#6D28D9', marginTop: 2 }}>
+            Passes vs Paid Tickets
+          </div>
+        </div>
+      </div>
+
       {/* Filter Row */}
       <div style={{ display: 'flex', gap: 12, marginBottom: 20, flexWrap: 'wrap', alignItems: 'center' }}>
-        <div style={{ position: 'relative', flex: 1, minWidth: 240 }}>
+        <div style={{ position: 'relative', flex: 1, minWidth: 220 }}>
           <Search size={14} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: '#94A3B8' }} />
           <input
             className="org-input"
             style={{ paddingLeft: 34 }}
-            placeholder="Search by name, email, or ticket #..."
+            placeholder="Search by name, email, or pass/ticket #..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
 
+        {/* Event Filter */}
         <select
           className="org-select"
           style={{ width: 180 }}
+          value={eventFilter}
+          onChange={(e) => setEventFilter(e.target.value)}
+        >
+          <option value="">All Events</option>
+          {events.map((ev) => (
+            <option key={ev._id} value={ev._id}>
+              {ev.title}
+            </option>
+          ))}
+        </select>
+
+        {/* Admission Type Filter */}
+        <select
+          className="org-select"
+          style={{ width: 170 }}
+          value={admissionFilter}
+          onChange={(e) => setAdmissionFilter(e.target.value)}
+        >
+          <option value="">All Admission Types</option>
+          <option value="FREE">🎉 Free Passes (RSVP)</option>
+          <option value="PAID">💳 Paid Tickets</option>
+        </select>
+
+        {/* Check-in Filter */}
+        <select
+          className="org-select"
+          style={{ width: 160 }}
           value={checkedInFilter}
           onChange={(e) => setCheckedInFilter(e.target.value)}
         >
@@ -196,19 +287,19 @@ export default function OrganizerAttendeesPage() {
             <div className="org-empty-icon"><Users size={22} /></div>
             <div className="org-empty-title">No attendees found</div>
             <div className="org-empty-subtitle">
-              {search ? 'Try adjusting your search query.' : 'When guests purchase or receive tickets, they appear here.'}
+              {search || admissionFilter || eventFilter ? 'Try adjusting your search or filters.' : 'When guests register or purchase tickets, they appear here.'}
             </div>
           </div>
         ) : (
-          <div className="org-table-wrap">
+          <div className="org-table-wrap responsive-table-container">
             <table className="org-table">
               <thead>
                 <tr>
                   <th>Attendee</th>
                   <th>Contact</th>
                   <th>Event</th>
-                  <th>Tier & Ticket ID</th>
-                  <th>Amount</th>
+                  <th>Tier & Reference</th>
+                  <th>Admission / Fee</th>
                   <th>Status</th>
                   <th>Check-In Time</th>
                   <th></th>
@@ -218,6 +309,7 @@ export default function OrganizerAttendeesPage() {
                 {attendees.map((t) => {
                   const name = t.ownerId ? `${t.ownerId.firstName} ${t.ownerId.lastName}` : 'Guest Attendee';
                   const isChecked = !!t.checkedInAt;
+                  const isFree = t.admissionType === 'FREE' || t.price === 0;
 
                   return (
                     <tr
@@ -238,15 +330,15 @@ export default function OrganizerAttendeesPage() {
                         </div>
                       </td>
                       <td>
-                        <span className="org-badge org-badge-purple" style={{ marginRight: 6 }}>
-                          {t.ticketTypeId?.name || 'Standard'}
+                        <span className={`org-badge ${isFree ? 'org-badge-success' : 'org-badge-purple'}`} style={{ marginRight: 6 }}>
+                          {isFree ? (t.ticketTypeId?.name || 'Free Pass') : (t.ticketTypeId?.name || 'Standard')}
                         </span>
                         <span style={{ fontFamily: 'monospace', fontSize: 11, color: '#64748B' }}>
-                          #{t.ticketNumber?.slice(-6) || 'TICK'}
+                          #{t.registrationRef || t.ticketNumber?.slice(-8) || 'PASS'}
                         </span>
                       </td>
-                      <td style={{ fontWeight: 600, color: '#0B1026' }}>
-                        {t.price === 0 ? 'COMP / FREE' : `₦${t.price.toLocaleString()}`}
+                      <td style={{ fontWeight: 600, color: isFree ? '#059669' : '#0B1026' }}>
+                        {isFree ? 'FREE PASS' : `₦${t.price.toLocaleString()}`}
                       </td>
                       <td>
                         {isChecked ? (

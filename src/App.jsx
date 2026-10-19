@@ -17,6 +17,7 @@ import CreateEventPage from './pages/events/CreateEventPage.jsx';
 import MyEventsPage from './pages/events/MyEventsPage.jsx';
 import MyTicketsPage from './pages/tickets/MyTicketsPage.jsx';
 import TicketDetailPage from './pages/tickets/TicketDetailPage.jsx';
+import PaymentCallbackPage from './pages/tickets/PaymentCallbackPage.jsx';
 import TransfersPage from './pages/transfers/TransfersPage.jsx';
 import ResalePage from './pages/resale/ResalePage.jsx';
 import ProfilePage from './pages/profile/ProfilePage.jsx';
@@ -28,6 +29,7 @@ import ForYouPage from './pages/forYou/ForYouPage.jsx';
 // Admin
 import AdminLayout from './pages/admin/AdminLayout.jsx';
 import AdminStatsPage from './pages/admin/AdminStatsPage.jsx';
+import AdminFinancialsPage from './pages/admin/AdminFinancialsPage.jsx';
 import AdminUsersPage from './pages/admin/AdminUsersPage.jsx';
 import AdminEventsPage from './pages/admin/AdminEventsPage.jsx';
 import AdminTicketsPage from './pages/admin/AdminTicketsPage.jsx';
@@ -85,6 +87,7 @@ export default function App() {
                 <Route path="/my-events" element={<Navigate to="/organizer/events" replace />} />
                 <Route path="/tickets" element={<ProtectedRoute><MyTicketsPage /></ProtectedRoute>} />
                 <Route path="/tickets/:id" element={<ProtectedRoute><TicketDetailPage /></ProtectedRoute>} />
+                <Route path="/tickets/verify-payment" element={<PaymentCallbackPage />} />
                 <Route path="/transfers" element={<ProtectedRoute><TransfersPage /></ProtectedRoute>} />
                 <Route path="/resale" element={<ProtectedRoute><ResalePage /></ProtectedRoute>} />
                 <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
@@ -114,6 +117,7 @@ export default function App() {
                 {/* Admin routes */}
                 <Route path="/admin" element={<ProtectedRoute requireAdmin><AdminLayout /></ProtectedRoute>}>
                   <Route index element={<AdminStatsPage />} />
+                  <Route path="financials" element={<AdminFinancialsPage />} />
                   <Route path="users" element={<AdminUsersPage />} />
                   <Route path="events" element={<AdminEventsPage />} />
                   <Route path="tickets" element={<AdminTicketsPage />} />

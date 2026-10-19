@@ -14,7 +14,7 @@ const STATUS_CONFIG = {
 };
 
 /**
- * Reusable Ticketmaster TicketCard Component
+ * Reusable Tickza TicketCard Component
  * Supports variants: 'digital' | 'purchased' | 'wallet' | 'transfer' | 'resale' | 'selection'
  */
 export default function TicketCard({
@@ -121,7 +121,7 @@ export default function TicketCard({
               backdropFilter: 'blur(4px)',
             }}
           >
-            Ticketmaster Verified
+            Tickza Verified
           </span>
 
           <span

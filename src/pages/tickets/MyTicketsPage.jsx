@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import AppLayout from '../../components/layout/AppLayout.jsx';
 import TicketCard from '../../components/tickets/TicketCard.jsx';
 import DigitalTicket from '../../components/tickets/DigitalTicket.jsx';
-import TicketmasterSpinner from '../../components/ui/TicketmasterSpinner.jsx';
+import TickzaSpinner from '../../components/ui/TickzaSpinner.jsx';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { useToast } from '../../components/ui/Toast.jsx';
 import api from '../../lib/axios.js';
@@ -149,7 +149,7 @@ export default function MyTicketsPage() {
       <div className="tm-container" style={{ padding: '32px 20px', maxWidth: '840px' }}>
         {loading ? (
           <div style={{ padding: '60px 0', textAlign: 'center' }}>
-            <TicketmasterSpinner size="md" message="Loading your ticket wallet..." />
+            <TickzaSpinner size="md" message="Loading your ticket wallet..." />
           </div>
         ) : tickets.length === 0 ? (
           <div
@@ -359,12 +359,12 @@ export default function MyTicketsPage() {
             </div>
 
             <p style={{ fontSize: '13px', color: '#6B6B6B', margin: '0 0 16px 0', lineHeight: 1.5 }}>
-              List ticket <strong>#{resaleTicketTarget.ticketNumber}</strong> on Ticketmaster's verified exchange. When purchased, payment is credited to your balance.
+              List ticket <strong>#{resaleTicketTarget.ticketNumber}</strong> on Tickza's verified exchange. When purchased, payment is credited to your balance.
             </p>
 
             <form onSubmit={handleResaleSubmit}>
               <div style={{ marginBottom: '20px' }}>
-                <label className="input-label">Resale Listing Price ($) *</label>
+                <label className="input-label">Resale Listing Price (₦) *</label>
                 <input
                   type="number"
                   min="1"

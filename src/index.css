@@ -1,4 +1,4 @@
-/* ===== TICKETMASTER GLOBAL DESIGN SYSTEM ===== */
+/* ===== TICKZA GLOBAL DESIGN SYSTEM ===== */
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
@@ -423,4 +423,27 @@ select.input {
 }
 .horizontal-scroll-row > * {
   scroll-snap-align: start;
+}
+
+/* Event Detail Page Responsive Layout (Mobile First / Adaptive) */
+.event-details-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.8fr) minmax(320px, 1.2fr);
+  gap: 32px;
+  align-items: start;
+}
+
+@media (max-width: 960px) {
+  .event-details-layout {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+}
+
+/* Responsive Table Wrapper */
+.responsive-table-container {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: var(--radius-md);
 }

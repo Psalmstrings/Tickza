@@ -4,7 +4,7 @@ import AppLayout from '../../components/layout/AppLayout.jsx';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { useToast } from '../../components/ui/Toast.jsx';
 import StatusBadge from '../../components/ui/StatusBadge.jsx';
-import TicketmasterSpinner from '../../components/ui/TicketmasterSpinner.jsx';
+import TickzaSpinner from '../../components/ui/TickzaSpinner.jsx';
 import api from '../../lib/axios.js';
 import {
   Wallet,
@@ -556,7 +556,7 @@ export default function ForYouPage() {
                   Receive instant drops, transfer notifications, and barcode alerts.
                 </p>
                 <a
-                  href="https://t.me/ticketmaster"
+                  href="https://t.me/tickza"
                   target="_blank"
                   rel="noreferrer"
                   style={{ fontSize: '12px', fontWeight: 700, color: '#229ED9', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '4px' }}
@@ -759,7 +759,7 @@ export default function ForYouPage() {
                 className="btn-primary"
                 style={{ width: '100%', padding: '13px' }}
               >
-                {fundingWallet ? <TicketmasterSpinner size="sm" color="#FFFFFF" /> : `Add $${creditAmount || 0} to Wallet`}
+                {fundingWallet ? <TickzaSpinner size="sm" color="#FFFFFF" /> : `Add $${creditAmount || 0} to Wallet`}
               </button>
             </form>
           </div>
@@ -828,7 +828,7 @@ export default function ForYouPage() {
 
               {searchingTm ? (
                 <div style={{ padding: '40px', textAlign: 'center' }}>
-                  <TicketmasterSpinner size="md" message="Searching catalog..." />
+                  <TickzaSpinner size="md" message="Searching catalog..." />
                 </div>
               ) : tmResults.length === 0 ? (
                 <p style={{ textAlign: 'center', color: '#6B6B6B', padding: '30px' }}>No catalog templates found.</p>

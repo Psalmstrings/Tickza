@@ -1,48 +1,203 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../../lib/axios.js';
+import { useToast } from '../../components/ui/Toast.jsx';
+import TickzaSpinner from '../../components/ui/TickzaSpinner.jsx';
 import './organizer.css';
 import {
-  Wallet, DollarSign, ArrowUpRight, CheckCircle2,
-  Clock, AlertCircle, Building2, CreditCard, ShieldAlert,
-  ArrowRight, Download
+  Wallet,
+  DollarSign,
+  ArrowUpRight,
+  CheckCircle2,
+  Clock,
+  AlertCircle,
+  Building2,
+  CreditCard,
+  ShieldCheck,
+  ArrowRight,
+  Download,
+  Search,
+  Filter,
+  RefreshCw,
+  Plus,
+  X,
+  FileText,
 } from 'lucide-react';
 
 export default function OrganizerPayoutsPage() {
+  const toast = useToast();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState('payouts'); // 'payouts' or 'ledger'
+
+  // Payout request modal state
+  const [showRequestModal, setShowRequestModal] = useState(false);
+  const [requestAmount, setRequestAmount] = useState('');
+  const [submittingRequest, setSubmittingRequest] = useState(false);
+  const [requestError, setRequestError] = useState('');
+
+  // Ledger transactions state
+  const [ledgerEntries, setLedgerEntries] = useState([]);
+  const [loadingLedger, setLoadingLedger] = useState(false);
+  const [ledgerSearch, setLedgerSearch] = useState('');
+  const [ledgerTypeFilter, setLedgerTypeFilter] = useState('');
+
+  const fetchPayoutData = async () => {
+    try {
+      setLoading(true);
+      const { data: res } = await api.get('/organizer/payouts');
+      setData(res.data);
+    } catch (err) {
+      console.error('[Fetch Payouts Error]', err);
+      toast.error('Failed to load payouts data.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchLedgerTransactions = async () => {
+    try {
+      setLoadingLedger(true);
+      const params = new URLSearchParams();
+      if (ledgerSearch) params.append('search', ledgerSearch);
+      if (ledgerTypeFilter) params.append('type', ledgerTypeFilter);
+
+      const { data: res } = await api.get(`/organizer/financials/transactions?${params.toString()}`);
+      setLedgerEntries(res.data || []);
+    } catch (err) {
+      console.error('[Fetch Ledger Error]', err);
+    } finally {
+      setLoadingLedger(false);
+    }
+  };
 
   useEffect(() => {
-    api.get('/organizer/payouts')
-      .then(({ data: res }) => setData(res.data))
-      .catch(() => setData(null))
-      .finally(() => setLoading(false));
+    fetchPayoutData();
   }, []);
+
+  useEffect(() => {
+    if (activeTab === 'ledger') {
+      fetchLedgerTransactions();
+    }
+  }, [activeTab, ledgerSearch, ledgerTypeFilter]);
 
   const summary = data?.summary || {
     grossRevenue: 0,
     platformFee: 0,
-    processingFee: 0,
+    commissionRate: 10,
     netRevenue: 0,
+    available: 0,
+    reserved: 0,
     paidOut: 0,
     pending: 0,
-    available: 0,
+    minimumPayoutNaira: 2000,
+    bankAccount: null,
   };
 
   const payouts = data?.payouts || [];
+  const bank = summary.bankAccount;
+  const isBankVerified = bank && bank.isVerified && bank.accountNumber;
+
+  const handleOpenPayoutModal = () => {
+    if (!isBankVerified) {
+      toast.error('Please configure and verify your settlement bank account before requesting a payout.');
+      return;
+    }
+    if (summary.available < summary.minimumPayoutNaira) {
+      toast.error(
+        `Your available balance (₦${summary.available.toLocaleString()}) is below the minimum withdrawal threshold of ₦${summary.minimumPayoutNaira.toLocaleString()}.`
+      );
+      return;
+    }
+    setRequestAmount(String(summary.available));
+    setRequestError('');
+    setShowRequestModal(true);
+  };
+
+  const handleConfirmPayoutRequest = async (e) => {
+    e.preventDefault();
+    const numAmount = Number(requestAmount);
+    if (isNaN(numAmount) || numAmount <= 0) {
+      setRequestError('Please enter a valid amount.');
+      return;
+    }
+    if (numAmount < summary.minimumPayoutNaira) {
+      setRequestError(`Minimum withdrawal amount is ₦${summary.minimumPayoutNaira.toLocaleString()}.`);
+      return;
+    }
+    if (numAmount > summary.available) {
+      setRequestError(`Requested amount exceeds your available balance of ₦${summary.available.toLocaleString()}.`);
+      return;
+    }
+
+    setSubmittingRequest(true);
+    setRequestError('');
+
+    try {
+      const { data: res } = await api.post('/organizer/payouts/request', {
+        amount: numAmount,
+      });
+
+      toast.success('Payout request submitted successfully for review.');
+      setShowRequestModal(false);
+      fetchPayoutData();
+    } catch (err) {
+      setRequestError(err.response?.data?.message || 'Failed to submit payout request.');
+    } finally {
+      setSubmittingRequest(false);
+    }
+  };
+
+  const handleExportCSV = () => {
+    if (ledgerEntries.length === 0) {
+      toast.error('No ledger transactions available to export.');
+      return;
+    }
+
+    const headers = ['Date', 'Type', 'Direction', 'Amount (NGN)', 'Balance After (NGN)', 'Reference', 'Description'];
+    const rows = ledgerEntries.map((entry) => [
+      new Date(entry.createdAt).toISOString().split('T')[0],
+      entry.type,
+      entry.direction,
+      (entry.amountKobo / 100).toFixed(2),
+      (entry.balanceAfterKobo / 100).toFixed(2),
+      `"${entry.idempotencyKey || ''}"`,
+      `"${entry.description || ''}"`,
+    ]);
+
+    const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map((e) => e.join(','))].join('\n');
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedUri);
+    link.setAttribute('download', `tickza_ledger_${new Date().toISOString().split('T')[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   return (
     <div className="org-page">
       {/* Header */}
       <div className="org-page-header">
         <div>
-          <h1 className="org-page-title">Payouts & Financial Settlement</h1>
-          <p className="org-page-subtitle">Track net proceeds, automated withdrawals, platform fee deductions, and settlement history.</p>
+          <h1 className="org-page-title">Earnings & Payouts</h1>
+          <p className="org-page-subtitle">
+            Manage your net event proceeds, Paystack bank transfers, platform commission deductions, and auditable financial ledger.
+          </p>
         </div>
 
-        <Link to="/organizer/settings" className="org-btn org-btn-secondary">
-          <Building2 size={15} /> Bank Account Settings
-        </Link>
+        <div style={{ display: 'flex', gap: '10px' }}>
+          <button
+            onClick={handleOpenPayoutModal}
+            className="org-btn org-btn-primary"
+            style={{ backgroundColor: '#059669', borderColor: '#059669' }}
+          >
+            <DollarSign size={16} /> Request Payout
+          </button>
+          <Link to="/organizer/settings" className="org-btn org-btn-secondary">
+            <Building2 size={15} /> Payout Account
+          </Link>
+        </div>
       </div>
 
       {/* Financial Highlight Cards */}
@@ -53,164 +208,550 @@ export default function OrganizerPayoutsPage() {
           </div>
           <div className="org-stat-label">Gross Ticket Sales</div>
           <div className="org-stat-value">₦{summary.grossRevenue.toLocaleString()}</div>
-          <div className="org-stat-delta positive">Total ticket orders</div>
-        </div>
-
-        <div className="org-stat-card success">
-          <div className="org-stat-icon" style={{ background: '#ECFDF5', color: '#10B981' }}>
-            <Wallet size={18} />
-          </div>
-          <div className="org-stat-label">Net Organizer Revenue</div>
-          <div className="org-stat-value" style={{ color: '#10B981' }}>
-            ₦{summary.netRevenue.toLocaleString()}
-          </div>
-          <div className="org-stat-delta">After fees deduction</div>
+          <div className="org-stat-delta positive">All paid orders</div>
         </div>
 
         <div className="org-stat-card warning">
-          <div className="org-stat-icon" style={{ background: '#FFFBEB', color: '#F59E0B' }}>
-            <Clock size={18} />
+          <div className="org-stat-icon" style={{ background: '#FEF3C7', color: '#D97706' }}>
+            <AlertCircle size={18} />
           </div>
-          <div className="org-stat-label">Pending Settlement</div>
-          <div className="org-stat-value" style={{ color: '#F59E0B' }}>
-            ₦{summary.pending.toLocaleString()}
+          <div className="org-stat-label">Tickza Commission ({summary.commissionRate}%)</div>
+          <div className="org-stat-value" style={{ color: '#D97706' }}>
+            -₦{summary.platformFee.toLocaleString()}
           </div>
-          <div className="org-stat-delta">In processing queue</div>
+          <div className="org-stat-delta">Platform infrastructure fee</div>
         </div>
 
-        <div className="org-stat-card info">
-          <div className="org-stat-icon" style={{ background: '#ECFEFF', color: '#0891B2' }}>
-            <CheckCircle2 size={18} />
+        <div className="org-stat-card success">
+          <div className="org-stat-icon" style={{ background: '#ECFDF5', color: '#059669' }}>
+            <Wallet size={18} />
           </div>
-          <div className="org-stat-label">Total Disbursed</div>
-          <div className="org-stat-value">₦{summary.paidOut.toLocaleString()}</div>
-          <div className="org-stat-delta positive">Paid to bank</div>
+          <div className="org-stat-label">Net Vendor Earnings</div>
+          <div className="org-stat-value" style={{ color: '#059669' }}>
+            ₦{summary.netRevenue.toLocaleString()}
+          </div>
+          <div className="org-stat-delta">After commission</div>
+        </div>
+
+        <div className="org-stat-card info" style={{ border: '2px solid #3B82F6' }}>
+          <div className="org-stat-icon" style={{ background: '#EFF6FF', color: '#2563EB' }}>
+            <ArrowUpRight size={18} />
+          </div>
+          <div className="org-stat-label" style={{ fontWeight: 800, color: '#1E40AF' }}>
+            Available for Withdrawal
+          </div>
+          <div className="org-stat-value" style={{ color: '#2563EB', fontWeight: 900 }}>
+            ₦{summary.available.toLocaleString()}
+          </div>
+          <div className="org-stat-delta" style={{ color: '#1E40AF' }}>
+            Min: ₦{summary.minimumPayoutNaira.toLocaleString()}
+          </div>
         </div>
       </div>
 
-      {/* Fee Breakdown & Bank Callout */}
-      <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 20, marginBottom: 24 }}>
+      {/* Bank Account Callout & Pending Metrics */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1.8fr 1.2fr', gap: 20, marginBottom: 24 }}>
+        {/* Payout Bank Overview */}
+        <div className="org-card" style={{ padding: 20 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <div
+                style={{
+                  width: 36,
+                  height: 36,
+                  borderRadius: 8,
+                  background: isBankVerified ? '#ECFDF5' : '#FEF3C7',
+                  color: isBankVerified ? '#059669' : '#D97706',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <Building2 size={18} />
+              </div>
+              <div>
+                <h3 style={{ fontSize: 15, fontWeight: 700, margin: 0, color: '#0B1026' }}>
+                  Connected Settlement Account
+                </h3>
+                <span
+                  style={{
+                    fontSize: 11,
+                    fontWeight: 700,
+                    color: isBankVerified ? '#059669' : '#D97706',
+                    textTransform: 'uppercase',
+                  }}
+                >
+                  {isBankVerified ? '✓ Verified Paystack Recipient' : '⚠ Action Required'}
+                </span>
+              </div>
+            </div>
+
+            <Link to="/organizer/settings" className="org-btn org-btn-secondary org-btn-sm">
+              Update Bank
+            </Link>
+          </div>
+
+          {isBankVerified ? (
+            <div
+              style={{
+                background: '#F8FAFC',
+                borderRadius: 10,
+                padding: '14px 16px',
+                border: '1px solid #E2E8F0',
+                display: 'grid',
+                gridTemplateColumns: 'repeat(3, 1fr)',
+                gap: 12,
+              }}
+            >
+              <div>
+                <span style={{ fontSize: 11, color: '#64748B', fontWeight: 600 }}>Bank Name</span>
+                <p style={{ margin: '2px 0 0', fontSize: 13, fontWeight: 700, color: '#1E293B' }}>
+                  {bank.bankName}
+                </p>
+              </div>
+              <div>
+                <span style={{ fontSize: 11, color: '#64748B', fontWeight: 600 }}>Account Number</span>
+                <p style={{ margin: '2px 0 0', fontSize: 13, fontWeight: 700, color: '#1E293B', fontFamily: 'monospace' }}>
+                  {bank.accountNumberMasked || `******${bank.accountNumber?.slice(-4)}`}
+                </p>
+              </div>
+              <div>
+                <span style={{ fontSize: 11, color: '#64748B', fontWeight: 600 }}>Beneficiary Name</span>
+                <p style={{ margin: '2px 0 0', fontSize: 13, fontWeight: 700, color: '#1E293B' }}>
+                  {bank.accountName}
+                </p>
+              </div>
+            </div>
+          ) : (
+            <div
+              style={{
+                background: '#FFFBEB',
+                borderRadius: 10,
+                padding: '14px 16px',
+                border: '1px solid #FDE68A',
+                color: '#92400E',
+                fontSize: 13,
+              }}
+            >
+              You have not connected a verified settlement bank account. Add your Nigerian bank details in Settings to enable direct withdrawals.
+            </div>
+          )}
+        </div>
+
+        {/* Payout Processing Summary */}
         <div className="org-card" style={{ padding: 20 }}>
           <h3 style={{ fontSize: 15, fontWeight: 700, margin: '0 0 14px', color: '#0B1026' }}>
-            Fee Structure & Transparency
+            Disbursement Metrics
           </h3>
-          <p style={{ fontSize: 13, color: '#475569', lineHeight: 1.5, margin: '0 0 16px' }}>
-            Tickza charges transparent, low platform fees to maintain high-speed QR gate scanning, redundant ticket cryptographic security, and automated payouts.
-          </p>
-
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
-            <div style={{ background: '#F8FAFC', borderRadius: 8, padding: 14, border: '1px solid #E2E8F0' }}>
-              <div style={{ fontSize: 11, color: '#94A3B8', fontWeight: 600, textTransform: 'uppercase' }}>Platform Fee (5%)</div>
-              <div style={{ fontSize: 16, fontWeight: 700, color: '#0B1026', marginTop: 4 }}>
-                ₦{summary.platformFee.toLocaleString()}
-              </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ fontSize: 13, color: '#64748B', display: 'flex', alignItems: 'center', gap: 6 }}>
+                <Clock size={15} color="#F59E0B" /> Pending / Under Review:
+              </span>
+              <strong style={{ fontSize: 14, color: '#F59E0B' }}>
+                ₦{summary.pending.toLocaleString()}
+              </strong>
             </div>
 
-            <div style={{ background: '#F8FAFC', borderRadius: 8, padding: 14, border: '1px solid #E2E8F0' }}>
-              <div style={{ fontSize: 11, color: '#94A3B8', fontWeight: 600, textTransform: 'uppercase' }}>Payment Gateway (1.5%)</div>
-              <div style={{ fontSize: 16, fontWeight: 700, color: '#0B1026', marginTop: 4 }}>
-                ₦{summary.processingFee.toLocaleString()}
-              </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ fontSize: 13, color: '#64748B', display: 'flex', alignItems: 'center', gap: 6 }}>
+                <CheckCircle2 size={15} color="#059669" /> Total Successfully Paid:
+              </span>
+              <strong style={{ fontSize: 14, color: '#059669' }}>
+                ₦{summary.paidOut.toLocaleString()}
+              </strong>
             </div>
 
-            <div style={{ background: '#EEF2FF', borderRadius: 8, padding: 14, border: '1px solid #C7D2FE' }}>
-              <div style={{ fontSize: 11, color: '#4F46E5', fontWeight: 700, textTransform: 'uppercase' }}>Settlement Balance</div>
-              <div style={{ fontSize: 16, fontWeight: 800, color: '#4F46E5', marginTop: 4 }}>
-                ₦{summary.available.toLocaleString()}
-              </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid #E2E8F0', paddingTop: 8 }}>
+              <span style={{ fontSize: 13, color: '#64748B' }}>Settlement Currency:</span>
+              <strong style={{ fontSize: 12, color: '#1E293B', fontFamily: 'monospace' }}>NGN (₦)</strong>
             </div>
           </div>
-        </div>
-
-        {/* Bank Account Overview */}
-        <div className="org-card" style={{ padding: 20 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
-            <Building2 size={18} color="#4F46E5" />
-            <h3 style={{ fontSize: 15, fontWeight: 700, margin: 0, color: '#0B1026' }}>Disbursement Target</h3>
-          </div>
-          <p style={{ fontSize: 13, color: '#475569', lineHeight: 1.5, margin: '0 0 16px' }}>
-            Payouts are deposited automatically to your verified Nigerian settlement account after event conclusion.
-          </p>
-          <div style={{ background: '#F8FAFC', borderRadius: 8, padding: 14, border: '1px solid #E2E8F0', marginBottom: 14 }}>
-            <div style={{ fontSize: 11, color: '#94A3B8', textTransform: 'uppercase', fontWeight: 600 }}>Connected Account</div>
-            <div style={{ fontSize: 14, fontWeight: 700, color: '#0B1026', marginTop: 3 }}>
-              Configured in Settings
-            </div>
-            <div style={{ fontSize: 12, color: '#64748B', marginTop: 2 }}>
-              Verified Direct Bank Transfer (NIP)
-            </div>
-          </div>
-          <Link to="/organizer/settings" className="org-btn org-btn-secondary org-btn-sm" style={{ width: '100%' }}>
-            Update Payout Account <ArrowRight size={13} />
-          </Link>
         </div>
       </div>
 
-      {/* Settlement History Table */}
-      <div className="org-card">
-        <div className="org-card-header">
-          <h3 className="org-card-title">Settlement Transfers & History</h3>
-        </div>
+      {/* Tabs Navigation */}
+      <div style={{ display: 'flex', gap: '8px', borderBottom: '2px solid #E2E8F0', marginBottom: 20 }}>
+        <button
+          onClick={() => setActiveTab('payouts')}
+          style={{
+            padding: '10px 18px',
+            background: 'none',
+            border: 'none',
+            borderBottom: activeTab === 'payouts' ? '3px solid #026CDF' : '3px solid transparent',
+            color: activeTab === 'payouts' ? '#026CDF' : '#64748B',
+            fontWeight: activeTab === 'payouts' ? 700 : 500,
+            fontSize: 14,
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 6,
+          }}
+        >
+          <CreditCard size={16} /> Payout Requests ({payouts.length})
+        </button>
 
-        {loading ? (
-          <div style={{ padding: 24 }}>
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="org-skeleton" style={{ height: 44, marginBottom: 8, borderRadius: 6 }} />
-            ))}
+        <button
+          onClick={() => setActiveTab('ledger')}
+          style={{
+            padding: '10px 18px',
+            background: 'none',
+            border: 'none',
+            borderBottom: activeTab === 'ledger' ? '3px solid #026CDF' : '3px solid transparent',
+            color: activeTab === 'ledger' ? '#026CDF' : '#64748B',
+            fontWeight: activeTab === 'ledger' ? 700 : 500,
+            fontSize: 14,
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 6,
+          }}
+        >
+          <FileText size={16} /> Financial Ledger & Audit Trail
+        </button>
+      </div>
+
+      {/* TAB 1: Payout Requests History */}
+      {activeTab === 'payouts' && (
+        <div className="org-card">
+          <div className="org-card-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <h3 className="org-card-title">Withdrawal Requests & Transfer Outcomes</h3>
+            <button
+              onClick={fetchPayoutData}
+              className="org-btn org-btn-secondary org-btn-sm"
+              title="Refresh payouts"
+            >
+              <RefreshCw size={13} /> Refresh
+            </button>
           </div>
-        ) : payouts.length === 0 ? (
-          <div className="org-empty" style={{ padding: 48 }}>
-            <div className="org-empty-icon"><Wallet size={22} /></div>
-            <div className="org-empty-title">No payout records yet</div>
-            <div className="org-empty-subtitle">
-              Payout transfers are automatically scheduled upon successful completion of your paid events.
+
+          {loading ? (
+            <div style={{ padding: 40, textAlign: 'center' }}>
+              <TickzaSpinner size="md" message="Loading payout history..." />
+            </div>
+          ) : payouts.length === 0 ? (
+            <div className="org-empty" style={{ padding: 48 }}>
+              <div className="org-empty-icon"><Wallet size={22} /></div>
+              <div className="org-empty-title">No payout requests submitted yet</div>
+              <div className="org-empty-subtitle">
+                When you have eligible earnings above ₦{summary.minimumPayoutNaira.toLocaleString()}, click "Request Payout" above to initiate a direct withdrawal to your bank.
+              </div>
+            </div>
+          ) : (
+            <div className="responsive-table-container">
+              <table className="org-table">
+                <thead>
+                  <tr>
+                    <th>Reference</th>
+                    <th>Requested Amount</th>
+                    <th>Bank & Account</th>
+                    <th>Status</th>
+                    <th>Submission Date</th>
+                    <th>Details / Notes</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {payouts.map((p) => {
+                    let badgeClass = 'org-badge-neutral';
+                    if (p.status === 'PAID') badgeClass = 'org-badge-success';
+                    if (p.status === 'PROCESSING') badgeClass = 'org-badge-info';
+                    if (p.status === 'REJECTED' || p.status === 'FAILED') badgeClass = 'org-badge-error';
+                    if (p.status === 'REQUESTED' || p.status === 'UNDER_REVIEW') badgeClass = 'org-badge-warning';
+
+                    const amountNaira = p.amountKobo ? p.amountKobo / 100 : p.netAmount || 0;
+
+                    return (
+                      <tr key={p._id}>
+                        <td style={{ fontFamily: 'monospace', fontWeight: 700, color: '#0B1026', fontSize: 13 }}>
+                          {p.reference}
+                        </td>
+                        <td style={{ fontWeight: 800, color: '#0B1026', fontSize: 14 }}>
+                          ₦{amountNaira.toLocaleString()}
+                        </td>
+                        <td>
+                          <div style={{ fontSize: 13, fontWeight: 600 }}>{p.bankAccount?.bankName || 'Direct Transfer'}</div>
+                          <div style={{ fontSize: 11, color: '#64748B', fontFamily: 'monospace' }}>
+                            {p.bankAccount?.accountNumberMasked || 'Verified Account'}
+                          </div>
+                        </td>
+                        <td>
+                          <span className={`org-badge ${badgeClass}`}>
+                            {p.status}
+                          </span>
+                        </td>
+                        <td style={{ color: '#64748B', fontSize: 13 }}>
+                          {new Date(p.createdAt).toLocaleDateString()}
+                        </td>
+                        <td style={{ fontSize: 12, color: '#64748B', maxWidth: 200 }}>
+                          {p.rejectionReason ? (
+                            <span style={{ color: '#DC2626' }}>Reason: {p.rejectionReason}</span>
+                          ) : p.paystackTransferCode ? (
+                            <span style={{ fontFamily: 'monospace' }}>Code: {p.paystackTransferCode}</span>
+                          ) : (
+                            'Pending administrative review'
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* TAB 2: Financial Ledger Transactions */}
+      {activeTab === 'ledger' && (
+        <div className="org-card">
+          <div className="org-card-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
+            <h3 className="org-card-title">Auditable Double-Entry Ledger</h3>
+
+            <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+              <div style={{ position: 'relative', width: 200 }}>
+                <Search size={14} style={{ position: 'absolute', left: 10, top: 11, color: '#94A3B8' }} />
+                <input
+                  type="text"
+                  placeholder="Search description..."
+                  value={ledgerSearch}
+                  onChange={(e) => setLedgerSearch(e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '8px 10px 8px 30px',
+                    borderRadius: 6,
+                    border: '1px solid #CBD5E1',
+                    fontSize: 12,
+                  }}
+                />
+              </div>
+
+              <select
+                value={ledgerTypeFilter}
+                onChange={(e) => setLedgerTypeFilter(e.target.value)}
+                style={{
+                  padding: '8px 12px',
+                  borderRadius: 6,
+                  border: '1px solid #CBD5E1',
+                  fontSize: 12,
+                  backgroundColor: '#FFFFFF',
+                }}
+              >
+                <option value="">All Entry Types</option>
+                <option value="TICKET_SALE_NET">Ticket Sale Earnings</option>
+                <option value="PAYOUT_RESERVED">Payout Reserved</option>
+                <option value="PAYOUT_DISBURSED">Payout Disbursed</option>
+                <option value="PAYOUT_RELEASED">Payout Released</option>
+                <option value="REFUND_DEDUCTION">Refund Deduction</option>
+              </select>
+
+              <button
+                onClick={handleExportCSV}
+                className="org-btn org-btn-secondary org-btn-sm"
+              >
+                <Download size={13} /> Export CSV
+              </button>
             </div>
           </div>
-        ) : (
-          <div className="org-table-wrap">
-            <table className="org-table">
-              <thead>
-                <tr>
-                  <th>Event</th>
-                  <th>Amount</th>
-                  <th>Status</th>
-                  <th>Reference</th>
-                  <th>Date</th>
-                </tr>
-              </thead>
-              <tbody>
-                {payouts.map((p) => {
-                  let badge = 'org-badge-neutral';
-                  if (p.status === 'PAID') badge = 'org-badge-success';
-                  if (p.status === 'PROCESSING') badge = 'org-badge-info';
-                  if (p.status === 'FAILED') badge = 'org-badge-error';
-                  if (p.status === 'PENDING') badge = 'org-badge-warning';
 
-                  return (
-                    <tr key={p._id}>
-                      <td style={{ fontWeight: 600, color: '#0B1026' }}>
-                        {p.eventId?.title || 'General Settlement'}
-                      </td>
-                      <td style={{ fontWeight: 700, color: '#0B1026' }}>
-                        ₦{p.netAmount?.toLocaleString() || 0}
-                      </td>
-                      <td>
-                        <span className={`org-badge ${badge}`}>{p.status}</span>
-                      </td>
-                      <td style={{ fontFamily: 'monospace', fontSize: 12, color: '#64748B' }}>
-                        {p.reference || '—'}
-                      </td>
-                      <td style={{ color: '#64748B', fontSize: 13 }}>
-                        {new Date(p.createdAt).toLocaleDateString()}
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+          {loadingLedger ? (
+            <div style={{ padding: 40, textAlign: 'center' }}>
+              <TickzaSpinner size="md" message="Loading ledger records..." />
+            </div>
+          ) : ledgerEntries.length === 0 ? (
+            <div className="org-empty" style={{ padding: 40 }}>
+              <div className="org-empty-title">No ledger records match the query</div>
+            </div>
+          ) : (
+            <div className="responsive-table-container">
+              <table className="org-table">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Type</th>
+                    <th>Direction</th>
+                    <th>Amount</th>
+                    <th>Balance After</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {ledgerEntries.map((entry) => {
+                    const isCredit = entry.direction === 'CREDIT';
+                    const amountNaira = (entry.amountKobo / 100).toLocaleString();
+                    const balanceNaira = (entry.balanceAfterKobo / 100).toLocaleString();
+
+                    return (
+                      <tr key={entry._id}>
+                        <td style={{ fontSize: 12, color: '#64748B' }}>
+                          {new Date(entry.createdAt).toLocaleDateString()}
+                        </td>
+                        <td>
+                          <span
+                            style={{
+                              fontSize: 11,
+                              fontWeight: 700,
+                              padding: '2px 6px',
+                              borderRadius: 4,
+                              backgroundColor: '#F1F5F9',
+                              color: '#334155',
+                              fontFamily: 'monospace',
+                            }}
+                          >
+                            {entry.type}
+                          </span>
+                        </td>
+                        <td>
+                          <span
+                            style={{
+                              fontSize: 11,
+                              fontWeight: 800,
+                              color: isCredit ? '#059669' : '#DC2626',
+                            }}
+                          >
+                            {isCredit ? '+ CREDIT' : '- DEBIT'}
+                          </span>
+                        </td>
+                        <td style={{ fontWeight: 800, color: isCredit ? '#059669' : '#1E293B', fontSize: 13 }}>
+                          {isCredit ? `+₦${amountNaira}` : `-₦${amountNaira}`}
+                        </td>
+                        <td style={{ fontSize: 13, fontWeight: 700, color: '#475569' }}>
+                          ₦{balanceNaira}
+                        </td>
+                        <td style={{ fontSize: 12, color: '#475569', maxWidth: 280 }}>
+                          {entry.description}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ===== REQUEST PAYOUT MODAL ===== */}
+      {showRequestModal && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            backgroundColor: 'rgba(0,0,0,0.6)',
+            backdropFilter: 'blur(4px)',
+            zIndex: 3000,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: 16,
+          }}
+          onClick={() => !submittingRequest && setShowRequestModal(false)}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              backgroundColor: '#FFFFFF',
+              borderRadius: 16,
+              maxWidth: 460,
+              width: '100%',
+              padding: 24,
+              boxShadow: '0 20px 50px rgba(0,0,0,0.2)',
+            }}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <Wallet size={20} color="#059669" />
+                <h3 style={{ margin: 0, fontSize: 17, fontWeight: 800, color: '#0B1026' }}>
+                  Request Earnings Payout
+                </h3>
+              </div>
+              <button
+                onClick={() => setShowRequestModal(false)}
+                style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748B' }}
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            {requestError && (
+              <div
+                style={{
+                  backgroundColor: '#FEF2F2',
+                  border: '1px solid #EF4444',
+                  color: '#B91C1C',
+                  padding: '10px 14px',
+                  borderRadius: 8,
+                  fontSize: 12,
+                  marginBottom: 16,
+                }}
+              >
+                {requestError}
+              </div>
+            )}
+
+            <form onSubmit={handleConfirmPayoutRequest}>
+              <div style={{ backgroundColor: '#F8FAFC', padding: 14, borderRadius: 10, border: '1px solid #E2E8F0', marginBottom: 16 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: '#64748B', marginBottom: 4 }}>
+                  <span>Available Balance</span>
+                  <strong style={{ color: '#059669', fontSize: 14 }}>
+                    ₦{summary.available.toLocaleString()}
+                  </strong>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: '#64748B' }}>
+                  <span>Minimum Withdrawal</span>
+                  <span>₦{summary.minimumPayoutNaira.toLocaleString()}</span>
+                </div>
+              </div>
+
+              <div className="org-form-group" style={{ marginBottom: 16 }}>
+                <label className="org-label">Withdrawal Amount (₦ NGN) *</label>
+                <input
+                  type="number"
+                  step="100"
+                  min={summary.minimumPayoutNaira}
+                  max={summary.available}
+                  className="org-input"
+                  value={requestAmount}
+                  onChange={(e) => setRequestAmount(e.target.value)}
+                  placeholder="e.g. 50000"
+                  required
+                />
+              </div>
+
+              {/* Bank destination overview */}
+              <div style={{ backgroundColor: '#EFF6FF', padding: 12, borderRadius: 8, border: '1px solid #BFDBFE', marginBottom: 20 }}>
+                <span style={{ fontSize: 11, fontWeight: 700, color: '#1E40AF', textTransform: 'uppercase' }}>
+                  Destination Bank Account
+                </span>
+                <p style={{ margin: '4px 0 2px', fontSize: 13, fontWeight: 700, color: '#1E3A8A' }}>
+                  {bank?.bankName} • {bank?.accountNumberMasked || bank?.accountNumber}
+                </p>
+                <p style={{ margin: 0, fontSize: 11, color: '#3B82F6' }}>
+                  Beneficiary: {bank?.accountName}
+                </p>
+              </div>
+
+              <div style={{ display: 'flex', gap: 10 }}>
+                <button
+                  type="button"
+                  className="org-btn org-btn-secondary"
+                  style={{ flex: 1 }}
+                  onClick={() => setShowRequestModal(false)}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={submittingRequest}
+                  className="org-btn org-btn-primary"
+                  style={{ flex: 1, backgroundColor: '#059669', borderColor: '#059669' }}
+                >
+                  {submittingRequest ? 'Submitting…' : 'Confirm Request'}
+                </button>
+              </div>
+            </form>
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }
