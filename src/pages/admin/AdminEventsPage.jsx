@@ -49,7 +49,7 @@ export default function AdminEventsPage() {
   const safeEvents = Array.isArray(events) ? events : [];
 
   return (
-    <div style={{ padding: '24px' }}>
+    <div style={{ padding: '8px 0 24px' }}>
       {/* Page header */}
       <div style={{ marginBottom: '20px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '4px' }}>

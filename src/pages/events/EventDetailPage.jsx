@@ -948,53 +948,61 @@ export default function EventDetailPage() {
                     )}
                   </div>
 
-                  {/* Payment method selector */}
+                  {/* Paystack Exclusive Payment Method */}
                   <div style={{ marginBottom: '20px' }}>
-                    <label className="input-label">Select Payment Method</label>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                      <label
+                    <label className="input-label" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <Lock size={14} color="#059669" /> Payment Method
+                    </label>
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        padding: '13px 16px',
+                        borderRadius: '10px',
+                        border: '1.5px solid #10B981',
+                        backgroundColor: '#F0FDF4',
+                      }}
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        <div
+                          style={{
+                            width: '36px',
+                            height: '36px',
+                            borderRadius: '8px',
+                            backgroundColor: '#059669',
+                            color: '#FFFFFF',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            flexShrink: 0,
+                          }}
+                        >
+                          <Lock size={18} />
+                        </div>
+                        <div>
+                          <p style={{ margin: 0, fontSize: '14px', fontWeight: 700, color: '#065F46' }}>
+                            Paystack Checkout
+                          </p>
+                          <p style={{ margin: '2px 0 0', fontSize: '12px', color: '#047857' }}>
+                            Cards, Instant Bank Transfer, Apple Pay, USSD & QR
+                          </p>
+                        </div>
+                      </div>
+                      <span
                         style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '10px',
-                          padding: '12px 14px',
-                          borderRadius: '10px',
-                          border: paymentMethod === 'CARD' ? '2px solid #026CDF' : '1px solid #E5E5E5',
-                          backgroundColor: paymentMethod === 'CARD' ? '#EBF3FD' : '#FFFFFF',
-                          cursor: 'pointer',
+                          fontSize: '11px',
+                          fontWeight: 800,
+                          backgroundColor: '#DCFCE7',
+                          color: '#15803D',
+                          padding: '3px 8px',
+                          borderRadius: '6px',
+                          textTransform: 'uppercase',
+                          letterSpacing: '0.04em',
                         }}
                       >
-                        <input
-                          type="radio"
-                          name="payment"
-                          checked={paymentMethod === 'CARD'}
-                          onChange={() => setPaymentMethod('CARD')}
-                        />
-                        <CreditCard size={18} color="#026CDF" />
-                        <span style={{ fontSize: '14px', fontWeight: 600 }}>Debit Card / Campus Pay / Instant Wallet</span>
-                      </label>
-
-                      <label
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '10px',
-                          padding: '12px 14px',
-                          borderRadius: '10px',
-                          border: paymentMethod === 'PAYSTACK' ? '2px solid #026CDF' : '1px solid #E5E5E5',
-                          backgroundColor: paymentMethod === 'PAYSTACK' ? '#EBF3FD' : '#FFFFFF',
-                          cursor: 'pointer',
-                        }}
-                      >
-                        <input
-                          type="radio"
-                          name="payment"
-                          checked={paymentMethod === 'PAYSTACK'}
-                          onChange={() => setPaymentMethod('PAYSTACK')}
-                        />
-                        <Lock size={18} color="#059669" />
-                        <span style={{ fontSize: '14px', fontWeight: 600 }}>Paystack / Bank Transfer / USSD</span>
-                      </label>
+                        Active
+                      </span>
                     </div>
                   </div>
 
@@ -1027,12 +1035,22 @@ export default function EventDetailPage() {
                     onClick={handleConfirmPurchase}
                     disabled={purchasing}
                     className="btn-primary"
-                    style={{ width: '100%', padding: '14px', borderRadius: '10px', fontSize: '15px' }}
+                    style={{
+                      width: '100%',
+                      padding: '14px',
+                      borderRadius: '10px',
+                      fontSize: '15px',
+                      backgroundColor: '#026CDF',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '8px',
+                    }}
                   >
                     {purchasing ? (
-                      <TickzaSpinner size="sm" color="#FFFFFF" message="Processing order..." />
+                      <TickzaSpinner size="sm" color="#FFFFFF" message="Connecting to Paystack..." />
                     ) : (
-                      `Place Order • ${totalAmount === 0 ? 'FREE' : `₦${totalAmount.toLocaleString()}`}`
+                      totalAmount === 0 ? 'Claim Free Pass • ₦0' : `Pay with Paystack • ₦${totalAmount.toLocaleString()}`
                     )}
                   </button>
                 </div>

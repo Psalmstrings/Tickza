@@ -31,7 +31,7 @@ export default function AdminOrdersPage() {
   const paidCount = safeOrders.filter(o => o.status === 'PAID').length;
 
   return (
-    <div style={{ padding: '24px' }}>
+    <div style={{ padding: '8px 0 24px' }}>
       {/* Header */}
       <div style={{ marginBottom: '20px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '4px' }}>
@@ -46,7 +46,7 @@ export default function AdminOrdersPage() {
         {[
           { label: 'Total Orders', value: safeOrders.length, color: '#1F1F1F' },
           { label: 'Paid Orders', value: paidCount, color: '#16A34A' },
-          { label: 'Total Revenue', value: totalRevenue === 0 ? '$0' : `$${totalRevenue.toLocaleString()}`, color: '#026CDF' },
+          { label: 'Total Revenue', value: totalRevenue === 0 ? '₦0' : `₦${totalRevenue.toLocaleString()}`, color: '#026CDF' },
         ].map(({ label, value, color }) => (
           <div key={label} style={{ background: '#FFFFFF', border: '1px solid #E5E5E5', borderRadius: '8px', padding: '16px 18px' }}>
             <p style={{ color, fontSize: '22px', fontWeight: 800, margin: '0 0 2px' }}>{value}</p>
@@ -86,7 +86,7 @@ export default function AdminOrdersPage() {
                       </td>
                       <td style={{ padding: '14px 16px', color: '#6B6B6B', fontSize: '13px', textAlign: 'center' }}>{o.quantity || 1}</td>
                       <td style={{ padding: '14px 16px', color: '#1F1F1F', fontWeight: 700, fontSize: '14px', whiteSpace: 'nowrap' }}>
-                        {o.totalAmount === 0 ? 'FREE' : `$${Number(o.totalAmount || 0).toLocaleString()}`}
+                        {o.totalAmount === 0 ? 'FREE' : `₦${Number(o.totalAmount || 0).toLocaleString()}`}
                       </td>
                       <td style={{ padding: '14px 16px' }}>
                         <span style={{ display: 'inline-block', background: badge.bg, color: badge.color, padding: '3px 10px', borderRadius: '20px', fontSize: '12px', fontWeight: 600, whiteSpace: 'nowrap' }}>{o.status}</span>

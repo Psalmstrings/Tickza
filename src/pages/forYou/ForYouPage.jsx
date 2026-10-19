@@ -67,13 +67,13 @@ export default function ForYouPage() {
     e.preventDefault();
     const amt = parseFloat(creditAmount);
     if (isNaN(amt) || amt <= 0) {
-      toast.error('Please enter a valid dollar amount.');
+      toast.error('Please enter a valid amount.');
       return;
     }
     setFundingWallet(true);
     try {
       await api.post('/auth/topup', { amount: amt });
-      toast.success(`Successfully added $${amt.toFixed(2)} to your wallet!`);
+      toast.success(`Successfully added ₦${amt.toLocaleString()} to your wallet!`);
       setShowBuyCreditModal(false);
       refreshUser();
     } catch (err) {
@@ -271,7 +271,7 @@ export default function ForYouPage() {
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <AlertCircle size={16} color="#D97706" />
                 <span style={{ fontSize: '13px', color: '#92400E', fontWeight: 500 }}>
-                  Low Balance Notice: Your wallet balance is below $10.00. Top up to purchase premium tickets.
+                  Low Balance Notice: Your wallet balance is low (below ₦1,000). Top up to purchase tickets.
                 </span>
               </div>
               <button
@@ -740,15 +740,15 @@ export default function ForYouPage() {
 
             <form onSubmit={handleBuyCredit}>
               <div style={{ marginBottom: '18px' }}>
-                <label className="input-label">Custom Amount ($)</label>
+                <label className="input-label">Custom Amount (₦)</label>
                 <input
                   type="number"
-                  min="5"
-                  step="5"
+                  min="500"
+                  step="500"
                   value={creditAmount}
                   onChange={(e) => setCreditAmount(e.target.value)}
                   className="input"
-                  placeholder="Enter amount in USD"
+                  placeholder="Enter amount in NGN (₦)"
                   required
                 />
               </div>
@@ -759,7 +759,7 @@ export default function ForYouPage() {
                 className="btn-primary"
                 style={{ width: '100%', padding: '13px' }}
               >
-                {fundingWallet ? <TickzaSpinner size="sm" color="#FFFFFF" /> : `Add $${creditAmount || 0} to Wallet`}
+                {fundingWallet ? <TickzaSpinner size="sm" color="#FFFFFF" /> : `Add ₦${Number(creditAmount || 0).toLocaleString()} to Wallet`}
               </button>
             </form>
           </div>

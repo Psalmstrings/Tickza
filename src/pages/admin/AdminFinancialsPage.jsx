@@ -203,75 +203,75 @@ export default function AdminFinancialsPage() {
       </div>
 
       {/* KPI Cards Grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 16, marginBottom: 24 }}>
-        <div style={{ backgroundColor: '#FFFFFF', borderRadius: 14, padding: 18, border: '1px solid #E5E5E5', boxShadow: '0 1px 4px rgba(0,0,0,0.03)' }}>
+      <div className="admin-fin-metrics-grid">
+        <div style={{ backgroundColor: '#FFFFFF', borderRadius: 14, padding: 18, border: '1px solid #E5E5E5', boxShadow: '0 1px 4px rgba(0,0,0,0.03)', minWidth: 0 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
             <span style={{ fontSize: 12, fontWeight: 700, color: '#6B6B6B', textTransform: 'uppercase' }}>Gross Ticket Volume</span>
             <div style={{ width: 32, height: 32, borderRadius: 8, backgroundColor: '#EFF6FF', color: '#026CDF', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <TrendingUp size={16} />
             </div>
           </div>
-          <p style={{ fontSize: 24, fontWeight: 900, color: '#1F1F1F', margin: '0 0 4px 0' }}>
+          <p style={{ fontSize: 24, fontWeight: 900, color: '#1F1F1F', margin: '0 0 4px 0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
             ₦{metrics.totalGrossTicketSales.toLocaleString()}
           </p>
           <span style={{ fontSize: 11, color: '#059669', fontWeight: 600 }}>{metrics.totalTransactionsCount} paid orders</span>
         </div>
 
-        <div style={{ backgroundColor: '#FFFFFF', borderRadius: 14, padding: 18, border: '2px solid #026CDF', boxShadow: '0 2px 8px rgba(2,108,223,0.08)' }}>
+        <div style={{ backgroundColor: '#FFFFFF', borderRadius: 14, padding: 18, border: '2px solid #026CDF', boxShadow: '0 2px 8px rgba(2,108,223,0.08)', minWidth: 0 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
             <span style={{ fontSize: 12, fontWeight: 800, color: '#026CDF', textTransform: 'uppercase' }}>Tickza Net Commission</span>
             <div style={{ width: 32, height: 32, borderRadius: 8, backgroundColor: '#EFF6FF', color: '#026CDF', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <DollarSign size={16} />
             </div>
           </div>
-          <p style={{ fontSize: 24, fontWeight: 900, color: '#026CDF', margin: '0 0 4px 0' }}>
+          <p style={{ fontSize: 24, fontWeight: 900, color: '#026CDF', margin: '0 0 4px 0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
             ₦{metrics.totalPlatformCommission.toLocaleString()}
           </p>
           <span style={{ fontSize: 11, color: '#6B6B6B' }}>Platform net revenue</span>
         </div>
 
-        <div style={{ backgroundColor: '#FFFFFF', borderRadius: 14, padding: 18, border: '1px solid #E5E5E5', boxShadow: '0 1px 4px rgba(0,0,0,0.03)' }}>
+        <div style={{ backgroundColor: '#FFFFFF', borderRadius: 14, padding: 18, border: '1px solid #E5E5E5', boxShadow: '0 1px 4px rgba(0,0,0,0.03)', minWidth: 0 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
             <span style={{ fontSize: 12, fontWeight: 700, color: '#6B6B6B', textTransform: 'uppercase' }}>Vendor Earnings Accrued</span>
             <div style={{ width: 32, height: 32, borderRadius: 8, backgroundColor: '#ECFDF5', color: '#059669', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <CreditCard size={16} />
             </div>
           </div>
-          <p style={{ fontSize: 24, fontWeight: 900, color: '#059669', margin: '0 0 4px 0' }}>
+          <p style={{ fontSize: 24, fontWeight: 900, color: '#059669', margin: '0 0 4px 0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
             ₦{metrics.totalVendorEarnings.toLocaleString()}
           </p>
           <span style={{ fontSize: 11, color: '#6B6B6B' }}>Avail: ₦{metrics.totalVendorAvailable.toLocaleString()}</span>
         </div>
 
-        <div style={{ backgroundColor: '#FFFFFF', borderRadius: 14, padding: 18, border: '1px solid #E5E5E5', boxShadow: '0 1px 4px rgba(0,0,0,0.03)' }}>
+        <div style={{ backgroundColor: '#FFFFFF', borderRadius: 14, padding: 18, border: '1px solid #E5E5E5', boxShadow: '0 1px 4px rgba(0,0,0,0.03)', minWidth: 0 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
             <span style={{ fontSize: 12, fontWeight: 700, color: '#D97706', textTransform: 'uppercase' }}>Pending Payout Requests</span>
             <div style={{ width: 32, height: 32, borderRadius: 8, backgroundColor: '#FFFBEB', color: '#D97706', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <Clock size={16} />
             </div>
           </div>
-          <p style={{ fontSize: 24, fontWeight: 900, color: '#D97706', margin: '0 0 4px 0' }}>
+          <p style={{ fontSize: 24, fontWeight: 900, color: '#D97706', margin: '0 0 4px 0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
             ₦{metrics.pendingPayoutRequestsAmount.toLocaleString()}
           </p>
           <span style={{ fontSize: 11, color: '#D97706', fontWeight: 600 }}>{metrics.pendingPayoutRequestsCount} request(s) awaiting approval</span>
         </div>
 
-        <div style={{ backgroundColor: '#FFFFFF', borderRadius: 14, padding: 18, border: '1px solid #E5E5E5', boxShadow: '0 1px 4px rgba(0,0,0,0.03)' }}>
+        <div style={{ backgroundColor: '#FFFFFF', borderRadius: 14, padding: 18, border: '1px solid #E5E5E5', boxShadow: '0 1px 4px rgba(0,0,0,0.03)', minWidth: 0 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
             <span style={{ fontSize: 12, fontWeight: 700, color: '#059669', textTransform: 'uppercase' }}>Disbursed Payouts</span>
             <div style={{ width: 32, height: 32, borderRadius: 8, backgroundColor: '#ECFDF5', color: '#059669', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <CheckCircle2 size={16} />
             </div>
           </div>
-          <p style={{ fontSize: 24, fontWeight: 900, color: '#1F1F1F', margin: '0 0 4px 0' }}>
+          <p style={{ fontSize: 24, fontWeight: 900, color: '#1F1F1F', margin: '0 0 4px 0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
             ₦{metrics.completedPayoutsAmount.toLocaleString()}
           </p>
           <span style={{ fontSize: 11, color: '#6B6B6B' }}>Paid via Paystack Transfers</span>
         </div>
       </div>
 
-      {/* Main Layout: Commission Configuration & Payout Requests */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 2.8fr', gap: 20, alignItems: 'start' }}>
+      {/* Main Layout: Commission Configuration & Payout Requests (Responsive Split Layout) */}
+      <div className="admin-fin-split-layout">
         {/* Commission & Settings Panel */}
         <div style={{ backgroundColor: '#FFFFFF', borderRadius: 16, padding: 20, border: '1px solid #E5E5E5', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
@@ -386,138 +386,253 @@ export default function AdminFinancialsPage() {
               <p style={{ margin: 0, fontWeight: 700, fontSize: 14 }}>No payout requests matching filter</p>
             </div>
           ) : (
-            <div className="responsive-table-container">
-              <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: 13 }}>
-                <thead>
-                  <tr style={{ backgroundColor: '#F9FAFB', borderBottom: '1px solid #E5E5E5', color: '#4B5563', fontSize: 12, textTransform: 'uppercase' }}>
-                    <th style={{ padding: '12px 16px' }}>Vendor</th>
-                    <th style={{ padding: '12px 16px' }}>Reference</th>
-                    <th style={{ padding: '12px 16px' }}>Amount</th>
-                    <th style={{ padding: '12px 16px' }}>Bank Account</th>
-                    <th style={{ padding: '12px 16px' }}>Status</th>
-                    <th style={{ padding: '12px 16px', textAlign: 'right' }}>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {payouts.map((p) => {
-                    const amountNaira = p.amountKobo ? p.amountKobo / 100 : p.netAmount || 0;
-                    const vendor = p.organizerId;
-                    const isPending = ['REQUESTED', 'UNDER_REVIEW'].includes(p.status);
-                    const isFailed = p.status === 'FAILED';
+            <>
+              {/* Desktop Table View (>= 768px) */}
+              <div className="desktop-only admin-desktop-table-container">
+                <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: 13 }}>
+                  <thead>
+                    <tr style={{ backgroundColor: '#F9FAFB', borderBottom: '1px solid #E5E5E5', color: '#4B5563', fontSize: 12, textTransform: 'uppercase' }}>
+                      <th style={{ padding: '12px 16px' }}>Vendor</th>
+                      <th style={{ padding: '12px 16px' }}>Reference</th>
+                      <th style={{ padding: '12px 16px' }}>Amount</th>
+                      <th style={{ padding: '12px 16px' }}>Bank Account</th>
+                      <th style={{ padding: '12px 16px' }}>Status</th>
+                      <th style={{ padding: '12px 16px', textAlign: 'right' }}>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {payouts.map((p) => {
+                      const amountNaira = p.amountKobo ? p.amountKobo / 100 : p.netAmount || 0;
+                      const vendor = p.organizerId;
+                      const isPending = ['REQUESTED', 'UNDER_REVIEW'].includes(p.status);
+                      const isFailed = p.status === 'FAILED';
 
-                    let badgeColor = '#6B7280';
-                    let badgeBg = '#F3F4F6';
-                    if (p.status === 'PAID') {
-                      badgeColor = '#059669';
-                      badgeBg = '#ECFDF5';
-                    } else if (p.status === 'PROCESSING') {
-                      badgeColor = '#2563EB';
-                      badgeBg = '#EFF6FF';
-                    } else if (p.status === 'REQUESTED' || p.status === 'UNDER_REVIEW') {
-                      badgeColor = '#D97706';
-                      badgeBg = '#FFFBEB';
-                    } else if (p.status === 'REJECTED' || p.status === 'FAILED') {
-                      badgeColor = '#DC2626';
-                      badgeBg = '#FEF2F2';
-                    }
+                      let badgeColor = '#6B7280';
+                      let badgeBg = '#F3F4F6';
+                      if (p.status === 'PAID') {
+                        badgeColor = '#059669';
+                        badgeBg = '#ECFDF5';
+                      } else if (p.status === 'PROCESSING') {
+                        badgeColor = '#2563EB';
+                        badgeBg = '#EFF6FF';
+                      } else if (p.status === 'REQUESTED' || p.status === 'UNDER_REVIEW') {
+                        badgeColor = '#D97706';
+                        badgeBg = '#FFFBEB';
+                      } else if (p.status === 'REJECTED' || p.status === 'FAILED') {
+                        badgeColor = '#DC2626';
+                        badgeBg = '#FEF2F2';
+                      }
 
-                    return (
-                      <tr key={p._id} style={{ borderBottom: '1px solid #F0F0F0' }}>
-                        <td style={{ padding: '12px 16px' }}>
-                          <strong style={{ color: '#1F1F1F' }}>
+                      return (
+                        <tr key={p._id} style={{ borderBottom: '1px solid #F0F0F0' }}>
+                          <td style={{ padding: '12px 16px' }}>
+                            <strong style={{ color: '#1F1F1F' }}>
+                              {vendor?.firstName} {vendor?.lastName}
+                            </strong>
+                            <div style={{ fontSize: 11, color: '#6B7280' }}>{vendor?.email}</div>
+                          </td>
+                          <td style={{ padding: '12px 16px', fontFamily: 'monospace', fontWeight: 600, color: '#4B5563' }}>
+                            {p.reference}
+                          </td>
+                          <td style={{ padding: '12px 16px', fontWeight: 800, color: '#1F1F1F' }}>
+                            ₦{amountNaira.toLocaleString()}
+                          </td>
+                          <td style={{ padding: '12px 16px' }}>
+                            <div style={{ fontWeight: 600, fontSize: 12 }}>{p.bankAccount?.bankName}</div>
+                            <div style={{ fontSize: 11, color: '#6B7280', fontFamily: 'monospace' }}>
+                              {p.bankAccount?.accountNumberMasked} • {p.bankAccount?.accountName}
+                            </div>
+                          </td>
+                          <td style={{ padding: '12px 16px' }}>
+                            <span
+                              style={{
+                                backgroundColor: badgeBg,
+                                color: badgeColor,
+                                padding: '3px 8px',
+                                borderRadius: 4,
+                                fontSize: 11,
+                                fontWeight: 800,
+                                textTransform: 'uppercase',
+                              }}
+                            >
+                              {p.status}
+                            </span>
+                          </td>
+                          <td style={{ padding: '12px 16px', textAlign: 'right' }}>
+                            {isPending && (
+                              <div style={{ display: 'inline-flex', gap: 6 }}>
+                                <button
+                                  onClick={() => handleOpenActionModal(p, 'APPROVE')}
+                                  style={{
+                                    backgroundColor: '#059669',
+                                    color: '#FFFFFF',
+                                    border: 'none',
+                                    padding: '5px 10px',
+                                    borderRadius: 6,
+                                    fontSize: 11,
+                                    fontWeight: 700,
+                                    cursor: 'pointer',
+                                  }}
+                                >
+                                  Approve & Pay
+                                </button>
+                                <button
+                                  onClick={() => handleOpenActionModal(p, 'REJECT')}
+                                  style={{
+                                    backgroundColor: '#FEF2F2',
+                                    color: '#DC2626',
+                                    border: '1px solid #FECACA',
+                                    padding: '5px 10px',
+                                    borderRadius: 6,
+                                    fontSize: 11,
+                                    fontWeight: 700,
+                                    cursor: 'pointer',
+                                  }}
+                                >
+                                  Reject
+                                </button>
+                              </div>
+                            )}
+                            {isFailed && (
+                              <button
+                                onClick={() => handleRetryPayout(p._id)}
+                                style={{
+                                  backgroundColor: '#EFF6FF',
+                                  color: '#2563EB',
+                                  border: '1px solid #BFDBFE',
+                                  padding: '5px 10px',
+                                  borderRadius: 6,
+                                  fontSize: 11,
+                                  fontWeight: 700,
+                                  cursor: 'pointer',
+                                }}
+                              >
+                                Retry
+                              </button>
+                            )}
+                            {!isPending && !isFailed && (
+                              <span style={{ fontSize: 11, color: '#9CA3AF' }}>Settled</span>
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Mobile Card List View (< 768px) */}
+              <div className="mobile-only admin-mobile-payout-list">
+                {payouts.map((p) => {
+                  const amountNaira = p.amountKobo ? p.amountKobo / 100 : p.netAmount || 0;
+                  const vendor = p.organizerId;
+                  const isPending = ['REQUESTED', 'UNDER_REVIEW'].includes(p.status);
+                  const isFailed = p.status === 'FAILED';
+
+                  let badgeColor = '#6B7280';
+                  let badgeBg = '#F3F4F6';
+                  if (p.status === 'PAID') {
+                    badgeColor = '#059669';
+                    badgeBg = '#ECFDF5';
+                  } else if (p.status === 'PROCESSING') {
+                    badgeColor = '#2563EB';
+                    badgeBg = '#EFF6FF';
+                  } else if (p.status === 'REQUESTED' || p.status === 'UNDER_REVIEW') {
+                    badgeColor = '#D97706';
+                    badgeBg = '#FFFBEB';
+                  } else if (p.status === 'REJECTED' || p.status === 'FAILED') {
+                    badgeColor = '#DC2626';
+                    badgeBg = '#FEF2F2';
+                  }
+
+                  return (
+                    <div key={p._id} className="admin-mobile-payout-card">
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
+                        <div>
+                          <strong style={{ color: '#1F1F1F', fontSize: 14 }}>
                             {vendor?.firstName} {vendor?.lastName}
                           </strong>
                           <div style={{ fontSize: 11, color: '#6B7280' }}>{vendor?.email}</div>
-                        </td>
-                        <td style={{ padding: '12px 16px', fontFamily: 'monospace', fontWeight: 600, color: '#4B5563' }}>
+                        </div>
+                        <span
+                          style={{
+                            backgroundColor: badgeBg,
+                            color: badgeColor,
+                            padding: '3px 8px',
+                            borderRadius: 4,
+                            fontSize: 10.5,
+                            fontWeight: 800,
+                            textTransform: 'uppercase',
+                            flexShrink: 0,
+                          }}
+                        >
+                          {p.status}
+                        </span>
+                      </div>
+
+                      <div style={{
+                        display: 'flex', justifyContent: 'space-between', alignItems: 'baseline',
+                        padding: '8px 10px', background: '#F8FAFC', borderRadius: 8
+                      }}>
+                        <div>
+                          <span style={{ fontSize: 11, color: '#64748B' }}>Amount: </span>
+                          <span style={{ fontSize: 16, fontWeight: 900, color: '#1F1F1F' }}>
+                            ₦{amountNaira.toLocaleString()}
+                          </span>
+                        </div>
+                        <div style={{ fontSize: 11, fontFamily: 'monospace', color: '#64748B' }}>
                           {p.reference}
-                        </td>
-                        <td style={{ padding: '12px 16px', fontWeight: 800, color: '#1F1F1F' }}>
-                          ₦{amountNaira.toLocaleString()}
-                        </td>
-                        <td style={{ padding: '12px 16px' }}>
-                          <div style={{ fontWeight: 600, fontSize: 12 }}>{p.bankAccount?.bankName}</div>
-                          <div style={{ fontSize: 11, color: '#6B7280', fontFamily: 'monospace' }}>
-                            {p.bankAccount?.accountNumberMasked} • {p.bankAccount?.accountName}
-                          </div>
-                        </td>
-                        <td style={{ padding: '12px 16px' }}>
-                          <span
+                        </div>
+                      </div>
+
+                      <div style={{ fontSize: 12, color: '#4B5563' }}>
+                        <strong>{p.bankAccount?.bankName}</strong> •{' '}
+                        <span style={{ fontFamily: 'monospace' }}>{p.bankAccount?.accountNumberMasked}</span>{' '}
+                        ({p.bankAccount?.accountName})
+                      </div>
+
+                      {isPending && (
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginTop: 4 }}>
+                          <button
+                            onClick={() => handleOpenActionModal(p, 'APPROVE')}
                             style={{
-                              backgroundColor: badgeBg,
-                              color: badgeColor,
-                              padding: '3px 8px',
-                              borderRadius: 4,
-                              fontSize: 11,
-                              fontWeight: 800,
-                              textTransform: 'uppercase',
+                              backgroundColor: '#059669', color: '#FFFFFF', border: 'none',
+                              minHeight: 40, borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: 'pointer',
+                              touchAction: 'manipulation'
                             }}
                           >
-                            {p.status}
-                          </span>
-                        </td>
-                        <td style={{ padding: '12px 16px', textAlign: 'right' }}>
-                          {isPending && (
-                            <div style={{ display: 'inline-flex', gap: 6 }}>
-                              <button
-                                onClick={() => handleOpenActionModal(p, 'APPROVE')}
-                                style={{
-                                  backgroundColor: '#059669',
-                                  color: '#FFFFFF',
-                                  border: 'none',
-                                  padding: '5px 10px',
-                                  borderRadius: 6,
-                                  fontSize: 11,
-                                  fontWeight: 700,
-                                  cursor: 'pointer',
-                                }}
-                              >
-                                Approve & Pay
-                              </button>
-                              <button
-                                onClick={() => handleOpenActionModal(p, 'REJECT')}
-                                style={{
-                                  backgroundColor: '#FEF2F2',
-                                  color: '#DC2626',
-                                  border: '1px solid #FECACA',
-                                  padding: '5px 10px',
-                                  borderRadius: 6,
-                                  fontSize: 11,
-                                  fontWeight: 700,
-                                  cursor: 'pointer',
-                                }}
-                              >
-                                Reject
-                              </button>
-                            </div>
-                          )}
-                          {isFailed && (
-                            <button
-                              onClick={() => handleRetryPayout(p._id)}
-                              style={{
-                                backgroundColor: '#EFF6FF',
-                                color: '#2563EB',
-                                border: '1px solid #BFDBFE',
-                                padding: '5px 10px',
-                                borderRadius: 6,
-                                fontSize: 11,
-                                fontWeight: 700,
-                                cursor: 'pointer',
-                              }}
-                            >
-                              Retry
-                            </button>
-                          )}
-                          {!isPending && !isFailed && (
-                            <span style={{ fontSize: 11, color: '#9CA3AF' }}>Settled</span>
-                          )}
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
+                            Approve & Pay
+                          </button>
+                          <button
+                            onClick={() => handleOpenActionModal(p, 'REJECT')}
+                            style={{
+                              backgroundColor: '#FEF2F2', color: '#DC2626', border: '1px solid #FECACA',
+                              minHeight: 40, borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: 'pointer',
+                              touchAction: 'manipulation'
+                            }}
+                          >
+                            Reject
+                          </button>
+                        </div>
+                      )}
+
+                      {isFailed && (
+                        <button
+                          onClick={() => handleRetryPayout(p._id)}
+                          style={{
+                            backgroundColor: '#EFF6FF', color: '#2563EB', border: '1px solid #BFDBFE',
+                            minHeight: 40, borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: 'pointer',
+                            touchAction: 'manipulation', width: '100%', marginTop: 4
+                          }}
+                        >
+                          Retry Transfer
+                        </button>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </>
           )}
         </div>
       </div>
@@ -525,29 +640,12 @@ export default function AdminFinancialsPage() {
       {/* ===== ACTION MODAL: APPROVE OR REJECT ===== */}
       {selectedPayout && (
         <div
-          style={{
-            position: 'fixed',
-            inset: 0,
-            backgroundColor: 'rgba(0,0,0,0.6)',
-            backdropFilter: 'blur(4px)',
-            zIndex: 3000,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: 16,
-          }}
+          className="admin-modal-backdrop"
           onClick={() => !processingAction && setSelectedPayout(null)}
         >
           <div
+            className="admin-modal-card"
             onClick={(e) => e.stopPropagation()}
-            style={{
-              backgroundColor: '#FFFFFF',
-              borderRadius: 16,
-              maxWidth: 460,
-              width: '100%',
-              padding: 24,
-              boxShadow: '0 20px 50px rgba(0,0,0,0.2)',
-            }}
           >
             {actionType === 'APPROVE' ? (
               <div>

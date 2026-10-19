@@ -35,7 +35,7 @@ export default function AdminTicketsPage() {
   const formatDate = (d) => d ? new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—';
 
   return (
-    <div style={{ padding: '24px' }}>
+    <div style={{ padding: '8px 0 24px' }}>
       {/* Header */}
       <div style={{ marginBottom: '20px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '4px' }}>
@@ -87,7 +87,7 @@ export default function AdminTicketsPage() {
                       <td style={{ padding: '14px 16px', color: '#6B6B6B', fontSize: '13px' }}>{t.ownerId?.email || '—'}</td>
                       <td style={{ padding: '14px 16px', color: '#6B6B6B', fontSize: '13px', whiteSpace: 'nowrap' }}>{t.ticketTypeId?.name || t.type || '—'}</td>
                       <td style={{ padding: '14px 16px', color: '#1F1F1F', fontWeight: 600, fontSize: '13px', whiteSpace: 'nowrap' }}>
-                        {t.price === 0 ? 'FREE' : t.price ? `$${Number(t.price).toLocaleString()}` : '—'}
+                        {t.price === 0 ? 'FREE' : t.price ? `₦${Number(t.price).toLocaleString()}` : '—'}
                       </td>
                       <td style={{ padding: '14px 16px' }}>
                         <span style={{ display: 'inline-block', background: badge.bg, color: badge.color, padding: '3px 10px', borderRadius: '20px', fontSize: '12px', fontWeight: 600, whiteSpace: 'nowrap' }}>{t.status}</span>

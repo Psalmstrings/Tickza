@@ -157,7 +157,7 @@ export default function ProfilePage() {
             {[
               { label: 'Tickets', value: ticketCount },
               { label: 'Events', value: eventCount },
-              { label: 'Balance', value: `$${(user?.balance || 0).toLocaleString()}` },
+              { label: 'Balance', value: `₦${(user?.balance || 0).toLocaleString()}` },
             ].map(({ label, value }) => (
               <div key={label} style={{ background: '#FFFFFF', border: '1px solid #E5E5E5', borderRadius: '8px', padding: '14px 12px', textAlign: 'center' }}>
                 <p style={{ color: '#1F1F1F', fontWeight: 800, fontSize: '18px', margin: '0 0 2px' }}>{value}</p>

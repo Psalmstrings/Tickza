@@ -192,7 +192,7 @@ export default function ResalePage() {
                     <div>
                       <span style={{ fontSize: '11px', color: '#8C8C8C', display: 'block', textTransform: 'uppercase' }}>Verified Price</span>
                       <span style={{ fontSize: '24px', fontWeight: 900, color: '#026CDF' }}>
-                        ${item.price?.toFixed(2)}
+                        ₦{item.price?.toFixed(2)}
                       </span>
                     </div>
 

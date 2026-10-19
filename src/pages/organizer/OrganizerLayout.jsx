@@ -76,6 +76,25 @@ export default function OrganizerLayout() {
   // Close sidebar on route change (mobile)
   useEffect(() => { closeSidebar(); }, [location.pathname]);
 
+  // Handle escape key and lock body scroll when mobile drawer is open
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape' && sidebarOpen) {
+        closeSidebar();
+      }
+    };
+    if (sidebarOpen) {
+      document.body.style.overflow = 'hidden';
+      window.addEventListener('keydown', handleKeyDown);
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [sidebarOpen]);
+
   // Fetch unread notification count
   useEffect(() => {
     api.get('/notifications').then(({ data }) => {
@@ -132,7 +151,7 @@ export default function OrganizerLayout() {
       {/* Sidebar */}
       <aside className={`org-sidebar${sidebarOpen ? ' open' : ''}`}>
         <button className="org-sidebar-close" onClick={closeSidebar} aria-label="Close menu">
-          <X size={14} />
+          <X size={18} />
         </button>
 
         {/* Logo */}
@@ -205,9 +224,10 @@ export default function OrganizerLayout() {
           <button
             className="org-header-menu-btn"
             onClick={() => setSidebarOpen(true)}
-            aria-label="Open menu"
+            aria-label="Open organizer navigation menu"
+            aria-expanded={sidebarOpen}
           >
-            <Menu size={20} />
+            <Menu size={22} />
           </button>
 
           <span className="org-header-title">{pageTitle()}</span>
@@ -265,18 +285,19 @@ export default function OrganizerLayout() {
             {/* Notifications */}
             <button
               style={{
-                position: 'relative', width: 36, height: 36, border: 'none',
-                background: 'transparent', borderRadius: 7, cursor: 'pointer',
+                position: 'relative', width: 44, height: 44, border: 'none',
+                background: 'transparent', borderRadius: 8, cursor: 'pointer',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 color: '#475569',
               }}
               onClick={() => navigate('/notifications')}
               title="Notifications"
+              aria-label="View notifications"
             >
-              <Bell size={18} />
+              <Bell size={20} />
               {notifications > 0 && (
                 <span style={{
-                  position: 'absolute', top: 4, right: 4,
+                  position: 'absolute', top: 6, right: 6,
                   width: 16, height: 16, borderRadius: '50%',
                   background: '#EF4444', color: '#FFF',
                   fontSize: 9, fontWeight: 700, display: 'flex',

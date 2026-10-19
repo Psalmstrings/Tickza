@@ -356,7 +356,7 @@ export default function TicketCard({
                 onResale(ticket);
               }}
             >
-              <DollarSign size={14} /> Sell
+               ₦   Sell
             </button>
           )}
         </div>

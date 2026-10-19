@@ -102,12 +102,9 @@ function EventCard({ ev, onToggleStatus, onRequestDelete, onCopyLink }) {
 
   return (
     <div className="org-card" style={{ overflow: 'visible', position: 'relative' }}>
-      <div style={{ display: 'flex', gap: 0, height: 'auto' }}>
+      <div className="org-event-card-inner">
         {/* Image with fallback */}
-        <div style={{
-          width: 110, height: 95, flexShrink: 0, overflow: 'hidden',
-          borderRadius: '12px 0 0 12px', background: '#F1F5F9', position: 'relative'
-        }}>
+        <div className="org-event-card-img">
           <img
             src={imageUrl}
             alt={ev.title}
@@ -144,12 +141,13 @@ function EventCard({ ev, onToggleStatus, onRequestDelete, onCopyLink }) {
               <button
                 onClick={() => setMenuOpen(v => !v)}
                 style={{
-                  width: 32, height: 32, border: '1px solid #E2E8F0', borderRadius: 8,
+                  width: 44, height: 44, border: '1px solid #E2E8F0', borderRadius: 8,
                   background: '#FFF', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  touchAction: 'manipulation',
                 }}
                 aria-label="Event Options"
               >
-                <MoreVertical size={15} color="#64748B" />
+                <MoreVertical size={16} color="#64748B" />
               </button>
               {menuOpen && (
                 <EventDropdown
@@ -287,14 +285,13 @@ export default function OrganizerEventsPage() {
 
       {/* Filters */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20, flexWrap: 'wrap' }}>
-        <div style={{ display: 'flex', gap: 0, background: '#F1F5F9', borderRadius: 9, padding: 3, overflow: 'auto' }}>
+        <div className="org-date-filter-group">
           {STATUS_TABS.map(t => (
             <button
               key={t.value}
               onClick={() => handleStatusFilter(t.value)}
+              className="org-date-filter-btn"
               style={{
-                padding: '6px 14px', borderRadius: 7, border: 'none', fontSize: 12.5, fontWeight: 600,
-                cursor: 'pointer', transition: 'all 0.15s', whiteSpace: 'nowrap',
                 background: statusFilter === t.value ? '#FFFFFF' : 'transparent',
                 color: statusFilter === t.value ? '#0B1026' : '#64748B',
                 boxShadow: statusFilter === t.value ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',

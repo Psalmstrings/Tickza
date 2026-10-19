@@ -44,37 +44,38 @@ export default function AdminStatsPage() {
           <TickzaSpinner size="md" message="Loading analytics..." />
         </div>
       ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px' }}>
+        <div className="admin-stats-grid">
           {cards.map((card) => (
             <div
               key={card.label}
               style={{
                 backgroundColor: '#FFFFFF',
                 borderRadius: '14px',
-                padding: '20px',
-                border: '1px solid #E5E5E5',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+                padding: '16px 18px',
+                border: '1px solid #E5E7EB',
+                boxShadow: '0 1px 4px rgba(0,0,0,0.03)',
+                minWidth: 0,
               }}
             >
               <div
                 style={{
-                  width: '44px',
-                  height: '44px',
+                  width: '40px',
+                  height: '40px',
                   borderRadius: '10px',
                   backgroundColor: card.bg,
                   color: card.color,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  marginBottom: '14px',
+                  marginBottom: '12px',
                 }}
               >
                 {card.icon}
               </div>
-              <p style={{ fontSize: '28px', fontWeight: 900, color: '#1F1F1F', margin: '0 0 2px 0' }}>
+              <p style={{ fontSize: 'clamp(22px, 5vw, 28px)', fontWeight: 900, color: '#1F1F1F', margin: '0 0 2px 0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                 {card.value ?? 0}
               </p>
-              <p style={{ fontSize: '13px', fontWeight: 600, color: '#6B6B6B', margin: 0 }}>{card.label}</p>
+              <p style={{ fontSize: '12.5px', fontWeight: 600, color: '#6B7280', margin: 0 }}>{card.label}</p>
             </div>
           ))}
         </div>

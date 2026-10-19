@@ -179,20 +179,14 @@ export default function OrganizerOverviewPage() {
           <p style={{ fontSize: 13.5, color: '#475569', margin: 0 }}>Here's what's happening with your events.</p>
         </div>
 
-        {/* Date Range Filter */}
-        <div style={{ display: 'flex', gap: 4, background: '#F1F5F9', borderRadius: 9, padding: 3 }}>
+        {/* Date Range Filter (Mobile-first scroll-contained segmented control) */}
+        <div className="org-date-filter-group">
           {RANGES.map(r => (
             <button
               key={r.value}
               onClick={() => setRange(r.value)}
+              className="org-date-filter-btn"
               style={{
-                padding: '6px 14px',
-                borderRadius: 7,
-                border: 'none',
-                fontSize: 12.5,
-                fontWeight: 600,
-                cursor: 'pointer',
-                transition: 'all 0.15s',
                 background: range === r.value ? '#FFFFFF' : 'transparent',
                 color: range === r.value ? '#0B1026' : '#64748B',
                 boxShadow: range === r.value ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
@@ -240,30 +234,30 @@ export default function OrganizerOverviewPage() {
         />
       </div>
 
-      {/* Secondary Metrics */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, marginBottom: 24 }}>
+      {/* Secondary Metrics (Responsive: 1 col on mobile, 2 col on tablet, 3 col on desktop) */}
+      <div className="org-secondary-metrics">
         {[
           { label: 'Conversion Rate', value: `${overview?.conversionRate || 0}%`, icon: BarChart2, color: '#7C3AED' },
           { label: 'Avg Ticket Value', value: `₦${(overview?.avgTicketValue || 0).toLocaleString()}`, icon: TrendingUp, color: '#10B981' },
           { label: 'Upcoming Events', value: (overview?.upcomingEvents || 0).toString(), icon: Clock, color: '#F59E0B' },
         ].map((m, i) => (
           <div key={i} className="org-card" style={{ padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 14 }}>
-            <div style={{ width: 38, height: 38, borderRadius: 10, background: `${m.color}18`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-              <m.icon size={16} style={{ color: m.color }} />
+            <div style={{ width: 40, height: 40, borderRadius: 10, background: `${m.color}18`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              <m.icon size={18} style={{ color: m.color }} />
             </div>
-            <div>
+            <div style={{ minWidth: 0, flex: 1 }}>
               <div style={{ fontSize: 11.5, fontWeight: 600, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 2 }}>{m.label}</div>
               {loading
                 ? <div className="org-skeleton" style={{ height: 20, width: 60 }} />
-                : <div style={{ fontSize: 20, fontWeight: 700, color: '#0B1026', letterSpacing: -0.3 }}>{m.value}</div>
+                : <div style={{ fontSize: 20, fontWeight: 700, color: '#0B1026', letterSpacing: -0.3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.value}</div>
               }
             </div>
           </div>
         ))}
       </div>
 
-      {/* Two-column: Chart + Top Events */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 360px', gap: 20, marginBottom: 20 }}>
+      {/* Responsive Grid: Chart + Top Events (Stacks on mobile/tablet < 1024px) */}
+      <div className="org-chart-grid">
         {/* Sales Chart */}
         <div className="org-card">
           <div className="org-card-header">
@@ -288,13 +282,13 @@ export default function OrganizerOverviewPage() {
               </>
             )}
           </div>
-          <div style={{ padding: '8px 20px 16px', borderTop: '1px solid #F1F5F9', display: 'flex', gap: 24 }}>
+          <div style={{ padding: '12px 20px 16px', borderTop: '1px solid #F1F5F9', display: 'flex', gap: '16px 24px', flexWrap: 'wrap' }}>
             {[
               { label: 'Total Tickets', value: analytics?.summary?.totalTickets || 0 },
               { label: 'Total Orders', value: analytics?.summary?.totalOrders || 0 },
               { label: 'Avg Order', value: `₦${(analytics?.summary?.avgOrderValue || 0).toLocaleString()}` },
             ].map((s, i) => (
-              <div key={i}>
+              <div key={i} style={{ minWidth: 90 }}>
                 <div style={{ fontSize: 10.5, color: '#94A3B8', marginBottom: 2 }}>{s.label}</div>
                 <div style={{ fontSize: 15, fontWeight: 700, color: '#0B1026' }}>{s.value}</div>
               </div>
@@ -359,7 +353,7 @@ export default function OrganizerOverviewPage() {
         </div>
       </div>
 
-      {/* Recent Events Table */}
+      {/* Recent Events Section (Desktop Table + Mobile Cards) */}
       <div className="org-card">
         <div className="org-card-header">
           <h3 className="org-card-title">Recent Events</h3>
@@ -386,65 +380,131 @@ export default function OrganizerOverviewPage() {
             </Link>
           </div>
         ) : (
-          <div className="org-table-wrap">
-            <table className="org-table">
-              <thead>
-                <tr>
-                  <th>Event</th>
-                  <th>Date</th>
-                  <th>Venue</th>
-                  <th>Tickets Sold</th>
-                  <th>Revenue</th>
-                  <th>Status</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody>
-                {events.map(ev => (
-                  <tr key={ev._id}>
-                    <td>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                        <div style={{
-                          width: 36, height: 36, borderRadius: 8, overflow: 'hidden', flexShrink: 0,
-                          background: '#F1F5F9',
-                        }}>
-                          {ev.coverImage?.url || typeof ev.coverImage === 'string' ? (
-                            <img
-                              src={getEventImageUrl(ev.coverImage?.url || ev.coverImage)}
-                              alt=""
-                              onError={handleImageFallback}
-                              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                            />
-                          ) : (
-                            <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                              <Calendar size={14} color="#94A3B8" />
+          <>
+            {/* Desktop Table View (>= 768px) */}
+            <div className="org-desktop-only">
+              <div className="org-table-wrap">
+                <table className="org-table">
+                  <thead>
+                    <tr>
+                      <th>Event</th>
+                      <th>Date</th>
+                      <th>Venue</th>
+                      <th>Tickets Sold</th>
+                      <th>Revenue</th>
+                      <th>Status</th>
+                      <th></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {events.map(ev => (
+                      <tr key={ev._id}>
+                        <td>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                            <div style={{
+                              width: 36, height: 36, borderRadius: 8, overflow: 'hidden', flexShrink: 0,
+                              background: '#F1F5F9',
+                            }}>
+                              {ev.coverImage?.url || typeof ev.coverImage === 'string' ? (
+                                <img
+                                  src={getEventImageUrl(ev.coverImage?.url || ev.coverImage)}
+                                  alt=""
+                                  onError={handleImageFallback}
+                                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                />
+                              ) : (
+                                <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                  <Calendar size={14} color="#94A3B8" />
+                                </div>
+                              )}
                             </div>
-                          )}
+                            <div style={{ fontWeight: 600, color: '#0B1026', fontSize: 13.5, maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                              {ev.title}
+                            </div>
+                          </div>
+                        </td>
+                        <td style={{ color: '#475569', fontSize: 13 }}>{formatDate(ev.startDate)}</td>
+                        <td style={{ color: '#475569', fontSize: 13, maxWidth: 140, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{ev.venue}</td>
+                        <td style={{ fontWeight: 600, color: '#0B1026' }}>{(ev.ticketsSold || 0).toLocaleString()}</td>
+                        <td style={{ fontWeight: 600, color: '#0B1026' }}>₦{(ev.revenue || 0).toLocaleString()}</td>
+                        <td><EventStatusBadge status={ev.status} /></td>
+                        <td>
+                          <Link
+                            to={`/organizer/events/${ev._id}`}
+                            className="org-btn org-btn-ghost org-btn-sm"
+                            style={{ color: '#4F46E5' }}
+                          >
+                            Manage <ArrowRight size={12} />
+                          </Link>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* Mobile Card List View (< 768px) */}
+            <div className="org-mobile-only org-mobile-card-list">
+              {events.map(ev => (
+                <div key={ev._id} className="org-mobile-card">
+                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
+                    <div style={{
+                      width: 50, height: 50, borderRadius: 10, overflow: 'hidden', flexShrink: 0,
+                      background: '#F1F5F9',
+                    }}>
+                      {ev.coverImage?.url || typeof ev.coverImage === 'string' ? (
+                        <img
+                          src={getEventImageUrl(ev.coverImage?.url || ev.coverImage)}
+                          alt=""
+                          onError={handleImageFallback}
+                          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                        />
+                      ) : (
+                        <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          <Calendar size={18} color="#94A3B8" />
                         </div>
-                        <div style={{ fontWeight: 600, color: '#0B1026', fontSize: 13.5, maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                          {ev.title}
-                        </div>
+                      )}
+                    </div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 6, marginBottom: 3 }}>
+                        <EventStatusBadge status={ev.status} />
+                        <span style={{ fontSize: 11, color: '#94A3B8' }}>{formatDate(ev.startDate)}</span>
                       </div>
-                    </td>
-                    <td style={{ color: '#475569', fontSize: 13 }}>{formatDate(ev.startDate)}</td>
-                    <td style={{ color: '#475569', fontSize: 13, maxWidth: 140, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{ev.venue}</td>
-                    <td style={{ fontWeight: 600, color: '#0B1026' }}>{(ev.ticketsSold || 0).toLocaleString()}</td>
-                    <td style={{ fontWeight: 600, color: '#0B1026' }}>₦{(ev.revenue || 0).toLocaleString()}</td>
-                    <td><EventStatusBadge status={ev.status} /></td>
-                    <td>
-                      <Link
-                        to={`/organizer/events/${ev._id}`}
-                        className="org-btn org-btn-ghost org-btn-sm"
-                        style={{ color: '#4F46E5' }}
-                      >
-                        Manage <ArrowRight size={12} />
-                      </Link>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                      <h4 style={{ margin: '0 0 2px', fontSize: 14, fontWeight: 700, color: '#0B1026', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {ev.title}
+                      </h4>
+                      <p style={{ margin: 0, fontSize: 12, color: '#64748B', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {ev.venue || 'Online / TBA'}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div style={{
+                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                    padding: '8px 10px', background: '#F8FAFC', borderRadius: 8, fontSize: 12
+                  }}>
+                    <div>
+                      <span style={{ color: '#64748B' }}>Sold: </span>
+                      <strong style={{ color: '#0B1026' }}>{(ev.ticketsSold || 0).toLocaleString()}</strong>
+                    </div>
+                    <div>
+                      <span style={{ color: '#64748B' }}>Revenue: </span>
+                      <strong style={{ color: '#10B981' }}>₦{(ev.revenue || 0).toLocaleString()}</strong>
+                    </div>
+                  </div>
+
+                  <Link
+                    to={`/organizer/events/${ev._id}`}
+                    className="org-btn org-btn-secondary"
+                    style={{ width: '100%', minHeight: 40, justifyContent: 'center', fontSize: 13, fontWeight: 600 }}
+                  >
+                    Manage Event <ArrowRight size={13} />
+                  </Link>
+                </div>
+              ))}
+            </div>
+          </>
         )}
       </div>
     </div>

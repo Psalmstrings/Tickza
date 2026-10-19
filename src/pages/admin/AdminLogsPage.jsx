@@ -38,7 +38,7 @@ export default function AdminLogsPage() {
   const formatDate = (d) => d ? new Date(d).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }) : '—';
 
   return (
-    <div style={{ padding: '24px' }}>
+    <div style={{ padding: '8px 0 24px' }}>
       {/* Header */}
       <div style={{ marginBottom: '20px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '4px' }}>

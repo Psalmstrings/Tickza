@@ -137,7 +137,7 @@ export default function AdminUsersPage() {
           <Search size={16} color="#6B6B6B" />
           <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search by name, email, phone…" style={{ background: 'transparent', border: 'none', outline: 'none', color: '#1F1F1F', fontSize: '14px', flex: 1 }} />
         </div>
-        <div style={{ display: 'flex', gap: '6px', flexShrink: 0 }}>
+        <div style={{ display: 'flex', gap: '6px', overflowX: 'auto', maxWidth: '100%', scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}>
           {STATUS_FILTERS.map(f => (
             <button key={f} onClick={() => setStatusFilter(f)} style={{ padding: '7px 14px', borderRadius: '20px', border: '1px solid', borderColor: statusFilter === f ? '#026CDF' : '#E5E5E5', background: statusFilter === f ? '#026CDF' : '#FFFFFF', color: statusFilter === f ? '#FFFFFF' : '#6B6B6B', fontSize: '12px', fontWeight: statusFilter === f ? 600 : 400, cursor: 'pointer', whiteSpace: 'nowrap', transition: 'all 0.15s' }}>
               {f}

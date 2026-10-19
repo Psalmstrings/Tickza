@@ -347,7 +347,7 @@ export default function MyTicketsPage() {
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <DollarSign size={20} color="#EA580C" />
+               
                 <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 800 }}>List on Resale Marketplace</h3>
               </div>
               <button
