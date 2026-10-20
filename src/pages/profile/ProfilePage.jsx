@@ -63,7 +63,7 @@ function EditProfileModal({ user, onClose, onSaved }) {
                 value={form[key]}
                 onChange={e => setForm(p => ({ ...p, [key]: e.target.value }))}
                 style={{ width: '100%', padding: '12px 12px 12px 40px', background: '#FFFFFF', border: '1px solid #E5E5E5', borderRadius: '6px', color: '#1F1F1F', fontSize: '14px', outline: 'none', boxSizing: 'border-box' }}
-                onFocus={e => e.target.style.borderColor = '#026CDF'}
+                onFocus={e => e.target.style.borderColor = 'var(--brand-accent, #397C80)'}
                 onBlur={e => e.target.style.borderColor = '#E5E5E5'}
               />
             </div>
@@ -73,7 +73,7 @@ function EditProfileModal({ user, onClose, onSaved }) {
         <button
           onClick={handleSave}
           disabled={loading}
-          style={{ width: '100%', padding: '12px', background: '#026CDF', border: 'none', borderRadius: '6px', color: '#FFFFFF', fontWeight: 700, fontSize: '14px', cursor: 'pointer', marginTop: '4px' }}
+          style={{ width: '100%', padding: '12px', background: 'var(--brand-accent, #397C80)', border: 'none', borderRadius: '6px', color: '#FFFFFF', fontWeight: 700, fontSize: '14px', cursor: 'pointer', marginTop: '4px' }}
         >
           {loading ? 'Saving…' : 'Save Changes'}
         </button>
@@ -122,18 +122,18 @@ export default function ProfilePage() {
 
   return (
     <AppLayout>
-      <div style={{ background: '#F5F5F5', minHeight: '100vh', paddingBottom: '80px' }}>
+      <div style={{ background: 'var(--brand-soft-mist, #F3F7F8)', minHeight: '100vh', paddingBottom: '80px' }}>
 
         {/* Profile Hero Card */}
         <div style={{ background: '#FFFFFF', borderBottom: '1px solid #E5E5E5', marginBottom: '16px' }}>
-          {/* Blue strip */}
-          <div style={{ background: '#026CDF', height: '72px' }} />
+          {/* Brand dark strip */}
+          <div style={{ background: 'var(--brand-primary, #0B1025)', height: '72px' }} />
           {/* Avatar + info */}
           <div style={{ padding: '0 20px 24px', marginTop: '-36px' }}>
-            <div style={{ width: '72px', height: '72px', borderRadius: '50%', background: '#EFF6FF', border: '3px solid #FFFFFF', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 8px rgba(0,0,0,0.1)', marginBottom: '12px' }}>
+            <div style={{ width: '72px', height: '72px', borderRadius: '50%', background: 'rgba(57, 124, 128, 0.15)', border: '3px solid #FFFFFF', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 8px rgba(0,0,0,0.1)', marginBottom: '12px' }}>
               {user?.avatar?.url
                 ? <img src={user.avatar.url} alt="" style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
-                : <span style={{ color: '#026CDF', fontWeight: 800, fontSize: '22px' }}>{initials || 'U'}</span>
+                : <span style={{ color: 'var(--brand-accent, #397C80)', fontWeight: 800, fontSize: '22px' }}>{initials || 'U'}</span>
               }
             </div>
             <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
@@ -191,7 +191,7 @@ export default function ProfilePage() {
                 onMouseEnter={e => e.currentTarget.style.background = '#F9FAFB'}
                 onMouseLeave={e => e.currentTarget.style.background = 'none'}
               >
-                <div style={{ width: '36px', height: '36px', background: '#EFF6FF', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, color: '#026CDF' }}>
+                <div style={{ width: '36px', height: '36px', background: 'rgba(57, 124, 128, 0.1)', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, color: 'var(--brand-accent, #397C80)' }}>
                   {item.icon}
                 </div>
                 <div style={{ flex: 1 }}>

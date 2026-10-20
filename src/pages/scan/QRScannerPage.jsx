@@ -68,10 +68,10 @@ export default function QRScannerPage() {
             <div style={{ position: 'relative', width: '200px', height: '200px', margin: '0 auto 16px' }}>
               {/* Corner brackets */}
               {[
-                { top: 0, left: 0, borderTop: '3px solid #026CDF', borderLeft: '3px solid #026CDF', borderRadius: '4px 0 0 0' },
-                { top: 0, right: 0, borderTop: '3px solid #026CDF', borderRight: '3px solid #026CDF', borderRadius: '0 4px 0 0' },
-                { bottom: 0, left: 0, borderBottom: '3px solid #026CDF', borderLeft: '3px solid #026CDF', borderRadius: '0 0 0 4px' },
-                { bottom: 0, right: 0, borderBottom: '3px solid #026CDF', borderRight: '3px solid #026CDF', borderRadius: '0 0 4px 0' },
+                { top: 0, left: 0, borderTop: '3px solid var(--brand-accent, #397C80)', borderLeft: '3px solid var(--brand-accent, #397C80)', borderRadius: '4px 0 0 0' },
+                { top: 0, right: 0, borderTop: '3px solid var(--brand-accent, #397C80)', borderRight: '3px solid var(--brand-accent, #397C80)', borderRadius: '0 4px 0 0' },
+                { bottom: 0, left: 0, borderBottom: '3px solid var(--brand-accent, #397C80)', borderLeft: '3px solid var(--brand-accent, #397C80)', borderRadius: '0 0 0 4px' },
+                { bottom: 0, right: 0, borderBottom: '3px solid var(--brand-accent, #397C80)', borderRight: '3px solid var(--brand-accent, #397C80)', borderRadius: '0 0 4px 0' },
               ].map((s, i) => (
                 <div key={i} style={{ position: 'absolute', width: '24px', height: '24px', ...s }} />
               ))}
@@ -83,14 +83,14 @@ export default function QRScannerPage() {
               <div style={{
                 position: 'absolute',
                 left: '8px', right: '8px', height: '2px',
-                background: 'linear-gradient(90deg, transparent, #026CDF, transparent)',
+                background: 'linear-gradient(90deg, transparent, var(--brand-accent, #397C80), transparent)',
                 animation: 'scanline 2s ease-in-out infinite',
                 top: 0,
               }} />
 
               {/* QR icon center */}
               <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <QrCode size={64} color="rgba(2,108,223,0.25)" />
+                <QrCode size={64} color="rgba(57,124,128,0.25)" />
               </div>
             </div>
             <p style={{ color: '#6B6B6B', fontSize: '13px', margin: 0 }}>Point camera at QR code or enter code below</p>
@@ -144,13 +144,13 @@ export default function QRScannerPage() {
                   placeholder="Paste or type QR token here..."
                   autoFocus
                   style={{ width: '100%', padding: '12px 14px', background: '#FFFFFF', border: '1px solid #E5E5E5', borderRadius: '6px', color: '#1F1F1F', fontSize: '14px', outline: 'none', boxSizing: 'border-box', marginBottom: '12px', fontFamily: 'monospace' }}
-                  onFocus={e => e.target.style.borderColor = '#026CDF'}
+                  onFocus={e => e.target.style.borderColor = 'var(--brand-accent, #397C80)'}
                   onBlur={e => e.target.style.borderColor = '#E5E5E5'}
                 />
                 <button
                   type="submit"
                   disabled={loading || !qrInput.trim()}
-                  style={{ width: '100%', padding: '13px', background: loading || !qrInput.trim() ? '#93C5FD' : '#026CDF', border: 'none', borderRadius: '6px', color: '#FFFFFF', fontWeight: 700, fontSize: '15px', cursor: loading ? 'wait' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
+                  style={{ width: '100%', padding: '13px', background: loading || !qrInput.trim() ? '#9CA3AF' : 'var(--brand-accent, #397C80)', border: 'none', borderRadius: '6px', color: '#FFFFFF', fontWeight: 700, fontSize: '15px', cursor: loading ? 'wait' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
                 >
                   {loading
                     ? <><div style={{ width: '18px', height: '18px', border: '2px solid rgba(255,255,255,0.4)', borderTopColor: '#fff', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} /> Validating…</>
@@ -162,7 +162,7 @@ export default function QRScannerPage() {
           ) : (
             <button
               onClick={reset}
-              style={{ width: '100%', padding: '13px', background: '#026CDF', border: 'none', borderRadius: '6px', color: '#FFFFFF', fontWeight: 700, fontSize: '15px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
+              style={{ width: '100%', padding: '13px', background: 'var(--brand-accent, #397C80)', border: 'none', borderRadius: '6px', color: '#FFFFFF', fontWeight: 700, fontSize: '15px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
             >
               <RotateCcw size={16} /> Scan Another Ticket
             </button>

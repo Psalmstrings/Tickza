@@ -73,19 +73,19 @@ export default function TransfersPage() {
       <div style={{ backgroundColor: '#FFFFFF', borderBottom: '1px solid #E5E5E5', padding: '28px 0 0' }}>
         <div className="tm-container">
           <Link
-            to="/for-you"
+            to="/tickets"
             style={{
               display: 'inline-flex',
               alignItems: 'center',
               gap: '6px',
-              color: '#026CDF',
+              color: 'var(--brand-accent, #397C80)',
               fontSize: '13px',
               fontWeight: 700,
               textDecoration: 'none',
               marginBottom: '12px',
             }}
           >
-            <ChevronLeft size={16} /> Back to For You
+            <ChevronLeft size={16} /> Back to My Tickets
           </Link>
 
           <h1 style={{ fontSize: '24px', fontWeight: 800, color: '#1F1F1F', margin: '0 0 16px 0' }}>
@@ -110,8 +110,8 @@ export default function TransfersPage() {
                     background: 'none',
                     fontSize: '14px',
                     fontWeight: isActive ? 700 : 500,
-                    color: isActive ? '#026CDF' : '#6B6B6B',
-                    borderBottom: isActive ? '3px solid #026CDF' : '3px solid transparent',
+                    color: isActive ? 'var(--brand-accent, #397C80)' : '#6B6B6B',
+                    borderBottom: isActive ? '3px solid var(--brand-accent, #397C80)' : '3px solid transparent',
                     cursor: 'pointer',
                     display: 'flex',
                     alignItems: 'center',

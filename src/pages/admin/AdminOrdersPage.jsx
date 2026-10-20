@@ -46,7 +46,7 @@ export default function AdminOrdersPage() {
         {[
           { label: 'Total Orders', value: safeOrders.length, color: '#1F1F1F' },
           { label: 'Paid Orders', value: paidCount, color: '#16A34A' },
-          { label: 'Total Revenue', value: totalRevenue === 0 ? '₦0' : `₦${totalRevenue.toLocaleString()}`, color: '#026CDF' },
+          { label: 'Total Revenue', value: totalRevenue === 0 ? '₦0' : `₦${totalRevenue.toLocaleString()}`, color: 'var(--brand-accent, #397C80)' },
         ].map(({ label, value, color }) => (
           <div key={label} style={{ background: '#FFFFFF', border: '1px solid #E5E5E5', borderRadius: '8px', padding: '16px 18px' }}>
             <p style={{ color, fontSize: '22px', fontWeight: 800, margin: '0 0 2px' }}>{value}</p>

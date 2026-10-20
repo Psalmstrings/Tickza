@@ -112,7 +112,7 @@ export default function AdminEventsPage() {
                       <td style={{ padding: '14px 16px' }}>
                         {event.status === 'PENDING_APPROVAL' && (
                           <div style={{ display: 'flex', gap: '6px' }}>
-                            <button onClick={() => handleAction(event._id, 'approve')} style={{ padding: '5px 12px', background: '#026CDF', border: 'none', borderRadius: '5px', color: '#FFFFFF', fontSize: '12px', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                            <button onClick={() => handleAction(event._id, 'approve')} style={{ padding: '5px 12px', background: 'var(--brand-accent, #397C80)', border: 'none', borderRadius: '5px', color: '#FFFFFF', fontSize: '12px', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}>
                               <Check size={12} /> Approve
                             </button>
                             <button onClick={() => handleAction(event._id, 'reject')} style={{ padding: '5px 12px', background: '#FFFFFF', border: '1px solid #DC2626', borderRadius: '5px', color: '#DC2626', fontSize: '12px', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}>

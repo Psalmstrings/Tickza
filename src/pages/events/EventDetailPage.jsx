@@ -457,7 +457,7 @@ export default function EventDetailPage() {
 
                 {event.organizerId && (
                   <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                    <Users size={18} color="#026CDF" />
+                    <Users size={18} color="var(--brand-accent, #397C80)" />
                     <span>Presented by: <strong>{event.organizerId.firstName} {event.organizerId.lastName}</strong></span>
                   </div>
                 )}
@@ -465,13 +465,13 @@ export default function EventDetailPage() {
             </div>
 
             {/* 100% Buyer Guarantee & Security */}
-            <div style={{ backgroundColor: '#EFF6FF', borderRadius: '16px', padding: '20px', border: '1px solid #BFDBFE', display: 'flex', gap: '14px', alignItems: 'flex-start' }}>
-              <ShieldCheck size={26} color="#026CDF" style={{ flexShrink: 0 }} />
+            <div style={{ backgroundColor: 'rgba(57, 124, 128, 0.08)', borderRadius: '16px', padding: '20px', border: '1px solid rgba(57, 124, 128, 0.25)', display: 'flex', gap: '14px', alignItems: 'flex-start' }}>
+              <ShieldCheck size={26} color="var(--brand-accent, #397C80)" style={{ flexShrink: 0 }} />
               <div>
-                <h4 style={{ fontSize: '15px', fontWeight: 700, color: '#1E3A8A', margin: '0 0 4px 0' }}>
+                <h4 style={{ fontSize: '15px', fontWeight: 700, color: 'var(--brand-primary, #0B1025)', margin: '0 0 4px 0' }}>
                   Tickza Verified Authentic
                 </h4>
-                <p style={{ fontSize: '13px', color: '#1E40AF', margin: 0, lineHeight: 1.5 }}>
+                <p style={{ fontSize: '13px', color: '#424B5D', margin: 0, lineHeight: 1.5 }}>
                   Every ticket purchased on Tickza features a cryptographically secured QR code verified at turnstiles. Safe transfers, reliable entry, and zero duplicate admissions.
                 </p>
               </div>
@@ -583,8 +583,8 @@ export default function EventDetailPage() {
                           style={{
                             padding: '14px 16px',
                             borderRadius: '12px',
-                            border: isSelected ? '2px solid #026CDF' : '1px solid #E5E5E5',
-                            backgroundColor: isSelected ? '#EBF3FD' : isTierSoldOut ? '#F9FAFB' : '#FFFFFF',
+                            border: isSelected ? '2px solid var(--brand-accent, #397C80)' : '1px solid #E5E5E5',
+                            backgroundColor: isSelected ? 'rgba(57, 124, 128, 0.08)' : isTierSoldOut ? '#F9FAFB' : '#FFFFFF',
                             cursor: isTierSoldOut ? 'not-allowed' : 'pointer',
                             opacity: isTierSoldOut ? 0.6 : 1,
                             transition: 'all 0.15s ease',
@@ -606,7 +606,7 @@ export default function EventDetailPage() {
                                     GROUP
                                   </span>
                                 )}
-                                {isSelected && <CheckCircle2 size={16} color="#026CDF" />}
+                                {isSelected && <CheckCircle2 size={16} color="var(--brand-accent, #397C80)" />}
                               </div>
 
                               <p style={{ fontSize: '12px', color: '#6B6B6B', margin: '3px 0 0 0' }}>
@@ -640,7 +640,7 @@ export default function EventDetailPage() {
                             </div>
 
                             <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                              <span style={{ fontSize: '18px', fontWeight: 800, color: '#026CDF' }}>
+                              <span style={{ fontSize: '18px', fontWeight: 800, color: 'var(--brand-accent, #397C80)' }}>
                                 {tt.price === 0 ? 'FREE' : `₦${tt.price.toLocaleString()}`}
                               </span>
                               {capacity > 1 && tt.price > 0 && (
@@ -722,7 +722,7 @@ export default function EventDetailPage() {
 
                     <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '16px', fontWeight: 800, color: '#1F1F1F', borderTop: '1px solid #E5E5E5', paddingTop: '10px', marginTop: '10px' }}>
                       <span>Total Due</span>
-                      <span style={{ color: '#026CDF' }}>
+                      <span style={{ color: 'var(--brand-accent, #397C80)' }}>
                         {totalAmount === 0 ? 'FREE' : `₦${totalAmount.toLocaleString()}`}
                       </span>
                     </div>
@@ -1022,7 +1022,7 @@ export default function EventDetailPage() {
 
                     <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '16px', fontWeight: 800, borderTop: '1px solid #E5E5E5', paddingTop: 8, marginTop: 4 }}>
                       <span>Total Due</span>
-                      <span style={{ color: '#026CDF' }}>
+                      <span style={{ color: 'var(--brand-accent, #397C80)' }}>
                         {totalAmount === 0 ? 'FREE' : `₦${totalAmount.toLocaleString()}`}
                       </span>
                     </div>
@@ -1040,7 +1040,7 @@ export default function EventDetailPage() {
                       padding: '14px',
                       borderRadius: '10px',
                       fontSize: '15px',
-                      backgroundColor: '#026CDF',
+                      backgroundColor: 'var(--brand-accent, #397C80)',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',

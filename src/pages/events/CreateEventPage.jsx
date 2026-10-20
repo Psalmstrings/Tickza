@@ -261,7 +261,7 @@ export default function CreateEventPage() {
               Step {currentStep + 1} of 4: {STEPS[currentStep].label} ({STEPS[currentStep].desc})
             </p>
           </div>
-          <Link to="/for-you" className="btn-ghost" style={{ fontSize: '13px' }}>
+          <Link to="/organizer" className="btn-ghost" style={{ fontSize: '13px' }}>
             Exit Wizard
           </Link>
         </div>

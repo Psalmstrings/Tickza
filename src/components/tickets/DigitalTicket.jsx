@@ -68,7 +68,7 @@ export default function DigitalTicket({
         <div
           style={{
             padding: '16px 20px',
-            backgroundColor: '#026CDF',
+            backgroundColor: 'var(--brand-primary, #0B1025)',
             color: '#FFFFFF',
             display: 'flex',
             alignItems: 'center',
@@ -76,8 +76,8 @@ export default function DigitalTicket({
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <TickzaLogo color="#FFFFFF" height={22} />
-            <span style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.05em', opacity: 0.9 }}>
+            <TickzaLogo color="var(--brand-pale-ice, #E6F5F7)" height={22} />
+            <span style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.05em', color: 'var(--brand-pale-ice, #E6F5F7)', opacity: 0.9 }}>
               DIGITAL WALLET
             </span>
           </div>
@@ -160,7 +160,7 @@ export default function DigitalTicket({
             <span style={{ fontSize: '11px', fontWeight: 700, color: '#6B6B6B', letterSpacing: '0.05em' }}>
               {ticket.admittedCapacity > 1 ? 'CAPACITY' : 'SEAT'}
             </span>
-            <p style={{ margin: '2px 0 0', fontSize: '16px', fontWeight: 800, color: '#026CDF' }}>
+            <p style={{ margin: '2px 0 0', fontSize: '16px', fontWeight: 800, color: 'var(--brand-accent, #397C80)' }}>
               {ticket.admittedCapacity > 1 ? `Admits ${ticket.admittedCapacity}` : seat}
             </p>
           </div>
@@ -203,8 +203,8 @@ export default function DigitalTicket({
                 left: 0,
                 right: 0,
                 height: '3px',
-                backgroundColor: '#026CDF',
-                boxShadow: '0 0 10px #026CDF',
+                backgroundColor: 'var(--brand-accent, #397C80)',
+                boxShadow: '0 0 10px var(--brand-accent, #397C80)',
                 animation: 'tmLaserScan 2s ease-in-out infinite alternate',
                 zIndex: 3,
               }}

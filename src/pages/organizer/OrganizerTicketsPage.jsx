@@ -938,11 +938,11 @@ export default function OrganizerTicketsPage() {
                   {/* Public Event Page Preview Card */}
                   <div
                     style={{
-                      border: '2px solid #026CDF',
+                      border: '2px solid var(--brand-accent, #397C80)',
                       borderRadius: 14,
                       background: '#FFFFFF',
                       padding: 18,
-                      boxShadow: '0 4px 14px rgba(2, 108, 223, 0.08)',
+                      boxShadow: '0 4px 14px rgba(57, 124, 128, 0.12)',
                     }}
                   >
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
@@ -951,7 +951,7 @@ export default function OrganizerTicketsPage() {
                           <span style={{ fontWeight: 800, fontSize: 16, color: '#1F1F1F' }}>
                             {form.name || 'Untitled Ticket Tier'}
                           </span>
-                          <CheckCircle2 size={16} color="#026CDF" />
+                          <CheckCircle2 size={16} color="var(--brand-accent, #397C80)" />
                         </div>
                         <div style={{ fontSize: 12, color: '#6B6B6B', marginTop: 2 }}>
                           {form.format === 'RESERVED_TABLE'
@@ -964,7 +964,7 @@ export default function OrganizerTicketsPage() {
                       </div>
 
                       <div style={{ textAlign: 'right' }}>
-                        <div style={{ fontSize: 20, fontWeight: 900, color: '#026CDF' }}>
+                        <div style={{ fontSize: 20, fontWeight: 900, color: 'var(--brand-accent, #397C80)' }}>
                           {previewGrossPerUnit === 0 ? 'FREE' : `₦${previewGrossPerUnit.toLocaleString()}`}
                         </div>
                         {previewCapacity > 1 && previewGrossPerUnit > 0 && (
@@ -1013,7 +1013,7 @@ export default function OrganizerTicketsPage() {
                         style={{
                           width: '100%',
                           padding: '10px',
-                          background: '#026CDF',
+                          background: 'var(--brand-accent, #397C80)',
                           color: '#FFFFFF',
                           border: 'none',
                           borderRadius: 8,

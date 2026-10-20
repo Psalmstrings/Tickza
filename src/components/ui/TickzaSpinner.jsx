@@ -6,7 +6,7 @@ import React from 'react';
  */
 export default function TickzaSpinner({
   size = 'md', // 'sm' | 'md' | 'lg' | 'xl'
-  color = '#026CDF',
+  color = 'var(--brand-accent, #397C80)',
   trackColor = '#E5E5E5',
   fullPage = false,
   overlay = false,

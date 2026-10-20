@@ -45,11 +45,28 @@ export function AuthProvider({ children }) {
   };
 
   const updateUser = (updatedUser) => {
-    setUser(prev => ({ ...prev, ...updatedUser }));
+    setUser(prev => (prev ? { ...prev, ...updatedUser } : updatedUser));
   };
 
+  const isAdmin = Boolean(user && (user.role === 'ADMIN' || user.role === 'SUPER_ADMIN'));
+  const isApproved = Boolean(user && user.status === 'APPROVED');
+  const isOrganizer = Boolean(
+    isAdmin || (user && user.status === 'APPROVED' && ['APPROVED_USER', 'ORGANIZER'].includes(user.role))
+  );
+
   return (
-    <AuthContext.Provider value={{ user, token, loading, login, logout, updateUser, refreshUser: fetchMe }}>
+    <AuthContext.Provider value={{
+      user,
+      token,
+      loading,
+      login,
+      logout,
+      updateUser,
+      refreshUser: fetchMe,
+      isAdmin,
+      isApproved,
+      isOrganizer,
+    }}>
       {children}
     </AuthContext.Provider>
   );

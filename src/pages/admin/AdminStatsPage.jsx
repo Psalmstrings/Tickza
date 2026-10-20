@@ -17,12 +17,12 @@ export default function AdminStatsPage() {
 
   const cards = stats
     ? [
-        { label: 'Total Users', value: stats.totalUsers, icon: <Users size={22} />, color: '#026CDF', bg: '#EBF3FD' },
+        { label: 'Total Users', value: stats.totalUsers, icon: <Users size={22} />, color: 'var(--brand-primary, #0B1025)', bg: 'rgba(11, 16, 37, 0.08)' },
         { label: 'Pending Approval', value: stats.pendingUsers, icon: <Clock size={22} />, color: '#D97706', bg: '#FFFBEB' },
         { label: 'Approved Users', value: stats.approvedUsers, icon: <CheckCircle size={22} />, color: '#059669', bg: '#ECFDF5' },
         { label: 'Suspended Accounts', value: stats.suspendedUsers, icon: <XCircle size={22} />, color: '#DC2626', bg: '#FEF2F2' },
         { label: 'Total Events', value: stats.totalEvents, icon: <Calendar size={22} />, color: '#7C3AED', bg: '#F5F3FF' },
-        { label: 'Published Events', value: stats.publishedEvents, icon: <BarChart3 size={22} />, color: '#026CDF', bg: '#EBF3FD' },
+        { label: 'Published Events', value: stats.publishedEvents, icon: <BarChart3 size={22} />, color: 'var(--brand-accent, #397C80)', bg: 'rgba(57, 124, 128, 0.1)' },
         { label: 'Total Tickets Issued', value: stats.totalTickets, icon: <Ticket size={22} />, color: '#EA580C', bg: '#FFF7ED' },
         { label: 'Total Orders Placed', value: stats.totalOrders, icon: <ShoppingBag size={22} />, color: '#059669', bg: '#ECFDF5' },
       ]

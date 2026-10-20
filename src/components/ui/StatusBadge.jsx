@@ -82,9 +82,9 @@ const STATUS_CONFIG = {
   PUBLISHED: {
     label: 'Published',
     icon: CheckCircle,
-    color: '#026CDF',
-    bg: '#EFF6FF',
-    border: '#BFDBFE',
+    color: 'var(--brand-accent, #397C80)',
+    bg: 'rgba(57, 124, 128, 0.1)',
+    border: 'rgba(57, 124, 128, 0.25)',
   },
 };
 

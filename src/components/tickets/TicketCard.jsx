@@ -4,7 +4,7 @@ import { Calendar, MapPin, QrCode, ArrowRight, Send, DollarSign, CheckCircle2, A
 
 const STATUS_CONFIG = {
   SOLD: { label: 'Valid / Active', bg: '#ECFDF5', color: '#059669', border: '#A7F3D0' },
-  AVAILABLE: { label: 'Available', bg: '#EFF6FF', color: '#026CDF', border: '#BFDBFE' },
+  AVAILABLE: { label: 'Available', bg: 'rgba(57, 124, 128, 0.1)', color: 'var(--brand-accent, #397C80)', border: 'rgba(57, 124, 128, 0.25)' },
   USED: { label: 'Used / Redeemed', bg: '#F3F4F6', color: '#6B7280', border: '#E5E7EB' },
   TRANSFERRED: { label: 'Transferred', bg: '#F5F3FF', color: '#7C3AED', border: '#DDD6FE' },
   TRANSFER_PENDING: { label: 'Transfer Pending', bg: '#FFFBEB', color: '#D97706', border: '#FDE68A' },
@@ -84,9 +84,9 @@ export default function TicketCard({
         margin: '0 auto',
         backgroundColor: '#FFFFFF',
         borderRadius: '16px',
-        border: isSelected ? '2px solid #026CDF' : '1px solid #E5E5E5',
+        border: isSelected ? '2px solid var(--brand-accent, #397C80)' : '1px solid #E5E5E5',
         boxShadow: isSelected
-          ? '0 0 0 3px rgba(2, 108, 223, 0.2), 0 8px 24px rgba(0,0,0,0.08)'
+          ? '0 0 0 3px rgba(57, 124, 128, 0.2), 0 8px 24px rgba(0,0,0,0.08)'
           : '0 4px 16px rgba(0,0,0,0.06)',
         cursor: 'pointer',
         position: 'relative',
@@ -180,7 +180,7 @@ export default function TicketCard({
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <Calendar size={16} color="#026CDF" />
+            <Calendar size={16} color="var(--brand-accent, #397C80)" />
             <div>
               <p style={{ margin: 0, fontSize: '14px', fontWeight: 700, color: '#1F1F1F' }}>
                 {dateStr}
@@ -196,7 +196,7 @@ export default function TicketCard({
           {price !== undefined && (
             <div style={{ textAlign: 'right' }}>
               <span style={{ fontSize: '11px', color: '#8C8C8C', display: 'block' }}>Admission</span>
-              <span style={{ fontSize: '16px', fontWeight: 800, color: '#026CDF' }}>
+              <span style={{ fontSize: '16px', fontWeight: 800, color: 'var(--brand-accent, #397C80)' }}>
                 {price === 0 ? 'FREE' : `₦${price.toLocaleString()}`}
               </span>
             </div>
@@ -282,7 +282,7 @@ export default function TicketCard({
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: '#026CDF',
+                color: 'var(--brand-accent, #397C80)',
               }}
             >
               <QrCode size={22} />

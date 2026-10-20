@@ -24,8 +24,6 @@ import ProfilePage from './pages/profile/ProfilePage.jsx';
 import NotificationsPage from './pages/notifications/NotificationsPage.jsx';
 import QRScannerPage from './pages/scan/QRScannerPage.jsx';
 
-import ForYouPage from './pages/forYou/ForYouPage.jsx';
-
 // Admin
 import AdminLayout from './pages/admin/AdminLayout.jsx';
 import AdminStatsPage from './pages/admin/AdminStatsPage.jsx';
@@ -64,7 +62,7 @@ export default function App() {
               minHeight: '100vh',
               display: 'flex',
               flexDirection: 'column',
-              backgroundColor: '#F5F5F5',
+              backgroundColor: 'var(--brand-soft-mist, #F3F7F8)',
               position: 'relative',
               overflowX: 'hidden',
             }}>
@@ -82,7 +80,7 @@ export default function App() {
                 <Route path="/events/:id" element={<EventDetailPage />} />
 
                 {/* Authenticated user routes */}
-                <Route path="/for-you" element={<ProtectedRoute><ForYouPage /></ProtectedRoute>} />
+                <Route path="/for-you" element={<Navigate to="/explore" replace />} />
                 <Route path="/create" element={<ProtectedRoute requireApproved><CreateEventPage /></ProtectedRoute>} />
                 <Route path="/my-events" element={<Navigate to="/organizer/events" replace />} />
                 <Route path="/tickets" element={<ProtectedRoute><MyTicketsPage /></ProtectedRoute>} />
@@ -95,7 +93,7 @@ export default function App() {
                 <Route path="/scan" element={<ProtectedRoute><QRScannerPage /></ProtectedRoute>} />
 
                 {/* Organizer Command Center */}
-                <Route path="/organizer" element={<ProtectedRoute><OrganizerLayout /></ProtectedRoute>}>
+                <Route path="/organizer" element={<ProtectedRoute requireApproved><OrganizerLayout /></ProtectedRoute>}>
                   <Route index element={<OrganizerOverviewPage />} />
                   <Route path="events" element={<OrganizerEventsPage />} />
                   <Route path="events/:id" element={<OrganizerEventDetailPage />} />

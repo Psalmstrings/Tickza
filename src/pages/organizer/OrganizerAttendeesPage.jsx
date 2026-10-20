@@ -199,11 +199,11 @@ export default function OrganizerAttendeesPage() {
         </div>
 
         <div className="org-card" style={{ padding: '16px 20px' }}>
-          <div style={{ fontSize: 11, fontWeight: 700, color: '#026CDF', textTransform: 'uppercase' }}>Attendance Rate</div>
-          <div style={{ fontSize: 24, fontWeight: 800, color: '#026CDF', marginTop: 4 }}>
+          <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--brand-accent, #397C80)', textTransform: 'uppercase' }}>Attendance Rate</div>
+          <div style={{ fontSize: 24, fontWeight: 800, color: 'var(--brand-accent, #397C80)', marginTop: 4 }}>
             {stats?.attendancePercentage !== undefined ? `${stats.attendancePercentage}%` : '0%'}
           </div>
-          <div style={{ fontSize: 11, color: '#0369A1', marginTop: 2 }}>
+          <div style={{ fontSize: 11, color: '#4B5563', marginTop: 2 }}>
             Admitted percentage
           </div>
         </div>

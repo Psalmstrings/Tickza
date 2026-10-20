@@ -207,7 +207,7 @@ export default function AdminFinancialsPage() {
         <div style={{ backgroundColor: '#FFFFFF', borderRadius: 14, padding: 18, border: '1px solid #E5E5E5', boxShadow: '0 1px 4px rgba(0,0,0,0.03)', minWidth: 0 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
             <span style={{ fontSize: 12, fontWeight: 700, color: '#6B6B6B', textTransform: 'uppercase' }}>Gross Ticket Volume</span>
-            <div style={{ width: 32, height: 32, borderRadius: 8, backgroundColor: '#EFF6FF', color: '#026CDF', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ width: 32, height: 32, borderRadius: 8, backgroundColor: 'rgba(57, 124, 128, 0.1)', color: 'var(--brand-accent, #397C80)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <TrendingUp size={16} />
             </div>
           </div>
@@ -217,14 +217,14 @@ export default function AdminFinancialsPage() {
           <span style={{ fontSize: 11, color: '#059669', fontWeight: 600 }}>{metrics.totalTransactionsCount} paid orders</span>
         </div>
 
-        <div style={{ backgroundColor: '#FFFFFF', borderRadius: 14, padding: 18, border: '2px solid #026CDF', boxShadow: '0 2px 8px rgba(2,108,223,0.08)', minWidth: 0 }}>
+        <div style={{ backgroundColor: '#FFFFFF', borderRadius: 14, padding: 18, border: '2px solid var(--brand-accent, #397C80)', boxShadow: '0 2px 8px rgba(57, 124, 128, 0.15)', minWidth: 0 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-            <span style={{ fontSize: 12, fontWeight: 800, color: '#026CDF', textTransform: 'uppercase' }}>Tickza Net Commission</span>
-            <div style={{ width: 32, height: 32, borderRadius: 8, backgroundColor: '#EFF6FF', color: '#026CDF', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <span style={{ fontSize: 12, fontWeight: 800, color: 'var(--brand-accent, #397C80)', textTransform: 'uppercase' }}>Tickza Net Commission</span>
+            <div style={{ width: 32, height: 32, borderRadius: 8, backgroundColor: 'rgba(57, 124, 128, 0.1)', color: 'var(--brand-accent, #397C80)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <DollarSign size={16} />
             </div>
           </div>
-          <p style={{ fontSize: 24, fontWeight: 900, color: '#026CDF', margin: '0 0 4px 0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          <p style={{ fontSize: 24, fontWeight: 900, color: 'var(--brand-accent, #397C80)', margin: '0 0 4px 0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
             ₦{metrics.totalPlatformCommission.toLocaleString()}
           </p>
           <span style={{ fontSize: 11, color: '#6B6B6B' }}>Platform net revenue</span>
@@ -275,7 +275,7 @@ export default function AdminFinancialsPage() {
         {/* Commission & Settings Panel */}
         <div style={{ backgroundColor: '#FFFFFF', borderRadius: 16, padding: 20, border: '1px solid #E5E5E5', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
-            <Settings size={18} color="#026CDF" />
+            <Settings size={18} color="var(--brand-accent, #397C80)" />
             <h3 style={{ margin: 0, fontSize: 16, fontWeight: 800, color: '#1F1F1F' }}>
               Commission & Payout Policy
             </h3>

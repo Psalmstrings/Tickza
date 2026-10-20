@@ -71,8 +71,8 @@ export default function AdminLayout() {
       <aside className={`admin-mobile-drawer${drawerOpen ? ' open' : ''}`}>
         <div className="admin-drawer-header">
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <TickzaLogo height={22} color="#026CDF" />
-            <span style={{ fontSize: '11px', fontWeight: 800, color: '#026CDF', backgroundColor: '#EFF6FF', padding: '2px 6px', borderRadius: '4px' }}>
+            <TickzaLogo height={22} color="var(--brand-primary, #0B1025)" />
+            <span style={{ fontSize: '11px', fontWeight: 800, color: 'var(--brand-accent, #397C80)', backgroundColor: 'rgba(57, 124, 128, 0.1)', padding: '2px 6px', borderRadius: '4px' }}>
               ADMIN
             </span>
           </div>
@@ -145,10 +145,10 @@ export default function AdminLayout() {
             </button>
 
             <Link to="/home" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
-              <TickzaLogo height={22} color="#026CDF" />
+              <TickzaLogo height={22} color="var(--brand-primary, #0B1025)" />
             </Link>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', backgroundColor: '#EFF6FF', color: '#026CDF', padding: '3px 8px', borderRadius: '4px', fontSize: '10.5px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', backgroundColor: 'rgba(57, 124, 128, 0.1)', color: 'var(--brand-accent, #397C80)', padding: '3px 8px', borderRadius: '4px', fontSize: '10.5px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
               <Shield size={12} />
               <span className="desktop-only">Enterprise Admin</span>
               <span className="mobile-only">Admin</span>
@@ -192,9 +192,9 @@ export default function AdminLayout() {
                   padding: '11px 14px',
                   fontSize: '13px',
                   fontWeight: isActive ? 700 : 500,
-                  color: isActive ? '#026CDF' : '#64748B',
+                  color: isActive ? 'var(--brand-accent, #397C80)' : '#64748B',
                   textDecoration: 'none',
-                  borderBottom: isActive ? '3px solid #026CDF' : '3px solid transparent',
+                  borderBottom: isActive ? '3px solid var(--brand-accent, #397C80)' : '3px solid transparent',
                   whiteSpace: 'nowrap',
                   transition: 'all 0.15s ease',
                 })}

@@ -6,49 +6,80 @@
 }
 
 :root {
-  /* Brand Colors */
-  --tm-blue: #026CDF;
-  --tm-blue-hover: #0050A8;
-  --tm-blue-active: #003B7C;
-  --tm-blue-light: #EBF3FD;
-  --tm-blue-subtle: #F0F6FE;
+  /* ===== OFFICIAL TICKZA BRAND DESIGN SYSTEM (Sampled from Official Logo) ===== */
+  --brand-primary: #0B1025;      /* Midnight Navy (Dominant background from official logo) */
+  --brand-secondary: #111831;    /* Deep Navy (Elevated cards & dark panels) */
+  --brand-contrast: #E6F5F7;     /* Pale Ice (Logo mark & crisp brand highlight) */
+  --brand-soft-mist: #F3F7F8;    /* Soft Mist (Light page canvas background) */
+  --brand-white: #FFFFFF;        /* Clean White */
+  --brand-slate: #424B5D;        /* Slate text for comfortable body reading */
+  --brand-muted: #788394;        /* Muted secondary labels & metadata */
+  --brand-border: #E1E7EC;       /* Subtle border */
+  --brand-accent: #397C80;       /* Deep Teal Accent (Interactive emphasis & buttons) */
+  --brand-accent-hover: #2E6568; /* Hover state for teal */
+  --brand-accent-subtle: rgba(57, 124, 128, 0.12);
+  --brand-warm-accent: #D6BE92;  /* Warm Champagne Accent (Restrained premium details) */
+  --brand-warm-accent-subtle: rgba(214, 190, 146, 0.16);
 
-  /* Neutrals */
-  --tm-dark: #1F1F1F;
-  --tm-dark-secondary: #4B4B4B;
-  --tm-text-secondary: #6B6B6B;
-  --tm-text-muted: #8C8C8C;
+  /* Surface Tokens */
+  --surface-page: #F3F7F8;
+  --surface-card: #FFFFFF;
+  --surface-dark: #0B1025;
+  --surface-dark-elevated: #111831;
+  --border-subtle: #E1E7EC;
+  --border-dark: rgba(230, 245, 247, 0.12);
+
+  /* Typography Colors */
+  --text-primary: #172033;
+  --text-slate: #424B5D;
+  --text-secondary: #788394;
+  --text-muted: #94A3B8;
+  --text-inverse: #FFFFFF;
+  --text-ice: #E6F5F7;
+
+  /* Legacy aliases mapped to new brand identity */
+  --tm-blue: #0B1025;
+  --tm-blue-hover: #17203D;
+  --tm-blue-active: #050814;
+  --tm-blue-light: #E6F5F7;
+  --tm-blue-subtle: #F3F7F8;
+
+  --tm-dark: #172033;
+  --tm-dark-secondary: #424B5D;
+  --tm-text-secondary: #788394;
+  --tm-text-muted: #94A3B8;
   --tm-white: #FFFFFF;
-  --tm-bg: #F5F5F5;
-  --tm-bg-alt: #FAFAFA;
+  --tm-bg: #F3F7F8;
+  --tm-bg-alt: #FFFFFF;
   --tm-card-bg: #FFFFFF;
-  --tm-border: #E5E5E5;
-  --tm-border-light: #EEEEEE;
-  --tm-border-focus: #026CDF;
+  --tm-border: #E1E7EC;
+  --tm-border-light: #F0F4F7;
+  --tm-border-focus: #397C80;
 
-  /* Accents & Status */
+  /* Status Tokens */
   --tm-success: #059669;
   --tm-success-light: #ECFDF5;
   --tm-warning: #D97706;
   --tm-warning-light: #FFFBEB;
   --tm-error: #DC2626;
   --tm-error-light: #FEF2F2;
-  --tm-info: #0284C7;
-  --tm-info-light: #F0F9FF;
+  --tm-info: #397C80;
+  --tm-info-light: #E6F5F7;
 
   /* Shadows */
-  --tm-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-  --tm-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
-  --tm-shadow-lg: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
-  --tm-shadow-card: 0 2px 8px rgba(0, 0, 0, 0.06);
-  --tm-shadow-ticket: 0 4px 20px rgba(0, 0, 0, 0.08);
+  --tm-shadow-sm: 0 1px 2px rgba(11, 16, 37, 0.05);
+  --tm-shadow-md: 0 4px 14px rgba(11, 16, 37, 0.08);
+  --tm-shadow-lg: 0 12px 36px rgba(11, 16, 37, 0.12);
+  --tm-shadow-card: 0 8px 28px rgba(11, 16, 37, 0.07);
+  --tm-shadow-ticket: 0 4px 20px rgba(11, 16, 37, 0.08);
+  --shadow-card: 0 8px 28px rgba(11, 16, 37, 0.07);
 
   /* Radii */
   --radius-xs: 4px;
-  --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 14px;
-  --radius-xl: 20px;
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 22px;
+  --radius-xl: 28px;
   --radius-full: 9999px;
 
   /* Sizing */
@@ -66,8 +97,8 @@ html {
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  background-color: var(--tm-bg);
-  color: var(--tm-dark);
+  background-color: var(--surface-page);
+  color: var(--text-primary);
   min-height: 100vh;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
@@ -80,13 +111,13 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background-color: var(--tm-bg);
+  background-color: var(--surface-page);
   position: relative;
 }
 
 /* ===== Typography ===== */
 h1, h2, h3, h4, h5, h6 {
-  color: var(--tm-dark);
+  color: var(--text-primary);
   font-weight: 700;
   line-height: 1.25;
 }
@@ -97,12 +128,12 @@ h3 { font-size: 1.25rem; font-weight: 700; }
 h4 { font-size: 1.1rem; font-weight: 600; }
 
 a {
-  color: var(--tm-blue);
+  color: var(--brand-accent);
   text-decoration: none;
   transition: color 0.15s ease;
 }
 a:hover {
-  color: var(--tm-blue-hover);
+  color: var(--brand-accent-hover);
   text-decoration: underline;
 }
 
@@ -137,6 +168,13 @@ a:hover {
   .tm-container {
     padding-left: 14px;
     padding-right: 14px;
+  }
+}
+
+@media (max-width: 360px) {
+  .tm-container {
+    padding-left: 10px;
+    padding-right: 10px;
   }
 }
 
@@ -175,33 +213,61 @@ a:hover {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  background-color: var(--tm-blue);
-  color: #FFFFFF;
-  border: none;
+  background-color: var(--brand-primary);
+  color: var(--brand-contrast);
+  border: 1px solid var(--brand-secondary);
   border-radius: var(--radius-sm);
   padding: 12px 22px;
-  font-size: 15px;
+  font-size: 14.5px;
   font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease;
+  transition: all 0.15s ease;
   font-family: inherit;
   line-height: 1.2;
-  box-shadow: 0 2px 4px rgba(2, 108, 223, 0.2);
+  box-shadow: 0 4px 12px rgba(11, 16, 37, 0.15);
   text-decoration: none !important;
+  touch-action: manipulation;
 }
 .btn-primary:hover:not(:disabled) {
-  background-color: var(--tm-blue-hover);
+  background-color: #17203D;
   color: #FFFFFF;
-  box-shadow: 0 4px 8px rgba(2, 108, 223, 0.3);
+  box-shadow: 0 6px 16px rgba(11, 16, 37, 0.22);
+  transform: translateY(-1px);
 }
 .btn-primary:active:not(:disabled) {
-  background-color: var(--tm-blue-active);
-  transform: translateY(1px);
+  background-color: #050814;
+  transform: translateY(0);
 }
 .btn-primary:disabled {
   opacity: 0.55;
   cursor: not-allowed;
   box-shadow: none;
+}
+
+/* Accent Button (Teal for high-priority interactive conversion) */
+.btn-accent {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background-color: var(--brand-accent);
+  color: #FFFFFF;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 12px 22px;
+  font-size: 14.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-family: inherit;
+  box-shadow: 0 4px 14px rgba(57, 124, 128, 0.25);
+  text-decoration: none !important;
+  touch-action: manipulation;
+}
+.btn-accent:hover:not(:disabled) {
+  background-color: var(--brand-accent-hover);
+  box-shadow: 0 6px 18px rgba(57, 124, 128, 0.35);
+  transform: translateY(-1px);
 }
 
 .btn-secondary {

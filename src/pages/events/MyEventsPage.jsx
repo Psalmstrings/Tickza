@@ -50,19 +50,19 @@ export default function MyEventsPage() {
       <div style={{ backgroundColor: '#FFFFFF', borderBottom: '1px solid #E5E5E5', padding: '28px 0 20px' }}>
         <div className="tm-container">
           <Link
-            to="/for-you"
+            to="/organizer"
             style={{
               display: 'inline-flex',
               alignItems: 'center',
               gap: '6px',
-              color: '#026CDF',
+              color: 'var(--brand-accent, #397C80)',
               fontSize: '13px',
               fontWeight: 700,
               textDecoration: 'none',
               marginBottom: '12px',
             }}
           >
-            <ChevronLeft size={16} /> Back to For You
+            <ChevronLeft size={16} /> Back to Organizer Dashboard
           </Link>
 
           <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: '16px' }}>

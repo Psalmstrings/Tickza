@@ -305,7 +305,7 @@ export default function PaymentCallbackPage() {
               Payment Confirmed! 🎉
             </h1>
             <p style={{ fontSize: '14px', color: '#6B6B6B', margin: '0 0 24px 0' }}>
-              Your order <strong style={{ color: '#026CDF' }}>#{orderData?.orderNumber || reference}</strong> has been verified and your admission tickets have been issued.
+              Your order <strong style={{ color: 'var(--brand-accent, #397C80)' }}>#{orderData?.orderNumber || reference}</strong> has been verified and your admission tickets have been issued.
             </p>
 
             {/* Order Highlight Card */}

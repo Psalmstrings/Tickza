@@ -67,19 +67,19 @@ export default function ResalePage() {
       <div style={{ backgroundColor: '#FFFFFF', borderBottom: '1px solid #E5E5E5', padding: '28px 0 20px' }}>
         <div className="tm-container">
           <Link
-            to="/for-you"
+            to="/explore"
             style={{
               display: 'inline-flex',
               alignItems: 'center',
               gap: '6px',
-              color: '#026CDF',
+              color: 'var(--brand-accent, #397C80)',
               fontSize: '13px',
               fontWeight: 700,
               textDecoration: 'none',
               marginBottom: '12px',
             }}
           >
-            <ChevronLeft size={16} /> Back to For You
+            <ChevronLeft size={16} /> Back to Events
           </Link>
 
           <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: '16px' }}>
@@ -165,7 +165,7 @@ export default function ResalePage() {
                 >
                   <div style={{ flex: 1, minWidth: '260px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
-                      <span style={{ backgroundColor: '#EFF6FF', color: '#026CDF', fontSize: '11px', fontWeight: 800, padding: '2px 8px', borderRadius: '4px', textTransform: 'uppercase' }}>
+                      <span style={{ backgroundColor: 'rgba(57, 124, 128, 0.1)', color: 'var(--brand-accent, #397C80)', fontSize: '11px', fontWeight: 800, padding: '2px 8px', borderRadius: '4px', textTransform: 'uppercase' }}>
                         Fan Resale
                       </span>
                       <span style={{ fontSize: '12px', color: '#6B6B6B' }}>
@@ -178,7 +178,7 @@ export default function ResalePage() {
                     </h3>
 
                     <p style={{ fontSize: '13px', color: '#6B6B6B', margin: '0 0 8px 0', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <Calendar size={14} color="#026CDF" /> {dateStr} • {event.venue || 'Venue'}
+                      <Calendar size={14} color="var(--brand-accent, #397C80)" /> {dateStr} • {event.venue || 'Venue'}
                     </p>
 
                     <div style={{ display: 'flex', gap: '12px', fontSize: '12px', fontWeight: 600, color: '#4B4B4B' }}>
@@ -191,8 +191,8 @@ export default function ResalePage() {
                   <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '8px' }}>
                     <div>
                       <span style={{ fontSize: '11px', color: '#8C8C8C', display: 'block', textTransform: 'uppercase' }}>Verified Price</span>
-                      <span style={{ fontSize: '24px', fontWeight: 900, color: '#026CDF' }}>
-                        ₦{item.price?.toFixed(2)}
+                      <span style={{ fontSize: '24px', fontWeight: 900, color: 'var(--brand-accent, #397C80)' }}>
+                        ₦{Number(item.price || 0).toLocaleString()}
                       </span>
                     </div>
 
