@@ -6,10 +6,10 @@ import AppLayout from '../../components/layout/AppLayout.jsx';
 
 const TYPE_CONFIG = {
   TICKET_ISSUED:      { color: '#16A34A', bg: '#F0FDF4' },
-  TRANSFER_RECEIVED:  { color: 'var(--brand-accent, #397C80)', bg: 'rgba(57, 124, 128, 0.1)' },
+  TRANSFER_RECEIVED:  { color: 'var(--brand-primary, #2457FF)', bg: 'rgba(57, 124, 128, 0.1)' },
   TRANSFER_ACCEPTED:  { color: '#16A34A', bg: '#F0FDF4' },
   TRANSFER_DECLINED:  { color: '#DC2626', bg: '#FEF2F2' },
-  ACCOUNT_CREATED:    { color: 'var(--brand-accent, #397C80)', bg: 'rgba(57, 124, 128, 0.1)' },
+  ACCOUNT_CREATED:    { color: 'var(--brand-primary, #2457FF)', bg: 'rgba(57, 124, 128, 0.1)' },
   ACCOUNT_APPROVED:   { color: '#16A34A', bg: '#F0FDF4' },
   ACCOUNT_SUSPENDED:  { color: '#DC2626', bg: '#FEF2F2' },
   RESALE_SOLD:        { color: '#D97706', bg: '#FFF7ED' },
@@ -101,14 +101,14 @@ export default function NotificationsPage() {
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <h1 style={{ color: '#1F1F1F', fontSize: '18px', fontWeight: 800, margin: 0 }}>Notifications</h1>
               {unreadCount > 0 && (
-                <span style={{ background: 'var(--brand-accent, #397C80)', color: '#FFFFFF', fontSize: '11px', fontWeight: 700, padding: '2px 8px', borderRadius: '20px', lineHeight: '18px' }}>
+                <span style={{ background: 'var(--brand-primary, #2457FF)', color: '#FFFFFF', fontSize: '11px', fontWeight: 700, padding: '2px 8px', borderRadius: '20px', lineHeight: '18px' }}>
                   {unreadCount}
                 </span>
               )}
             </div>
           </div>
           {unreadCount > 0 && (
-            <button onClick={markAllRead} style={{ background: 'none', border: 'none', color: 'var(--brand-accent, #397C80)', fontSize: '13px', fontWeight: 600, cursor: 'pointer', padding: '4px 8px' }}>
+            <button onClick={markAllRead} style={{ background: 'none', border: 'none', color: 'var(--brand-primary, #2457FF)', fontSize: '13px', fontWeight: 600, cursor: 'pointer', padding: '4px 8px' }}>
               Mark all read
             </button>
           )}
@@ -119,7 +119,7 @@ export default function NotificationsPage() {
           {/* Loading */}
           {loading && (
             <div style={{ textAlign: 'center', padding: '60px 0' }}>
-              <div style={{ width: '32px', height: '32px', border: '3px solid #E5E5E5', borderTopColor: 'var(--brand-accent, #397C80)', borderRadius: '50%', animation: 'spin 0.8s linear infinite', margin: '0 auto 12px' }} />
+              <div style={{ width: '32px', height: '32px', border: '3px solid #E5E5E5', borderTopColor: 'var(--brand-primary, #2457FF)', borderRadius: '50%', animation: 'spin 0.8s linear infinite', margin: '0 auto 12px' }} />
               <p style={{ color: '#6B6B6B', fontSize: '14px', margin: 0 }}>Loading notifications…</p>
               <style>{`@keyframes spin { to { transform: rotate(360deg) } }`}</style>
             </div>
@@ -155,7 +155,7 @@ export default function NotificationsPage() {
                         background: n.read ? '#FFFFFF' : '#FAFBFF',
                         border: 'none', cursor: 'pointer', textAlign: 'left',
                         borderBottom: idx < items.length - 1 ? '1px solid #F3F4F6' : 'none',
-                        borderLeft: !n.read ? '3px solid var(--brand-accent, #397C80)' : '3px solid transparent',
+                        borderLeft: !n.read ? '3px solid var(--brand-primary, #2457FF)' : '3px solid transparent',
                         transition: 'background 0.1s',
                       }}
                       onMouseEnter={e => e.currentTarget.style.background = '#F9FAFB'}
@@ -177,7 +177,7 @@ export default function NotificationsPage() {
                       </div>
                       {/* Unread dot */}
                       {!n.read && (
-                        <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--brand-accent, #397C80)', flexShrink: 0, marginTop: '4px' }} />
+                        <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--brand-primary, #2457FF)', flexShrink: 0, marginTop: '4px' }} />
                       )}
                     </button>
                   );

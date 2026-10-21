@@ -45,8 +45,8 @@ export default function BottomNav() {
         bottom: 0,
         left: 0,
         right: 0,
-        backgroundColor: 'var(--brand-primary, #0B1025)',
-        borderTop: '1px solid rgba(230, 245, 247, 0.1)',
+        backgroundColor: 'var(--surface-card, #FFFFFF)',
+        borderTop: '1px solid var(--border-subtle, #E5E7EB)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-around',
@@ -54,7 +54,7 @@ export default function BottomNav() {
         paddingTop: '6px',
         paddingBottom: 'calc(6px + env(safe-area-inset-bottom, 0px))',
         zIndex: 1000,
-        boxShadow: '0 -4px 24px rgba(0, 0, 0, 0.45)',
+        boxShadow: '0 -4px 20px rgba(17, 24, 39, 0.06)',
       }}
     >
       {navItems.map(({ to, icon: Icon, label }) => {
@@ -78,7 +78,7 @@ export default function BottomNav() {
               gap: '3px',
               textDecoration: 'none',
               padding: '2px 4px',
-              color: isActive ? 'var(--brand-pale-ice, #E6F5F7)' : 'rgba(230, 245, 247, 0.6)',
+              color: isActive ? 'var(--color-primary, #FF5A5F)' : 'var(--color-text-secondary, #57534E)',
               transition: 'all 0.15s ease',
               position: 'relative',
               WebkitTapHighlightColor: 'transparent',
@@ -92,13 +92,13 @@ export default function BottomNav() {
                 alignItems: 'center',
                 justifyContent: 'center',
                 borderRadius: '12px',
-                backgroundColor: isActive ? 'rgba(57, 124, 128, 0.25)' : 'transparent',
+                backgroundColor: isActive ? 'var(--color-surface-soft, #FFF4EE)' : 'transparent',
                 transition: 'background-color 0.15s ease',
               }}
             >
               <Icon
                 size={19}
-                color={isActive ? 'var(--brand-pale-ice, #E6F5F7)' : 'rgba(230, 245, 247, 0.6)'}
+                color={isActive ? 'var(--color-primary, #FF5A5F)' : 'var(--color-text-secondary, #57534E)'}
                 strokeWidth={isActive ? 2.4 : 1.8}
               />
             </div>
@@ -107,7 +107,7 @@ export default function BottomNav() {
                 fontSize: '10.5px',
                 fontWeight: isActive ? 700 : 500,
                 lineHeight: 1.1,
-                color: isActive ? 'var(--brand-pale-ice, #E6F5F7)' : 'rgba(230, 245, 247, 0.6)',
+                color: isActive ? 'var(--color-primary, #FF5A5F)' : 'var(--color-text-secondary, #57534E)',
                 textAlign: 'center',
                 whiteSpace: 'nowrap',
                 overflow: 'hidden',
@@ -127,7 +127,7 @@ export default function BottomNav() {
                   left: '28%',
                   right: '28%',
                   height: '3px',
-                  backgroundColor: 'var(--brand-accent, #397C80)',
+                  backgroundColor: 'var(--color-primary, #FF5A5F)',
                   borderRadius: '0 0 3px 3px',
                 }}
               />

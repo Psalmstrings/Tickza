@@ -8,9 +8,9 @@ const ACTION_COLORS = {
   USER_DELETED:     { bg: '#FEF2F2', color: '#DC2626' },
   EVENT_APPROVED:   { bg: '#F0FDF4', color: '#16A34A' },
   EVENT_REJECTED:   { bg: '#FEF2F2', color: '#DC2626' },
-  TICKET_ISSUED:    { bg: 'rgba(57, 124, 128, 0.1)', color: 'var(--brand-accent, #397C80)' },
+  TICKET_ISSUED:    { bg: 'var(--color-surface-soft, #FFF4EE)', color: 'var(--color-primary, #FF5A5F)' },
   TICKET_USED:      { bg: '#F3F4F6', color: '#6B7280' },
-  ORDER_CREATED:    { bg: 'rgba(57, 124, 128, 0.1)', color: 'var(--brand-accent, #397C80)' },
+  ORDER_CREATED:    { bg: 'var(--color-surface-soft, #FFF4EE)', color: 'var(--color-primary, #FF5A5F)' },
   TRANSFER_SENT:    { bg: '#FFF7ED', color: '#D97706' },
   TRANSFER_ACCEPTED:{ bg: '#F0FDF4', color: '#16A34A' },
 };

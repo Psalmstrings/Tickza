@@ -1,53 +1,58 @@
 /**
- * Tickza Currency & Financial Formatting Utility (NGN - Nigerian Naira)
+ * Tickza Shared Currency & Financial Formatting Utility (NGN - Nigerian Naira)
  */
-
 export const NAIRA_SYMBOL = '₦';
 
 /**
- * Format a number or numeric string as Nigerian Naira (NGN)
+ * Format a numeric amount as Nigerian Naira (NGN)
  * @param {number|string} amount - Amount in Naira
- * @param {Object} options
- * @param {number} [options.decimals=0] - Decimal places (default 0 for clean event pricing)
- * @param {boolean} [options.showSymbol=true] - Whether to prepend ₦
- * @param {string} [options.zeroLabel] - Optional custom label if amount is 0 (e.g. 'FREE')
- * @returns {string} Formatted currency string
+ * @param {Object} [options]
+ * @param {number} [options.decimals] - Maximum fraction digits (defaults to 2)
+ * @param {string} [options.zeroLabel] - Custom label if amount is 0 (e.g. 'FREE')
+ * @returns {string} Formatted currency string with ₦
  */
-export const formatNaira = (amount, { decimals = 0, showSymbol = true, zeroLabel = null } = {}) => {
-  const num = Number(amount);
-  if (isNaN(num)) return showSymbol ? `${NAIRA_SYMBOL}0` : '0';
+export const formatNaira = (amount, options = {}) => {
+  const value = Number(amount);
 
-  if (num === 0 && zeroLabel !== null) {
-    return zeroLabel;
+  if (!Number.isFinite(value)) {
+    return '₦0';
   }
 
-  // Format using standard Intl API
-  try {
-    const formatted = new Intl.NumberFormat('en-NG', {
-      minimumFractionDigits: decimals,
-      maximumFractionDigits: decimals,
-    }).format(num);
+  if (value === 0 && options && options.zeroLabel !== undefined && options.zeroLabel !== null) {
+    return options.zeroLabel;
+  }
 
-    return showSymbol ? `${NAIRA_SYMBOL}${formatted}` : formatted;
+  try {
+    const minDigits = options && options.decimals !== undefined ? options.decimals : 0;
+    const maxDigits = options && options.decimals !== undefined ? options.decimals : 2;
+
+    return new Intl.NumberFormat('en-NG', {
+      style: 'currency',
+      currency: 'NGN',
+      minimumFractionDigits: minDigits,
+      maximumFractionDigits: maxDigits,
+    }).format(value);
   } catch (e) {
-    // Fallback if Intl fails
-    const fallback = num.toLocaleString('en-US', {
-      minimumFractionDigits: decimals,
-      maximumFractionDigits: decimals,
+    const minDigits = options && options.decimals !== undefined ? options.decimals : 0;
+    const maxDigits = options && options.decimals !== undefined ? options.decimals : 2;
+
+    const fallback = value.toLocaleString('en-US', {
+      minimumFractionDigits: minDigits,
+      maximumFractionDigits: maxDigits,
     });
-    return showSymbol ? `${NAIRA_SYMBOL}${fallback}` : fallback;
+    return `₦${fallback}`;
   }
 };
 
 /**
  * Format an integer minor unit (kobo) as Nigerian Naira
  * @param {number|string} amountKobo - Amount in kobo (100 kobo = 1 Naira)
- * @param {Object} options
+ * @param {Object} [options]
  * @returns {string} Formatted currency string
  */
 export const formatKobo = (amountKobo, options = {}) => {
   const numKobo = Number(amountKobo);
-  if (isNaN(numKobo)) return formatNaira(0, options);
+  if (!Number.isFinite(numKobo)) return formatNaira(0, options);
   return formatNaira(numKobo / 100, options);
 };
 

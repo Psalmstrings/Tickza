@@ -131,8 +131,8 @@ export default function MyTicketsPage() {
                     background: 'none',
                     fontSize: '14px',
                     fontWeight: isActive ? 700 : 500,
-                    color: isActive ? 'var(--brand-accent, #397C80)' : '#6B6B6B',
-                    borderBottom: isActive ? '3px solid var(--brand-accent, #397C80)' : '3px solid transparent',
+                    color: isActive ? 'var(--brand-primary, #2457FF)' : '#6B6B6B',
+                    borderBottom: isActive ? '3px solid var(--brand-primary, #2457FF)' : '3px solid transparent',
                     cursor: 'pointer',
                     transition: 'all 0.15s ease',
                   }}
@@ -168,7 +168,7 @@ export default function MyTicketsPage() {
                 height: '60px',
                 borderRadius: '50%',
                 backgroundColor: 'rgba(57, 124, 128, 0.1)',
-                color: 'var(--brand-accent, #397C80)',
+                color: 'var(--brand-primary, #2457FF)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -266,7 +266,7 @@ export default function MyTicketsPage() {
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <Send size={20} color="var(--brand-accent, #397C80)" />
+                <Send size={20} color="var(--brand-primary, #2457FF)" />
                 <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 800 }}>Transfer Ticket</h3>
               </div>
               <button

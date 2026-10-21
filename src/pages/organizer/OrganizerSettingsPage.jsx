@@ -169,6 +169,49 @@ export default function OrganizerSettingsPage() {
     }
   };
 
+  const [savingBank, setSavingBank] = useState(false);
+  const [bankSavedSuccess, setBankSavedSuccess] = useState(false);
+  const [bankErrorMsg, setBankErrorMsg] = useState('');
+
+  const handleSaveBankAccount = async () => {
+    const { accountNumber, bankCode, bankName, accountName } = form.bankAccount;
+    if (!accountNumber || accountNumber.length !== 10) {
+      setBankErrorMsg('Please enter a valid 10-digit NUBAN account number.');
+      return;
+    }
+    if (!bankCode) {
+      setBankErrorMsg('Please select a valid Nigerian bank.');
+      return;
+    }
+    if (!accountName || !accountName.trim()) {
+      setBankErrorMsg('Please verify the account name using the "Verify Name" button first.');
+      return;
+    }
+
+    setSavingBank(true);
+    setBankErrorMsg('');
+    setBankSavedSuccess(false);
+
+    try {
+      await api.post('/organizer/payouts/bank-account', {
+        bankName,
+        bankCode,
+        accountNumber,
+        accountName: accountName.trim() || `${form.firstName} ${form.lastName}`,
+      });
+      setBankSavedSuccess(true);
+      setForm((prev) => ({
+        ...prev,
+        bankAccount: { ...prev.bankAccount, isVerified: true },
+      }));
+      setTimeout(() => setBankSavedSuccess(false), 4000);
+    } catch (err) {
+      setBankErrorMsg(err.response?.data?.message || 'Failed to save bank account. Please try again.');
+    } finally {
+      setSavingBank(false);
+    }
+  };
+
   const handleSave = async (e) => {
     e.preventDefault();
     setSaving(true);
@@ -176,18 +219,14 @@ export default function OrganizerSettingsPage() {
     setSavedSuccess(false);
 
     try {
-      // 1. If bank account is specified, register Paystack recipient
-      if (form.bankAccount.accountNumber && form.bankAccount.bankCode) {
-        await api.post('/organizer/payouts/bank-account', {
-          bankName: form.bankAccount.bankName,
-          bankCode: form.bankAccount.bankCode,
-          accountNumber: form.bankAccount.accountNumber,
-          accountName: form.bankAccount.accountName || `${form.firstName} ${form.lastName}`,
-        });
-      }
-
-      // 2. Update general profile settings
-      await api.put('/organizer/settings', form);
+      // Only update general profile (firstName, lastName, phone, branding)
+      // Bank account is saved separately via handleSaveBankAccount
+      await api.put('/organizer/settings', {
+        firstName: form.firstName,
+        lastName: form.lastName,
+        phone: form.phone,
+        branding: form.branding,
+      });
       setSavedSuccess(true);
       setTimeout(() => setSavedSuccess(false), 3000);
     } catch (err) {
@@ -196,6 +235,7 @@ export default function OrganizerSettingsPage() {
       setSaving(false);
     }
   };
+
 
   return (
     <div className="org-page">
@@ -210,7 +250,7 @@ export default function OrganizerSettingsPage() {
 
         <button onClick={handleSave} disabled={saving} className="org-btn org-btn-primary">
           {savedSuccess ? <Check size={15} /> : <Save size={15} />}
-          {saving ? 'Saving…' : savedSuccess ? 'Saved Changes!' : 'Save Settings'}
+          {saving ? 'Saving…' : savedSuccess ? 'Profile Saved!' : 'Save Profile'}
         </button>
       </div>
 
@@ -229,7 +269,7 @@ export default function OrganizerSettingsPage() {
             gap: 8,
           }}
         >
-          <Check size={16} /> All organizer profile and bank settlement settings have been updated and connected to Paystack.
+          <Check size={16} /> Organizer profile settings updated successfully.
         </div>
       )}
 
@@ -264,7 +304,7 @@ export default function OrganizerSettingsPage() {
             gap: 8,
           }}
         >
-          <ShieldCheck size={16} color="#2563EB" /> {resolveSuccessMsg}
+          <ShieldCheck size={16} color="#2563EB" /> {resolveSuccessMsg} — Now click "Save Bank Account" to register with Paystack.
         </div>
       )}
 
@@ -295,6 +335,61 @@ export default function OrganizerSettingsPage() {
                 </p>
               </div>
             </div>
+
+            {form.bankAccount.isVerified && (
+              <div
+                style={{
+                  background: '#ECFDF5',
+                  border: '1px solid #10B981',
+                  borderRadius: 8,
+                  padding: '10px 14px',
+                  marginBottom: 16,
+                  fontSize: 12,
+                  color: '#047857',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8,
+                }}
+              >
+                <ShieldCheck size={14} color="#10B981" />
+                ✓ Bank account registered with Paystack Transfers — ready for withdrawals.
+              </div>
+            )}
+
+            {bankSavedSuccess && (
+              <div
+                style={{
+                  background: '#ECFDF5',
+                  border: '1px solid #10B981',
+                  color: '#047857',
+                  padding: '10px 14px',
+                  borderRadius: 8,
+                  fontSize: 12,
+                  marginBottom: 16,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8,
+                }}
+              >
+                <Check size={14} /> Bank account saved and registered with Paystack successfully!
+              </div>
+            )}
+
+            {bankErrorMsg && (
+              <div
+                style={{
+                  background: '#FEF2F2',
+                  border: '1px solid #EF4444',
+                  color: '#B91C1C',
+                  padding: '10px 14px',
+                  borderRadius: 8,
+                  fontSize: 12,
+                  marginBottom: 16,
+                }}
+              >
+                {bankErrorMsg}
+              </div>
+            )}
 
             <div className="org-form-group">
               <label className="org-label">Settlement Bank *</label>
@@ -329,6 +424,7 @@ export default function OrganizerSettingsPage() {
                       },
                     });
                     setResolveSuccessMsg('');
+                    setBankErrorMsg('');
                   }}
                 />
                 <button
@@ -347,7 +443,7 @@ export default function OrganizerSettingsPage() {
               <label className="org-label">Account Beneficiary Name *</label>
               <input
                 className="org-input"
-                placeholder="e.g. Abimbola Events Ltd"
+                placeholder="Auto-filled after verification"
                 value={form.bankAccount.accountName}
                 onChange={(e) =>
                   setForm({
@@ -367,7 +463,7 @@ export default function OrganizerSettingsPage() {
                 display: 'flex',
                 alignItems: 'center',
                 gap: 10,
-                marginTop: 12,
+                marginBottom: 16,
               }}
             >
               <ShieldCheck size={18} color="#10B981" />
@@ -375,6 +471,22 @@ export default function OrganizerSettingsPage() {
                 Bank details are registered with Paystack Transfers to ensure reliable electronic disbursements.
               </span>
             </div>
+
+            <button
+              type="button"
+              onClick={handleSaveBankAccount}
+              disabled={savingBank || !form.bankAccount.accountNumber || !form.bankAccount.accountName}
+              className="org-btn org-btn-primary"
+              style={{ width: '100%', padding: '11px', backgroundColor: '#4F46E5', borderColor: '#4F46E5' }}
+            >
+              {savingBank ? (
+                'Registering with Paystack…'
+              ) : bankSavedSuccess ? (
+                <><Check size={14} /> Bank Account Saved!</>
+              ) : (
+                <><Building2 size={14} /> Save Bank Account</>
+              )}
+            </button>
           </div>
 
           {/* Section 2: Organizer Profile */}
@@ -438,7 +550,7 @@ export default function OrganizerSettingsPage() {
                 className="org-btn org-btn-primary"
                 style={{ width: '100%', padding: '12px' }}
               >
-                {saving ? 'Saving Changes…' : 'Save All Changes'}
+                {saving ? 'Saving Profile…' : 'Save Profile Changes'}
               </button>
             </div>
           </div>

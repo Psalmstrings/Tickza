@@ -1,11 +1,11 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Calendar, MapPin, QrCode, ArrowRight, Send, DollarSign, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Calendar, MapPin, QrCode, ArrowRight, Send, CheckCircle2, AlertCircle } from 'lucide-react';
 
 const STATUS_CONFIG = {
   SOLD: { label: 'Valid / Active', bg: '#ECFDF5', color: '#059669', border: '#A7F3D0' },
-  AVAILABLE: { label: 'Available', bg: 'rgba(57, 124, 128, 0.1)', color: 'var(--brand-accent, #397C80)', border: 'rgba(57, 124, 128, 0.25)' },
-  USED: { label: 'Used / Redeemed', bg: '#F3F4F6', color: '#6B7280', border: '#E5E7EB' },
+  AVAILABLE: { label: 'Available', bg: 'var(--color-surface-soft, #FFF4EE)', color: 'var(--color-primary, #FF5A5F)', border: 'rgba(255, 90, 95, 0.25)' },
+  USED: { label: 'Used / Redeemed', bg: '#F3F4F6', color: '#6B7280', border: '#E7E5E4' },
   TRANSFERRED: { label: 'Transferred', bg: '#F5F3FF', color: '#7C3AED', border: '#DDD6FE' },
   TRANSFER_PENDING: { label: 'Transfer Pending', bg: '#FFFBEB', color: '#D97706', border: '#FDE68A' },
   LISTED: { label: 'Listed for Resale', bg: '#FFF7ED', color: '#EA580C', border: '#FED7AA' },
@@ -84,10 +84,10 @@ export default function TicketCard({
         margin: '0 auto',
         backgroundColor: '#FFFFFF',
         borderRadius: '16px',
-        border: isSelected ? '2px solid var(--brand-accent, #397C80)' : '1px solid #E5E5E5',
+        border: isSelected ? '2px solid var(--color-primary, #FF5A5F)' : '1px solid var(--color-border, #E7E5E4)',
         boxShadow: isSelected
-          ? '0 0 0 3px rgba(57, 124, 128, 0.2), 0 8px 24px rgba(0,0,0,0.08)'
-          : '0 4px 16px rgba(0,0,0,0.06)',
+          ? '0 0 0 3px rgba(255, 90, 95, 0.2), 0 8px 24px rgba(41, 37, 36, 0.08)'
+          : '0 4px 16px rgba(41, 37, 36, 0.06)',
         cursor: 'pointer',
         position: 'relative',
         overflow: 'hidden',
@@ -176,17 +176,17 @@ export default function TicketCard({
             alignItems: 'center',
             justifyContent: 'space-between',
             paddingBottom: '14px',
-            borderBottom: '1px solid #F0F0F0',
+            borderBottom: '1px solid #F5F5F4',
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <Calendar size={16} color="var(--brand-accent, #397C80)" />
+            <Calendar size={16} color="var(--color-secondary, #FF8A3D)" />
             <div>
-              <p style={{ margin: 0, fontSize: '14px', fontWeight: 700, color: '#1F1F1F' }}>
+              <p style={{ margin: 0, fontSize: '14px', fontWeight: 700, color: 'var(--color-text-primary, #292524)' }}>
                 {dateStr}
               </p>
               {timeStr && (
-                <p style={{ margin: 0, fontSize: '12px', color: '#6B6B6B' }}>
+                <p style={{ margin: 0, fontSize: '12px', color: 'var(--color-text-secondary, #57534E)' }}>
                   Doors open • {timeStr}
                 </p>
               )}
@@ -195,8 +195,8 @@ export default function TicketCard({
 
           {price !== undefined && (
             <div style={{ textAlign: 'right' }}>
-              <span style={{ fontSize: '11px', color: '#8C8C8C', display: 'block' }}>Admission</span>
-              <span style={{ fontSize: '16px', fontWeight: 800, color: 'var(--brand-accent, #397C80)' }}>
+              <span style={{ fontSize: '11px', color: 'var(--color-text-muted, #78716C)', display: 'block' }}>Admission</span>
+              <span style={{ fontSize: '16px', fontWeight: 800, color: 'var(--color-primary, #FF5A5F)' }}>
                 {price === 0 ? 'FREE' : `₦${price.toLocaleString()}`}
               </span>
             </div>
@@ -282,17 +282,17 @@ export default function TicketCard({
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: 'var(--brand-accent, #397C80)',
+                color: 'var(--color-primary, #FF5A5F)',
               }}
             >
               <QrCode size={22} />
             </div>
 
             <div>
-              <p style={{ margin: 0, fontSize: '12px', fontWeight: 700, color: '#1F1F1F', letterSpacing: '0.02em' }}>
+              <p style={{ margin: 0, fontSize: '12px', fontWeight: 700, color: 'var(--color-text-primary, #292524)', letterSpacing: '0.02em' }}>
                 Tap to View Barcode
               </p>
-              <p style={{ margin: '2px 0 0 0', fontSize: '11px', fontFamily: 'monospace', color: '#6B6B6B' }}>
+              <p style={{ margin: '2px 0 0 0', fontSize: '11px', fontFamily: 'monospace', color: 'var(--color-text-muted, #78716C)' }}>
                 {ticketNumber}
               </p>
             </div>
@@ -350,13 +350,13 @@ export default function TicketCard({
           {onResale && statusKey === 'SOLD' && (
             <button
               className="btn-secondary"
-              style={{ flex: 1, padding: '10px 10px', fontSize: '13px', borderRadius: '8px', color: '#D97706' }}
+              style={{ flex: 1, padding: '10px 10px', fontSize: '13px', borderRadius: '8px', color: 'var(--color-secondary, #FF8A3D)' }}
               onClick={(e) => {
                 e.stopPropagation();
                 onResale(ticket);
               }}
             >
-               ₦   Sell
+              ₦ Resell
             </button>
           )}
         </div>

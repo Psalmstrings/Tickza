@@ -4,10 +4,30 @@ import AppLayout from '../../components/layout/AppLayout.jsx';
 import EventCard from '../../components/events/EventCard.jsx';
 import EventCardSkeleton from '../../components/events/EventCardSkeleton.jsx';
 import api from '../../lib/axios.js';
-import { Search, MapPin, Calendar, SlidersHorizontal, X, Tag } from 'lucide-react';
+import { Search, MapPin, Calendar, SlidersHorizontal, X, Tag, Sparkles } from 'lucide-react';
 
-const CATEGORIES = ['All', 'Concerts', 'Festivals', 'Sports', 'Nightlife & Parties', 'Arts & Theater', 'Family'];
-const CITIES = ['All Cities', 'Lagos', 'Abuja', 'Port Harcourt', 'Ibadan', 'Benin City', 'Enugu', 'Calabar', 'Online / Virtual'];
+const CATEGORIES = [
+  'All',
+  'Concerts',
+  'Festivals',
+  'Nightlife & Parties',
+  'Sports',
+  'Arts & Theater',
+  'Family',
+];
+
+const CITIES = [
+  'All Cities',
+  'Lagos',
+  'Abuja',
+  'Port Harcourt',
+  'Ibadan',
+  'Benin City',
+  'Enugu',
+  'Calabar',
+  'Online / Virtual',
+];
+
 const DATES = [
   { label: 'All Dates', value: '' },
   { label: 'Today', value: 'today' },
@@ -66,7 +86,12 @@ export default function ExplorePage() {
       if (p === 'free') {
         list = list.filter((e) => e.admissionType === 'FREE' || e.isFree || e.minPrice === 0);
       } else if (p === 'paid') {
-        list = list.filter((e) => e.admissionType !== 'FREE' && !e.isFree && (e.minPrice > 0 || (Array.isArray(e.ticketTypes) && e.ticketTypes.some(t => t.price > 0))));
+        list = list.filter(
+          (e) =>
+            e.admissionType !== 'FREE' &&
+            !e.isFree &&
+            (e.minPrice > 0 || (Array.isArray(e.ticketTypes) && e.ticketTypes.some((t) => t.price > 0)))
+        );
       }
 
       setEvents(list);
@@ -97,7 +122,12 @@ export default function ExplorePage() {
     navigate('/explore');
   };
 
-  const hasActiveFilters = search || (category && category !== 'All') || (city && city !== 'All Cities') || date || (price && price !== 'all');
+  const hasActiveFilters =
+    search ||
+    (category && category !== 'All') ||
+    (city && city !== 'All Cities') ||
+    date ||
+    (price && price !== 'all');
 
   return (
     <AppLayout>
@@ -105,18 +135,41 @@ export default function ExplorePage() {
       <div
         style={{
           backgroundColor: '#FFFFFF',
-          borderBottom: '1px solid var(--border-subtle, #E1E7EC)',
+          borderBottom: '1px solid var(--color-border, #E7E5E4)',
           padding: '24px 0 16px',
         }}
       >
-        <div className="tm-container">
-          <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '16px', marginBottom: '16px' }}>
+        <div className="tm-container" style={{ padding: '0 16px' }}>
+          <div
+            style={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: '16px',
+              marginBottom: '16px',
+            }}
+          >
             <div>
-              <h1 style={{ fontSize: '24px', fontWeight: 800, color: 'var(--brand-primary, #0B1025)', margin: 0 }}>
-                {category !== 'All' ? `${category} in Nigeria` : price === 'free' ? 'Free Events & Passes' : 'Discover Events in Nigeria'}
+              <h1
+                style={{
+                  fontSize: 'clamp(22px, 3.5vw, 28px)',
+                  fontWeight: 900,
+                  color: 'var(--color-text-primary, #292524)',
+                  margin: 0,
+                  letterSpacing: '-0.02em',
+                }}
+              >
+                {category !== 'All'
+                  ? `${category} in Nigeria`
+                  : price === 'free'
+                  ? 'Free Events & Passes'
+                  : 'Find your next experience.'}
               </h1>
-              <p style={{ fontSize: '13px', color: 'var(--text-muted, #788394)', margin: '4px 0 0 0' }}>
-                {city !== 'All Cities' ? `Showing live tickets in ${city}` : 'Find concerts, festivals, sports games, and experiences'}
+              <p style={{ fontSize: '13.5px', color: 'var(--color-text-secondary, #57534E)', margin: '4px 0 0 0' }}>
+                {city !== 'All Cities'
+                  ? `Showing live events and passes in ${city}`
+                  : 'Discover concerts, festivals, sports games, workshops, parties, and free admission events.'}
               </p>
             </div>
 
@@ -132,9 +185,9 @@ export default function ExplorePage() {
                   gap: '6px',
                   padding: '8px 14px',
                   borderRadius: '8px',
-                  backgroundColor: hasActiveFilters ? 'rgba(57, 124, 128, 0.12)' : 'var(--brand-soft-mist, #F3F7F8)',
-                  border: `1px solid ${hasActiveFilters ? 'var(--brand-accent, #397C80)' : 'var(--border-subtle, #E1E7EC)'}`,
-                  color: hasActiveFilters ? 'var(--brand-accent, #397C80)' : 'var(--brand-primary, #0B1025)',
+                  backgroundColor: hasActiveFilters ? 'var(--color-surface-soft, #FFF4EE)' : '#FAFAF9',
+                  border: `1px solid ${hasActiveFilters ? 'var(--color-primary, #FF5A5F)' : 'var(--color-border, #E7E5E4)'}`,
+                  color: hasActiveFilters ? 'var(--color-primary, #FF5A5F)' : 'var(--color-text-primary, #292524)',
                   fontSize: '13px',
                   fontWeight: 600,
                   cursor: 'pointer',
@@ -143,7 +196,9 @@ export default function ExplorePage() {
                 <SlidersHorizontal size={14} /> Filters {hasActiveFilters && '•'}
               </button>
 
-              <span style={{ fontSize: '13px', color: 'var(--text-muted, #788394)' }} className="desktop-only">Sort:</span>
+              <span style={{ fontSize: '13px', color: 'var(--color-text-muted, #78716C)' }} className="desktop-only">
+                Sort:
+              </span>
               <select
                 value={sort}
                 onChange={(e) => setSort(e.target.value)}
@@ -160,7 +215,16 @@ export default function ExplorePage() {
           <div className="desktop-flex" style={{ display: 'none', flexWrap: 'wrap', gap: '10px', alignItems: 'center' }}>
             {/* Search Input */}
             <div style={{ position: 'relative', minWidth: '220px', flex: 1 }}>
-              <Search size={15} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted, #788394)' }} />
+              <Search
+                size={15}
+                style={{
+                  position: 'absolute',
+                  left: 12,
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  color: 'var(--color-text-muted, #78716C)',
+                }}
+              />
               <input
                 type="text"
                 placeholder="Search event, artist or venue..."
@@ -224,8 +288,8 @@ export default function ExplorePage() {
                 style={{ borderRadius: '8px' }}
               >
                 <option value="all">All Prices</option>
-                <option value="free">Free Events</option>
-                <option value="paid">Paid Events</option>
+                <option value="free">Free Events Only</option>
+                <option value="paid">Paid Events Only</option>
               </select>
             </div>
 
@@ -247,16 +311,25 @@ export default function ExplorePage() {
               style={{
                 marginTop: '12px',
                 padding: '16px',
-                backgroundColor: 'var(--brand-soft-mist, #F3F7F8)',
+                backgroundColor: 'var(--color-surface-soft, #FFF4EE)',
                 borderRadius: '12px',
-                border: '1px solid var(--border-subtle, #E1E7EC)',
+                border: '1px solid rgba(255, 90, 95, 0.2)',
                 display: 'flex',
                 flexDirection: 'column',
                 gap: '10px',
               }}
             >
               <div style={{ position: 'relative' }}>
-                <Search size={15} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted, #788394)' }} />
+                <Search
+                  size={15}
+                  style={{
+                    position: 'absolute',
+                    left: 12,
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    color: 'var(--color-text-muted, #78716C)',
+                  }}
+                />
                 <input
                   type="text"
                   placeholder="Search event, artist or venue..."
@@ -275,7 +348,9 @@ export default function ExplorePage() {
                   style={{ backgroundColor: '#FFFFFF' }}
                 >
                   {CITIES.map((c) => (
-                    <option key={c} value={c}>{c}</option>
+                    <option key={c} value={c}>
+                      {c}
+                    </option>
                   ))}
                 </select>
 
@@ -286,7 +361,9 @@ export default function ExplorePage() {
                   style={{ backgroundColor: '#FFFFFF' }}
                 >
                   {DATES.map((d) => (
-                    <option key={d.label} value={d.value}>{d.label}</option>
+                    <option key={d.label} value={d.value}>
+                      {d.label}
+                    </option>
                   ))}
                 </select>
               </div>
@@ -311,7 +388,7 @@ export default function ExplorePage() {
                   }}
                   style={{
                     flex: 1,
-                    backgroundColor: 'var(--brand-accent, #397C80)',
+                    backgroundColor: 'var(--color-primary, #FF5A5F)',
                     color: '#FFFFFF',
                     border: 'none',
                     borderRadius: '8px',
@@ -333,7 +410,7 @@ export default function ExplorePage() {
                     style={{
                       padding: '10px 14px',
                       backgroundColor: 'transparent',
-                      border: '1px solid var(--border-subtle, #E1E7EC)',
+                      border: '1px solid var(--color-border, #E7E5E4)',
                       borderRadius: '8px',
                       color: '#DC2626',
                       fontWeight: 600,
@@ -359,11 +436,11 @@ export default function ExplorePage() {
                     handleApplyFilter(cat, city, date, price);
                   }}
                   style={{
-                    padding: '6px 14px',
-                    borderRadius: '20px',
-                    border: isSelected ? '1.5px solid var(--brand-accent, #397C80)' : '1px solid var(--border-subtle, #E1E7EC)',
-                    backgroundColor: isSelected ? 'rgba(57, 124, 128, 0.12)' : '#FFFFFF',
-                    color: isSelected ? 'var(--brand-accent, #397C80)' : 'var(--text-slate, #424B5D)',
+                    padding: '7px 16px',
+                    borderRadius: '24px',
+                    border: isSelected ? '1.5px solid var(--color-primary, #FF5A5F)' : '1px solid var(--color-border, #E7E5E4)',
+                    backgroundColor: isSelected ? 'var(--color-surface-soft, #FFF4EE)' : '#FFFFFF',
+                    color: isSelected ? 'var(--color-primary, #FF5A5F)' : 'var(--color-text-secondary, #57534E)',
                     fontSize: '13px',
                     fontWeight: isSelected ? 700 : 500,
                     cursor: 'pointer',
@@ -380,10 +457,10 @@ export default function ExplorePage() {
       </div>
 
       {/* Results Content Area */}
-      <div className="tm-container" style={{ padding: '32px 20px 60px' }}>
+      <div className="tm-container" style={{ padding: '32px 16px 60px' }}>
         {/* Results Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-          <p style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-muted, #788394)', margin: 0 }}>
+          <p style={{ fontSize: '14px', fontWeight: 600, color: 'var(--color-text-muted, #78716C)', margin: 0 }}>
             {loading ? 'Searching events...' : `${events.length} event${events.length === 1 ? '' : 's'} available`}
           </p>
         </div>
@@ -402,23 +479,23 @@ export default function ExplorePage() {
               padding: '60px 20px',
               backgroundColor: '#FFFFFF',
               borderRadius: '16px',
-              border: '1px solid var(--border-subtle, #E1E7EC)',
+              border: '1px solid var(--color-border, #E7E5E4)',
               maxWidth: '500px',
               margin: '0 auto',
-              boxShadow: 'var(--shadow-card, 0 4px 16px rgba(11,16,37,0.06))',
+              boxShadow: '0 4px 16px rgba(41, 37, 36, 0.04)',
             }}
           >
-            <Search size={44} color="#CBD5E1" style={{ marginBottom: '16px' }} />
-            <h3 style={{ fontSize: '18px', fontWeight: 800, color: 'var(--brand-primary, #0B1025)', margin: '0 0 6px 0' }}>
+            <Search size={44} color="var(--color-border, #E7E5E4)" style={{ marginBottom: '16px' }} />
+            <h3 style={{ fontSize: '18px', fontWeight: 800, color: 'var(--color-text-primary, #292524)', margin: '0 0 6px 0' }}>
               No matching events found
             </h3>
-            <p style={{ fontSize: '13.5px', color: 'var(--text-muted, #788394)', margin: '0 0 20px 0', lineHeight: 1.5 }}>
+            <p style={{ fontSize: '13.5px', color: 'var(--color-text-secondary, #57534E)', margin: '0 0 20px 0', lineHeight: 1.5 }}>
               We couldn't find any events matching your selected filters. Try searching for a different city or category.
             </p>
             <button
               onClick={clearAllFilters}
               style={{
-                backgroundColor: 'var(--brand-accent, #397C80)',
+                backgroundColor: 'var(--color-primary, #FF5A5F)',
                 color: '#FFFFFF',
                 border: 'none',
                 borderRadius: '8px',
@@ -426,6 +503,7 @@ export default function ExplorePage() {
                 fontWeight: 700,
                 fontSize: '13.5px',
                 cursor: 'pointer',
+                boxShadow: '0 2px 8px rgba(255, 90, 95, 0.25)',
               }}
             >
               Reset Search Filters

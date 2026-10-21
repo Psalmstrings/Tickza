@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../../lib/axios.js';
+import { formatNaira } from '../../lib/currency.js';
 import { useToast } from '../../components/ui/Toast.jsx';
 import TickzaSpinner from '../../components/ui/TickzaSpinner.jsx';
 import './organizer.css';
 import {
   Wallet,
-  DollarSign,
-  ArrowUpRight,
+    ArrowUpRight,
   CheckCircle2,
   Clock,
   AlertCircle,
@@ -42,6 +42,20 @@ export default function OrganizerPayoutsPage() {
   const [ledgerSearch, setLedgerSearch] = useState('');
   const [ledgerTypeFilter, setLedgerTypeFilter] = useState('');
 
+  // Inline bank setup state
+  const [showBankSetup, setShowBankSetup] = useState(false);
+  const [banksList, setBanksList] = useState([]);
+  const [bankForm, setBankForm] = useState({
+    bankName: 'Guaranty Trust Bank (GTBank)',
+    bankCode: '058',
+    accountNumber: '',
+    accountName: '',
+  });
+  const [resolvingBank, setResolvingBank] = useState(false);
+  const [bankResolveMsg, setBankResolveMsg] = useState('');
+  const [savingBank, setSavingBank] = useState(false);
+  const [bankSaveError, setBankSaveError] = useState('');
+
   const fetchPayoutData = async () => {
     try {
       setLoading(true);
@@ -71,8 +85,18 @@ export default function OrganizerPayoutsPage() {
     }
   };
 
+  const fetchBanksList = async () => {
+    try {
+      const { data: res } = await api.get('/organizer/payouts/banks');
+      if (res.data && res.data.length > 0) setBanksList(res.data);
+    } catch {
+      // Falls back to empty list; backend already returns curated fallback
+    }
+  };
+
   useEffect(() => {
     fetchPayoutData();
+    fetchBanksList();
   }, []);
 
   useEffect(() => {
@@ -98,9 +122,83 @@ export default function OrganizerPayoutsPage() {
   const bank = summary.bankAccount;
   const isBankVerified = bank && bank.isVerified && bank.accountNumber;
 
+  const handleBankSelectChange = (e) => {
+    const selectedName = e.target.value;
+    const found = banksList.find((b) => b.name === selectedName);
+    setBankForm((prev) => ({
+      ...prev,
+      bankName: selectedName,
+      bankCode: found?.code || '',
+      accountName: '',
+    }));
+    setBankResolveMsg('');
+  };
+
+  const handleResolveInlineAccount = async () => {
+    if (!bankForm.accountNumber || bankForm.accountNumber.length !== 10) {
+      toast.error('Please enter a 10-digit NUBAN account number.');
+      return;
+    }
+    if (!bankForm.bankCode) {
+      toast.error('Please select a valid bank.');
+      return;
+    }
+    setResolvingBank(true);
+    setBankResolveMsg('');
+    setBankSaveError('');
+    try {
+      const { data: res } = await api.post('/organizer/payouts/resolve-account', {
+        accountNumber: bankForm.accountNumber,
+        bankCode: bankForm.bankCode,
+      });
+      if (res.data?.accountName) {
+        setBankForm((prev) => ({ ...prev, accountName: res.data.accountName }));
+        setBankResolveMsg(`✓ Account verified: ${res.data.accountName}`);
+      }
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Could not verify account. Check bank and account number.');
+    } finally {
+      setResolvingBank(false);
+    }
+  };
+
+  const handleSaveInlineBank = async () => {
+    if (!bankForm.accountNumber || bankForm.accountNumber.length !== 10) {
+      setBankSaveError('Valid 10-digit NUBAN account number is required.');
+      return;
+    }
+    if (!bankForm.bankCode) {
+      setBankSaveError('Please select a bank first.');
+      return;
+    }
+    if (!bankForm.accountName?.trim()) {
+      setBankSaveError('Please verify your account name first using the "Verify" button.');
+      return;
+    }
+
+    setSavingBank(true);
+    setBankSaveError('');
+    try {
+      await api.post('/organizer/payouts/bank-account', {
+        bankName: bankForm.bankName,
+        bankCode: bankForm.bankCode,
+        accountNumber: bankForm.accountNumber,
+        accountName: bankForm.accountName.trim(),
+      });
+      toast.success('Bank account saved and registered with Paystack successfully!');
+      setShowBankSetup(false);
+      fetchPayoutData(); // Refresh to show updated bank details
+    } catch (err) {
+      setBankSaveError(err.response?.data?.message || 'Failed to save bank account.');
+    } finally {
+      setSavingBank(false);
+    }
+  };
+
   const handleOpenPayoutModal = () => {
     if (!isBankVerified) {
       toast.error('Please configure and verify your settlement bank account before requesting a payout.');
+      setShowBankSetup(true);
       return;
     }
     if (summary.available < summary.minimumPayoutNaira) {
@@ -134,7 +232,7 @@ export default function OrganizerPayoutsPage() {
     setRequestError('');
 
     try {
-      const { data: res } = await api.post('/organizer/payouts/request', {
+      await api.post('/organizer/payouts/request', {
         amount: numAmount,
       });
 
@@ -175,6 +273,8 @@ export default function OrganizerPayoutsPage() {
     document.body.removeChild(link);
   };
 
+
+
   return (
     <div className="org-page">
       {/* Header */}
@@ -190,9 +290,9 @@ export default function OrganizerPayoutsPage() {
           <button
             onClick={handleOpenPayoutModal}
             className="org-btn org-btn-primary"
-            style={{ backgroundColor: '#059669', borderColor: '#059669' }}
+            style={{ backgroundColor: '#2457FF', borderColor: '#2457FF' }}
           >
-            <DollarSign size={16} /> Request Payout
+            <Wallet size={16} /> Request Payout
           </button>
           <Link to="/organizer/settings" className="org-btn org-btn-secondary">
             <Building2 size={15} /> Payout Account
@@ -204,10 +304,10 @@ export default function OrganizerPayoutsPage() {
       <div className="org-stats-grid" style={{ marginBottom: 24 }}>
         <div className="org-stat-card revenue">
           <div className="org-stat-icon" style={{ background: '#EEF2FF', color: '#4F46E5' }}>
-            <DollarSign size={18} />
+            <Wallet size={18} />
           </div>
           <div className="org-stat-label">Gross Ticket Sales</div>
-          <div className="org-stat-value">₦{summary.grossRevenue.toLocaleString()}</div>
+          <div className="org-stat-value">{formatNaira(summary.grossRevenue)}</div>
           <div className="org-stat-delta positive">All paid orders</div>
         </div>
 
@@ -217,7 +317,7 @@ export default function OrganizerPayoutsPage() {
           </div>
           <div className="org-stat-label">Tickza Commission ({summary.commissionRate}%)</div>
           <div className="org-stat-value" style={{ color: '#D97706' }}>
-            -₦{summary.platformFee.toLocaleString()}
+            -{formatNaira(summary.platformFee)}
           </div>
           <div className="org-stat-delta">Platform infrastructure fee</div>
         </div>
@@ -227,21 +327,21 @@ export default function OrganizerPayoutsPage() {
             <Wallet size={18} />
           </div>
           <div className="org-stat-label">Net Vendor Earnings</div>
-          <div className="org-stat-value" style={{ color: '#059669' }}>
-            ₦{summary.netRevenue.toLocaleString()}
+          <div className="org-stat-value" style={{ color: '#16A34A' }}>
+            {formatNaira(summary.netRevenue)}
           </div>
           <div className="org-stat-delta">After commission</div>
         </div>
 
-        <div className="org-stat-card info" style={{ border: '2px solid #3B82F6' }}>
-          <div className="org-stat-icon" style={{ background: '#EFF6FF', color: '#2563EB' }}>
+        <div className="org-stat-card info" style={{ border: '2px solid #2457FF' }}>
+          <div className="org-stat-icon" style={{ background: '#EFF6FF', color: '#2457FF' }}>
             <ArrowUpRight size={18} />
           </div>
           <div className="org-stat-label" style={{ fontWeight: 800, color: '#1E40AF' }}>
             Available for Withdrawal
           </div>
-          <div className="org-stat-value" style={{ color: '#2563EB', fontWeight: 900 }}>
-            ₦{summary.available.toLocaleString()}
+          <div className="org-stat-value" style={{ color: '#2457FF', fontWeight: 900 }}>
+            {formatNaira(summary.available)}
           </div>
           <div className="org-stat-delta" style={{ color: '#1E40AF' }}>
             Min: ₦{summary.minimumPayoutNaira.toLocaleString()}
@@ -286,12 +386,29 @@ export default function OrganizerPayoutsPage() {
               </div>
             </div>
 
-            <Link to="/organizer/settings" className="org-btn org-btn-secondary org-btn-sm">
-              Update Bank
-            </Link>
+            <div style={{ display: 'flex', gap: 8 }}>
+              {isBankVerified && (
+                <button
+                  onClick={() => { setShowBankSetup(!showBankSetup); setBankSaveError(''); setBankResolveMsg(''); }}
+                  className="org-btn org-btn-secondary org-btn-sm"
+                >
+                  {showBankSetup ? <><X size={13} /> Cancel</> : 'Update Bank'}
+                </button>
+              )}
+              {!isBankVerified && (
+                <button
+                  onClick={() => { setShowBankSetup(!showBankSetup); setBankSaveError(''); setBankResolveMsg(''); }}
+                  className="org-btn org-btn-primary org-btn-sm"
+                  style={{ backgroundColor: '#4F46E5', borderColor: '#4F46E5' }}
+                >
+                  {showBankSetup ? <><X size={13} /> Cancel</> : <><Plus size={13} /> Add Bank Account</>}
+                </button>
+              )}
+            </div>
           </div>
 
-          {isBankVerified ? (
+          {/* Verified Bank Display */}
+          {isBankVerified && !showBankSetup && (
             <div
               style={{
                 background: '#F8FAFC',
@@ -322,7 +439,106 @@ export default function OrganizerPayoutsPage() {
                 </p>
               </div>
             </div>
-          ) : (
+          )}
+
+          {/* Inline Bank Setup / Update Form */}
+          {(showBankSetup || !isBankVerified) && (
+            <div
+              style={{
+                background: '#F8FAFC',
+                borderRadius: 10,
+                padding: '18px 20px',
+                border: '2px solid #E0E7FF',
+                marginTop: isBankVerified ? 12 : 0,
+              }}
+            >
+              <h4 style={{ fontSize: 13, fontWeight: 700, color: '#1E293B', margin: '0 0 14px' }}>
+                {isBankVerified ? '🔄 Update Settlement Bank Account' : '🏦 Connect Your Settlement Bank Account'}
+              </h4>
+
+              {bankResolveMsg && (
+                <div style={{ background: '#ECFDF5', border: '1px solid #10B981', color: '#047857', padding: '8px 12px', borderRadius: 6, fontSize: 12, marginBottom: 12 }}>
+                  {bankResolveMsg}
+                </div>
+              )}
+              {bankSaveError && (
+                <div style={{ background: '#FEF2F2', border: '1px solid #EF4444', color: '#B91C1C', padding: '8px 12px', borderRadius: 6, fontSize: 12, marginBottom: 12 }}>
+                  {bankSaveError}
+                </div>
+              )}
+
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 12, marginBottom: 12 }}>
+                <div className="org-form-group" style={{ margin: 0 }}>
+                  <label className="org-label" style={{ fontSize: 11 }}>Nigerian Bank *</label>
+                  <select
+                    className="org-select"
+                    value={bankForm.bankName}
+                    onChange={handleBankSelectChange}
+                    style={{ fontSize: 13 }}
+                  >
+                    {banksList.length === 0 && (
+                      <option value="Guaranty Trust Bank (GTBank)">Guaranty Trust Bank (GTBank)</option>
+                    )}
+                    {banksList.map((b) => (
+                      <option key={b.code || b.name} value={b.name}>{b.name}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="org-form-group" style={{ margin: 0 }}>
+                  <label className="org-label" style={{ fontSize: 11 }}>NUBAN Account Number (10 digits) *</label>
+                  <div style={{ display: 'flex', gap: 6 }}>
+                    <input
+                      className="org-input"
+                      maxLength={10}
+                      placeholder="0123456789"
+                      value={bankForm.accountNumber}
+                      style={{ fontSize: 13 }}
+                      onChange={(e) => {
+                        setBankForm((prev) => ({ ...prev, accountNumber: e.target.value.replace(/\D/g, ''), accountName: '' }));
+                        setBankResolveMsg('');
+                        setBankSaveError('');
+                      }}
+                    />
+                    <button
+                      type="button"
+                      onClick={handleResolveInlineAccount}
+                      disabled={resolvingBank || bankForm.accountNumber.length !== 10}
+                      className="org-btn org-btn-secondary"
+                      style={{ whiteSpace: 'nowrap', fontSize: 12, padding: '0 10px' }}
+                    >
+                      {resolvingBank ? '…' : 'Verify'}
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {bankForm.accountName && (
+                <div className="org-form-group" style={{ margin: '0 0 12px' }}>
+                  <label className="org-label" style={{ fontSize: 11 }}>Verified Account Name</label>
+                  <input
+                    className="org-input"
+                    value={bankForm.accountName}
+                    readOnly
+                    style={{ background: '#F0FDF4', borderColor: '#86EFAC', fontSize: 13, color: '#166534', fontWeight: 600 }}
+                  />
+                </div>
+              )}
+
+              <button
+                type="button"
+                onClick={handleSaveInlineBank}
+                disabled={savingBank || !bankForm.accountNumber || !bankForm.accountName}
+                className="org-btn org-btn-primary"
+                style={{ backgroundColor: '#4F46E5', borderColor: '#4F46E5', width: '100%', justifyContent: 'center' }}
+              >
+                {savingBank ? 'Registering with Paystack…' : <><ShieldCheck size={14} /> Save &amp; Register Bank Account</>}
+              </button>
+            </div>
+          )}
+
+          {/* Unverified prompt when form is hidden */}
+          {!isBankVerified && !showBankSetup && (
             <div
               style={{
                 background: '#FFFBEB',
@@ -333,7 +549,7 @@ export default function OrganizerPayoutsPage() {
                 fontSize: 13,
               }}
             >
-              You have not connected a verified settlement bank account. Add your Nigerian bank details in Settings to enable direct withdrawals.
+              ⚠ You have not connected a verified settlement bank account. Click <strong>Add Bank Account</strong> above to enable direct withdrawals.
             </div>
           )}
         </div>
@@ -378,8 +594,8 @@ export default function OrganizerPayoutsPage() {
             padding: '10px 18px',
             background: 'none',
             border: 'none',
-            borderBottom: activeTab === 'payouts' ? '3px solid var(--brand-accent, #397C80)' : '3px solid transparent',
-            color: activeTab === 'payouts' ? 'var(--brand-accent, #397C80)' : '#64748B',
+            borderBottom: activeTab === 'payouts' ? '3px solid var(--brand-primary, #2457FF)' : '3px solid transparent',
+            color: activeTab === 'payouts' ? 'var(--brand-primary, #2457FF)' : '#64748B',
             fontWeight: activeTab === 'payouts' ? 700 : 500,
             fontSize: 14,
             cursor: 'pointer',
@@ -397,8 +613,8 @@ export default function OrganizerPayoutsPage() {
             padding: '10px 18px',
             background: 'none',
             border: 'none',
-            borderBottom: activeTab === 'ledger' ? '3px solid var(--brand-accent, #397C80)' : '3px solid transparent',
-            color: activeTab === 'ledger' ? 'var(--brand-accent, #397C80)' : '#64748B',
+            borderBottom: activeTab === 'ledger' ? '3px solid var(--brand-primary, #2457FF)' : '3px solid transparent',
+            color: activeTab === 'ledger' ? 'var(--brand-primary, #2457FF)' : '#64748B',
             fontWeight: activeTab === 'ledger' ? 700 : 500,
             fontSize: 14,
             cursor: 'pointer',

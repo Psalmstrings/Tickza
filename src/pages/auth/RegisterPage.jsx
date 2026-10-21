@@ -10,7 +10,7 @@ function Field({ label, icon, type = 'text', value, onChange, placeholder, requi
       <label
         style={{
           display: 'block',
-          color: 'var(--brand-pale-ice, #E6F5F7)',
+          color: 'var(--text-primary, #111827)',
           fontSize: '13px',
           fontWeight: 600,
           marginBottom: '6px',
@@ -27,7 +27,7 @@ function Field({ label, icon, type = 'text', value, onChange, placeholder, requi
               top: '50%',
               transform: 'translateY(-50%)',
               pointerEvents: 'none',
-              color: 'rgba(230, 245, 247, 0.5)',
+              color: 'var(--text-secondary, #64748B)',
               display: 'flex',
               alignItems: 'center',
             }}
@@ -44,10 +44,10 @@ function Field({ label, icon, type = 'text', value, onChange, placeholder, requi
           style={{
             width: '100%',
             padding: `12px 14px 12px ${icon ? '42px' : '14px'}`,
-            backgroundColor: 'rgba(230, 245, 247, 0.06)',
-            border: '1px solid rgba(230, 245, 247, 0.16)',
+            backgroundColor: '#FFFFFF',
+            border: '1px solid var(--border-subtle, #E5E7EB)',
             borderRadius: '8px',
-            color: '#FFFFFF',
+            color: 'var(--text-primary, #111827)',
             fontSize: '14px',
             outline: 'none',
             boxSizing: 'border-box',
@@ -55,11 +55,11 @@ function Field({ label, icon, type = 'text', value, onChange, placeholder, requi
             minHeight: '46px',
           }}
           onFocus={(e) => {
-            e.target.style.borderColor = 'var(--brand-accent, #397C80)';
-            e.target.style.boxShadow = '0 0 0 3px rgba(57, 124, 128, 0.25)';
+            e.target.style.borderColor = 'var(--brand-primary, #2457FF)';
+            e.target.style.boxShadow = '0 0 0 3px rgba(36, 87, 255, 0.15)';
           }}
           onBlur={(e) => {
-            e.target.style.borderColor = 'rgba(230, 245, 247, 0.16)';
+            e.target.style.borderColor = 'var(--border-subtle, #E5E7EB)';
             e.target.style.boxShadow = 'none';
           }}
         />
@@ -119,7 +119,7 @@ export default function RegisterPage() {
       <div
         style={{
           minHeight: '100vh',
-          backgroundColor: 'var(--brand-primary, #0B1025)',
+          backgroundColor: 'var(--surface-page, #F5F7FF)',
           backgroundImage: 'radial-gradient(circle at 50% 0%, rgba(57, 124, 128, 0.25) 0%, rgba(11, 16, 37, 0) 70%)',
           display: 'flex',
           alignItems: 'center',
@@ -132,10 +132,10 @@ export default function RegisterPage() {
           style={{
             maxWidth: '440px',
             width: '100%',
-            backgroundColor: 'var(--brand-secondary, #111831)',
+            backgroundColor: '#FFFFFF',
             borderRadius: '16px',
-            border: '1px solid rgba(230, 245, 247, 0.15)',
-            boxShadow: '0 24px 60px rgba(0, 0, 0, 0.6)',
+            border: '1px solid var(--border-subtle, #E5E7EB)',
+            boxShadow: '0 20px 40px rgba(17, 24, 39, 0.08)',
             padding: '40px 28px',
             textAlign: 'center',
           }}
@@ -144,8 +144,8 @@ export default function RegisterPage() {
             style={{
               width: '72px',
               height: '72px',
-              backgroundColor: 'rgba(57, 124, 128, 0.2)',
-              border: '2px solid var(--brand-accent, #397C80)',
+              backgroundColor: '#ECFDF5',
+              border: '2px solid var(--state-success, #16A34A)',
               borderRadius: '50%',
               display: 'flex',
               alignItems: 'center',
@@ -153,12 +153,12 @@ export default function RegisterPage() {
               margin: '0 auto 20px',
             }}
           >
-            <CheckCircle size={38} color="var(--brand-pale-ice, #E6F5F7)" />
+            <CheckCircle size={38} color="var(--state-success, #16A34A)" />
           </div>
-          <h2 style={{ color: 'var(--brand-pale-ice, #E6F5F7)', fontSize: '24px', fontWeight: 800, margin: '0 0 10px' }}>
+          <h2 style={{ color: 'var(--text-primary, #111827)', fontSize: '24px', fontWeight: 800, margin: '0 0 10px' }}>
             Account Created!
           </h2>
-          <p style={{ color: 'rgba(230, 245, 247, 0.75)', fontSize: '14px', lineHeight: '1.6', margin: '0 0 24px' }}>
+          <p style={{ color: 'var(--text-secondary, #64748B)', fontSize: '14px', lineHeight: '1.6', margin: '0 0 24px' }}>
             Welcome to Tickza! You can now browse events, register for free passes, and purchase tickets via Paystack.
           </p>
           <div
@@ -166,7 +166,7 @@ export default function RegisterPage() {
               display: 'inline-flex',
               alignItems: 'center',
               gap: '8px',
-              color: 'var(--brand-warm-accent, #D6BE92)',
+              color: 'var(--brand-accent, #FF6B35)',
               fontSize: '13px',
               fontWeight: 600,
             }}
@@ -182,8 +182,8 @@ export default function RegisterPage() {
     <div
       style={{
         minHeight: '100vh',
-        backgroundColor: 'var(--brand-primary, #0B1025)',
-        backgroundImage: 'radial-gradient(circle at 50% 0%, rgba(57, 124, 128, 0.22) 0%, rgba(11, 16, 37, 0) 70%)',
+        backgroundColor: 'var(--surface-page, #F5F7FF)',
+        backgroundImage: 'radial-gradient(circle at 50% 0%, rgba(36, 87, 255, 0.08) 0%, rgba(245, 247, 255, 0) 70%)',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
@@ -201,23 +201,24 @@ export default function RegisterPage() {
             display: 'inline-flex',
             alignItems: 'center',
             gap: '6px',
-            color: 'rgba(230, 245, 247, 0.75)',
+            color: 'var(--text-primary, #111827)',
             fontSize: '13px',
             fontWeight: 600,
             textDecoration: 'none',
-            padding: '8px 12px',
+            padding: '8px 14px',
             borderRadius: '8px',
-            backgroundColor: 'rgba(230, 245, 247, 0.05)',
-            border: '1px solid rgba(230, 245, 247, 0.1)',
+            backgroundColor: '#FFFFFF',
+            border: '1px solid var(--border-subtle, #E5E7EB)',
+            boxShadow: '0 1px 3px rgba(17, 24, 39, 0.05)',
             transition: 'all 0.15s ease',
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.color = '#FFFFFF';
-            e.currentTarget.style.backgroundColor = 'rgba(230, 245, 247, 0.1)';
+            e.currentTarget.style.backgroundColor = 'var(--subtle-blue, #EAF0FF)';
+            e.currentTarget.style.color = 'var(--brand-primary, #2457FF)';
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.color = 'rgba(230, 245, 247, 0.75)';
-            e.currentTarget.style.backgroundColor = 'rgba(230, 245, 247, 0.05)';
+            e.currentTarget.style.backgroundColor = '#FFFFFF';
+            e.currentTarget.style.color = 'var(--text-primary, #111827)';
           }}
         >
           <ArrowLeft size={15} /> Back to Events
@@ -229,10 +230,10 @@ export default function RegisterPage() {
         style={{
           width: '100%',
           maxWidth: '480px',
-          backgroundColor: 'var(--brand-secondary, #111831)',
+          backgroundColor: '#FFFFFF',
           borderRadius: '16px',
-          border: '1px solid rgba(230, 245, 247, 0.14)',
-          boxShadow: '0 20px 50px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(230, 245, 247, 0.05)',
+          border: '1px solid var(--border-subtle, #E5E7EB)',
+          boxShadow: '0 20px 40px rgba(17, 24, 39, 0.08)',
           overflow: 'hidden',
         }}
       >
@@ -241,16 +242,16 @@ export default function RegisterPage() {
           style={{
             padding: '32px 28px 22px',
             textAlign: 'center',
-            borderBottom: '1px solid rgba(230, 245, 247, 0.08)',
-            backgroundColor: 'rgba(230, 245, 247, 0.03)',
+            borderBottom: '1px solid var(--border-subtle, #E5E7EB)',
+            backgroundColor: 'transparent',
           }}
         >
           <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '14px' }}>
-            <TickzaLogo height={36} color="var(--brand-pale-ice, #E6F5F7)" />
+            <TickzaLogo height={36} color="var(--brand-primary, #2457FF)" />
           </div>
           <h1
             style={{
-              color: 'var(--brand-pale-ice, #E6F5F7)',
+              color: 'var(--text-primary, #111827)',
               fontSize: '22px',
               fontWeight: 800,
               margin: '0 0 6px',
@@ -259,7 +260,7 @@ export default function RegisterPage() {
           >
             Create Your Account
           </h1>
-          <p style={{ color: 'rgba(230, 245, 247, 0.7)', fontSize: '13.5px', margin: 0, lineHeight: 1.4 }}>
+          <p style={{ color: 'var(--text-secondary, #64748B)', fontSize: '13.5px', margin: 0, lineHeight: 1.4 }}>
             Join Tickza to discover, purchase, and manage events
           </p>
         </div>
@@ -269,12 +270,12 @@ export default function RegisterPage() {
           {error && (
             <div
               style={{
-                backgroundColor: 'rgba(239, 68, 68, 0.12)',
-                border: '1px solid rgba(239, 68, 68, 0.3)',
+                backgroundColor: '#FEF2F2',
+                border: '1px solid #FCA5A5',
                 borderRadius: '8px',
                 padding: '12px 14px',
                 marginBottom: '20px',
-                color: '#FCA5A5',
+                color: '#DC2626',
                 fontSize: '13px',
                 lineHeight: 1.45,
               }}
@@ -326,7 +327,7 @@ export default function RegisterPage() {
               <label
                 style={{
                   display: 'block',
-                  color: 'var(--brand-pale-ice, #E6F5F7)',
+                  color: 'var(--text-primary, #111827)',
                   fontSize: '13px',
                   fontWeight: 600,
                   marginBottom: '6px',
@@ -360,7 +361,7 @@ export default function RegisterPage() {
                     minHeight: '46px',
                   }}
                   onFocus={(e) => {
-                    e.target.style.borderColor = 'var(--brand-accent, #397C80)';
+                    e.target.style.borderColor = 'var(--brand-primary, #2457FF)';
                     e.target.style.boxShadow = '0 0 0 3px rgba(57, 124, 128, 0.25)';
                   }}
                   onBlur={(e) => {
@@ -397,7 +398,7 @@ export default function RegisterPage() {
               <label
                 style={{
                   display: 'block',
-                  color: 'var(--brand-pale-ice, #E6F5F7)',
+                  color: 'var(--text-primary, #111827)',
                   fontSize: '13px',
                   fontWeight: 600,
                   marginBottom: '6px',
@@ -431,7 +432,7 @@ export default function RegisterPage() {
                     minHeight: '46px',
                   }}
                   onFocus={(e) => {
-                    e.target.style.borderColor = 'var(--brand-accent, #397C80)';
+                    e.target.style.borderColor = 'var(--brand-primary, #2457FF)';
                     e.target.style.boxShadow = '0 0 0 3px rgba(57, 124, 128, 0.25)';
                   }}
                   onBlur={(e) => {
@@ -475,7 +476,7 @@ export default function RegisterPage() {
             >
               <p
                 style={{
-                  color: 'var(--brand-warm-accent, #D6BE92)',
+                  color: 'var(--brand-accent, #FF6B35)',
                   fontSize: '12.5px',
                   margin: 0,
                   lineHeight: '1.5',
@@ -493,7 +494,7 @@ export default function RegisterPage() {
                 width: '100%',
                 minHeight: '48px',
                 padding: '12px',
-                backgroundColor: loading ? 'rgba(57, 124, 128, 0.6)' : 'var(--brand-accent, #397C80)',
+                backgroundColor: loading ? 'rgba(36, 87, 255, 0.6)' : 'var(--brand-primary, #2457FF)',
                 border: 'none',
                 borderRadius: '8px',
                 color: '#FFFFFF',
@@ -530,10 +531,10 @@ export default function RegisterPage() {
             <Link
               to="/login"
               style={{
-                color: 'var(--brand-pale-ice, #E6F5F7)',
+                color: 'var(--text-primary, #111827)',
                 fontWeight: 700,
                 textDecoration: 'none',
-                borderBottom: '1px solid var(--brand-accent, #397C80)',
+                borderBottom: '1.5px solid var(--brand-primary, #2457FF)',
                 paddingBottom: '1px',
               }}
             >
@@ -550,12 +551,12 @@ export default function RegisterPage() {
               gap: '6px',
               marginTop: '24px',
               paddingTop: '18px',
-              borderTop: '1px solid rgba(230, 245, 247, 0.08)',
-              color: 'rgba(230, 245, 247, 0.5)',
+              borderTop: '1px solid var(--border-subtle, #E5E7EB)',
+              color: 'var(--text-secondary, #64748B)',
               fontSize: '12px',
             }}
           >
-            <ShieldCheck size={14} color="var(--brand-accent, #397C80)" />
+            <ShieldCheck size={14} color="var(--state-success, #16A34A)" />
             <span>Secured with Paystack payment gateway</span>
           </div>
         </div>

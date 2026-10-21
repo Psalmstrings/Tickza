@@ -5,10 +5,10 @@ import api from '../../lib/axios.js';
 const STATUS_BADGE = {
   SOLD:             { bg: '#F0FDF4', color: '#16A34A' },
   USED:             { bg: '#F3F4F6', color: '#6B7280' },
-  TRANSFERRED:      { bg: 'rgba(57, 124, 128, 0.1)', color: 'var(--brand-accent, #397C80)' },
+  TRANSFERRED:      { bg: 'var(--color-surface-soft, #FFF4EE)', color: 'var(--color-primary, #FF5A5F)' },
   LISTED:           { bg: '#FFF7ED', color: '#D97706' },
   CANCELLED:        { bg: '#FEF2F2', color: '#DC2626' },
-  AVAILABLE:        { bg: 'rgba(57, 124, 128, 0.1)', color: 'var(--brand-accent, #397C80)' },
+  AVAILABLE:        { bg: 'var(--color-surface-soft, #FFF4EE)', color: 'var(--color-primary, #FF5A5F)' },
   TRANSFER_PENDING: { bg: '#FFF7ED', color: '#D97706' },
 };
 

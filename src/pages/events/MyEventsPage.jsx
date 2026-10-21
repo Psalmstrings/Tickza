@@ -55,7 +55,7 @@ export default function MyEventsPage() {
               display: 'inline-flex',
               alignItems: 'center',
               gap: '6px',
-              color: 'var(--brand-accent, #397C80)',
+              color: 'var(--color-primary, #FF5A5F)',
               fontSize: '13px',
               fontWeight: 700,
               textDecoration: 'none',

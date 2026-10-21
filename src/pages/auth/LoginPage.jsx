@@ -53,8 +53,8 @@ export default function LoginPage() {
     <div
       style={{
         minHeight: '100vh',
-        backgroundColor: 'var(--brand-primary, #0B1025)',
-        backgroundImage: 'radial-gradient(circle at 50% 0%, rgba(57, 124, 128, 0.22) 0%, rgba(11, 16, 37, 0) 70%)',
+        backgroundColor: 'var(--surface-page, #F5F7FF)',
+        backgroundImage: 'radial-gradient(circle at 50% 0%, rgba(36, 87, 255, 0.08) 0%, rgba(245, 247, 255, 0) 70%)',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
@@ -72,23 +72,24 @@ export default function LoginPage() {
             display: 'inline-flex',
             alignItems: 'center',
             gap: '6px',
-            color: 'rgba(230, 245, 247, 0.75)',
+            color: 'var(--text-primary, #111827)',
             fontSize: '13px',
             fontWeight: 600,
             textDecoration: 'none',
-            padding: '8px 12px',
+            padding: '8px 14px',
             borderRadius: '8px',
-            backgroundColor: 'rgba(230, 245, 247, 0.05)',
-            border: '1px solid rgba(230, 245, 247, 0.1)',
+            backgroundColor: '#FFFFFF',
+            border: '1px solid var(--border-subtle, #E5E7EB)',
+            boxShadow: '0 1px 3px rgba(17, 24, 39, 0.05)',
             transition: 'all 0.15s ease',
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.color = '#FFFFFF';
-            e.currentTarget.style.backgroundColor = 'rgba(230, 245, 247, 0.1)';
+            e.currentTarget.style.backgroundColor = 'var(--subtle-blue, #EAF0FF)';
+            e.currentTarget.style.color = 'var(--brand-primary, #2457FF)';
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.color = 'rgba(230, 245, 247, 0.75)';
-            e.currentTarget.style.backgroundColor = 'rgba(230, 245, 247, 0.05)';
+            e.currentTarget.style.backgroundColor = '#FFFFFF';
+            e.currentTarget.style.color = 'var(--text-primary, #111827)';
           }}
         >
           <ArrowLeft size={15} /> Back to Events
@@ -100,10 +101,10 @@ export default function LoginPage() {
         style={{
           width: '100%',
           maxWidth: '440px',
-          backgroundColor: 'var(--brand-secondary, #111831)',
+          backgroundColor: '#FFFFFF',
           borderRadius: '16px',
-          border: '1px solid rgba(230, 245, 247, 0.14)',
-          boxShadow: '0 20px 50px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(230, 245, 247, 0.05)',
+          border: '1px solid var(--border-subtle, #E5E7EB)',
+          boxShadow: '0 20px 40px rgba(17, 24, 39, 0.08)',
           overflow: 'hidden',
         }}
       >
@@ -112,16 +113,16 @@ export default function LoginPage() {
           style={{
             padding: '32px 28px 24px',
             textAlign: 'center',
-            borderBottom: '1px solid rgba(230, 245, 247, 0.08)',
-            backgroundColor: 'rgba(230, 245, 247, 0.03)',
+            borderBottom: '1px solid var(--border-subtle, #E5E7EB)',
+            backgroundColor: 'transparent',
           }}
         >
           <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '14px' }}>
-            <TickzaLogo height={36} color="var(--brand-pale-ice, #E6F5F7)" />
+            <TickzaLogo height={36} color="var(--brand-primary, #2457FF)" />
           </div>
           <h1
             style={{
-              color: 'var(--brand-pale-ice, #E6F5F7)',
+              color: 'var(--text-primary, #111827)',
               fontSize: '22px',
               fontWeight: 800,
               margin: '0 0 6px',
@@ -130,7 +131,7 @@ export default function LoginPage() {
           >
             Welcome Back
           </h1>
-          <p style={{ color: 'rgba(230, 245, 247, 0.7)', fontSize: '13.5px', margin: 0, lineHeight: 1.4 }}>
+          <p style={{ color: 'var(--text-secondary, #64748B)', fontSize: '13.5px', margin: 0, lineHeight: 1.4 }}>
             Sign in to access your tickets, passes, and events
           </p>
         </div>
@@ -140,12 +141,12 @@ export default function LoginPage() {
           {error && (
             <div
               style={{
-                backgroundColor: 'rgba(239, 68, 68, 0.12)',
-                border: '1px solid rgba(239, 68, 68, 0.3)',
+                backgroundColor: '#FEF2F2',
+                border: '1px solid #FCA5A5',
                 borderRadius: '8px',
                 padding: '12px 14px',
                 marginBottom: '20px',
-                color: '#FCA5A5',
+                color: '#DC2626',
                 fontSize: '13px',
                 lineHeight: 1.45,
               }}
@@ -160,7 +161,7 @@ export default function LoginPage() {
               <label
                 style={{
                   display: 'block',
-                  color: 'var(--brand-pale-ice, #E6F5F7)',
+                  color: 'var(--text-primary, #111827)',
                   fontSize: '13px',
                   fontWeight: 600,
                   marginBottom: '6px',
@@ -171,7 +172,7 @@ export default function LoginPage() {
               <div style={{ position: 'relative' }}>
                 <Mail
                   size={16}
-                  color="rgba(230, 245, 247, 0.5)"
+                  color="var(--text-secondary, #64748B)"
                   style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }}
                 />
                 <input
@@ -184,10 +185,10 @@ export default function LoginPage() {
                   style={{
                     width: '100%',
                     padding: '12px 14px 12px 42px',
-                    backgroundColor: 'rgba(230, 245, 247, 0.06)',
-                    border: '1px solid rgba(230, 245, 247, 0.16)',
+                    backgroundColor: '#FFFFFF',
+                    border: '1px solid var(--border-subtle, #E5E7EB)',
                     borderRadius: '8px',
-                    color: '#FFFFFF',
+                    color: 'var(--text-primary, #111827)',
                     fontSize: '14px',
                     outline: 'none',
                     boxSizing: 'border-box',
@@ -195,11 +196,11 @@ export default function LoginPage() {
                     minHeight: '46px',
                   }}
                   onFocus={(e) => {
-                    e.target.style.borderColor = 'var(--brand-accent, #397C80)';
-                    e.target.style.boxShadow = '0 0 0 3px rgba(57, 124, 128, 0.25)';
+                    e.target.style.borderColor = 'var(--brand-primary, #2457FF)';
+                    e.target.style.boxShadow = '0 0 0 3px rgba(36, 87, 255, 0.15)';
                   }}
                   onBlur={(e) => {
-                    e.target.style.borderColor = 'rgba(230, 245, 247, 0.16)';
+                    e.target.style.borderColor = 'var(--border-subtle, #E5E7EB)';
                     e.target.style.boxShadow = 'none';
                   }}
                 />
@@ -211,7 +212,7 @@ export default function LoginPage() {
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
                 <label
                   style={{
-                    color: 'var(--brand-pale-ice, #E6F5F7)',
+                    color: 'var(--text-primary, #111827)',
                     fontSize: '13px',
                     fontWeight: 600,
                   }}
@@ -228,7 +229,7 @@ export default function LoginPage() {
                   style={{
                     background: 'none',
                     border: 'none',
-                    color: 'var(--brand-warm-accent, #D6BE92)',
+                    color: 'var(--brand-primary, #2457FF)',
                     fontSize: '12.5px',
                     fontWeight: 600,
                     cursor: 'pointer',
@@ -245,7 +246,7 @@ export default function LoginPage() {
               <div style={{ position: 'relative' }}>
                 <Lock
                   size={16}
-                  color="rgba(230, 245, 247, 0.5)"
+                  color="var(--text-secondary, #64748B)"
                   style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }}
                 />
                 <input
@@ -258,10 +259,10 @@ export default function LoginPage() {
                   style={{
                     width: '100%',
                     padding: '12px 46px 12px 42px',
-                    backgroundColor: 'rgba(230, 245, 247, 0.06)',
-                    border: '1px solid rgba(230, 245, 247, 0.16)',
+                    backgroundColor: '#FFFFFF',
+                    border: '1px solid var(--border-subtle, #E5E7EB)',
                     borderRadius: '8px',
-                    color: '#FFFFFF',
+                    color: 'var(--text-primary, #111827)',
                     fontSize: '14px',
                     outline: 'none',
                     boxSizing: 'border-box',
@@ -269,11 +270,11 @@ export default function LoginPage() {
                     minHeight: '46px',
                   }}
                   onFocus={(e) => {
-                    e.target.style.borderColor = 'var(--brand-accent, #397C80)';
-                    e.target.style.boxShadow = '0 0 0 3px rgba(57, 124, 128, 0.25)';
+                    e.target.style.borderColor = 'var(--brand-primary, #2457FF)';
+                    e.target.style.boxShadow = '0 0 0 3px rgba(36, 87, 255, 0.15)';
                   }}
                   onBlur={(e) => {
-                    e.target.style.borderColor = 'rgba(230, 245, 247, 0.16)';
+                    e.target.style.borderColor = 'var(--border-subtle, #E5E7EB)';
                     e.target.style.boxShadow = 'none';
                   }}
                 />
@@ -290,7 +291,7 @@ export default function LoginPage() {
                     border: 'none',
                     cursor: 'pointer',
                     padding: '8px',
-                    color: 'rgba(230, 245, 247, 0.6)',
+                    color: 'var(--text-secondary, #64748B)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -309,7 +310,7 @@ export default function LoginPage() {
                 width: '100%',
                 minHeight: '48px',
                 padding: '12px',
-                backgroundColor: loading ? 'rgba(57, 124, 128, 0.6)' : 'var(--brand-accent, #397C80)',
+                backgroundColor: loading ? 'rgba(36, 87, 255, 0.6)' : 'var(--brand-primary, #2457FF)',
                 border: 'none',
                 borderRadius: '8px',
                 color: '#FFFFFF',
@@ -337,7 +338,7 @@ export default function LoginPage() {
           <p
             style={{
               textAlign: 'center',
-              color: 'rgba(230, 245, 247, 0.7)',
+              color: 'var(--text-secondary, #64748B)',
               fontSize: '14px',
               margin: '24px 0 0',
             }}
@@ -346,10 +347,10 @@ export default function LoginPage() {
             <Link
               to="/register"
               style={{
-                color: 'var(--brand-pale-ice, #E6F5F7)',
+                color: 'var(--text-primary, #111827)',
                 fontWeight: 700,
                 textDecoration: 'none',
-                borderBottom: '1px solid var(--brand-accent, #397C80)',
+                borderBottom: '1.5px solid var(--brand-primary, #2457FF)',
                 paddingBottom: '1px',
               }}
             >
@@ -366,12 +367,12 @@ export default function LoginPage() {
               gap: '6px',
               marginTop: '24px',
               paddingTop: '18px',
-              borderTop: '1px solid rgba(230, 245, 247, 0.08)',
-              color: 'rgba(230, 245, 247, 0.5)',
+              borderTop: '1px solid var(--border-subtle, #E5E7EB)',
+              color: 'var(--text-secondary, #64748B)',
               fontSize: '12px',
             }}
           >
-            <ShieldCheck size={14} color="var(--brand-accent, #397C80)" />
+            <ShieldCheck size={14} color="var(--state-success, #16A34A)" />
             <span>Secured with Paystack payment gateway</span>
           </div>
         </div>
@@ -395,7 +396,7 @@ export default function LoginPage() {
         >
           <div
             style={{
-              backgroundColor: 'var(--brand-secondary, #111831)',
+              backgroundColor: '#FFFFFF',
               borderRadius: '16px',
               padding: '28px',
               width: '100%',
@@ -406,7 +407,7 @@ export default function LoginPage() {
             onClick={(e) => e.stopPropagation()}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '18px' }}>
-              <h3 style={{ color: 'var(--brand-pale-ice, #E6F5F7)', fontSize: '18px', fontWeight: 800, margin: 0 }}>
+              <h3 style={{ color: 'var(--text-primary, #111827)', fontSize: '18px', fontWeight: 800, margin: 0 }}>
                 Reset Password
               </h3>
               <button
@@ -430,11 +431,11 @@ export default function LoginPage() {
 
             {forgotSent ? (
               <div style={{ textAlign: 'center', padding: '12px 0' }}>
-                <CheckCircle size={46} color="var(--brand-accent, #397C80)" style={{ marginBottom: '12px' }} />
-                <p style={{ color: 'var(--brand-pale-ice, #E6F5F7)', fontWeight: 700, fontSize: '16px', margin: '0 0 8px' }}>
+                <CheckCircle size={46} color="var(--state-success, #16A34A)" style={{ marginBottom: '12px' }} />
+                <p style={{ color: 'var(--text-primary, #111827)', fontWeight: 700, fontSize: '16px', margin: '0 0 8px' }}>
                   Check your email
                 </p>
-                <p style={{ color: 'rgba(230, 245, 247, 0.7)', fontSize: '13.5px', margin: '0 0 24px', lineHeight: 1.5 }}>
+                <p style={{ color: 'var(--text-secondary, #64748B)', fontSize: '13.5px', margin: '0 0 24px', lineHeight: 1.5 }}>
                   If an account exists for <strong>{forgotEmail}</strong>, password reset instructions have been sent.
                 </p>
                 <button
@@ -443,7 +444,7 @@ export default function LoginPage() {
                     width: '100%',
                     minHeight: '44px',
                     padding: '11px 24px',
-                    backgroundColor: 'var(--brand-accent, #397C80)',
+                    backgroundColor: 'var(--brand-primary, #2457FF)',
                     border: 'none',
                     borderRadius: '8px',
                     color: '#FFFFFF',
@@ -457,7 +458,7 @@ export default function LoginPage() {
               </div>
             ) : (
               <form onSubmit={handleForgotPassword}>
-                <p style={{ color: 'rgba(230, 245, 247, 0.7)', fontSize: '13.5px', margin: '0 0 18px', lineHeight: 1.5 }}>
+                <p style={{ color: 'var(--text-secondary, #64748B)', fontSize: '13.5px', margin: '0 0 18px', lineHeight: 1.5 }}>
                   Enter your email address and we will send you a secure link to reset your account password.
                 </p>
                 <div style={{ marginBottom: '20px' }}>
@@ -491,7 +492,7 @@ export default function LoginPage() {
                       backgroundColor: 'rgba(230, 245, 247, 0.08)',
                       border: '1px solid rgba(230, 245, 247, 0.15)',
                       borderRadius: '8px',
-                      color: 'var(--brand-pale-ice, #E6F5F7)',
+                      color: 'var(--text-primary, #111827)',
                       fontWeight: 600,
                       fontSize: '14px',
                       cursor: 'pointer',
@@ -505,7 +506,7 @@ export default function LoginPage() {
                     style={{
                       flex: 1,
                       minHeight: '44px',
-                      backgroundColor: 'var(--brand-accent, #397C80)',
+                      backgroundColor: 'var(--brand-primary, #2457FF)',
                       border: 'none',
                       borderRadius: '8px',
                       color: '#FFFFFF',

@@ -217,8 +217,8 @@ export default function EventCard({
             minWidth: 48,
             width: 48,
             height: 52,
-            backgroundColor: '#F8FAFB',
-            border: '1px solid var(--border-subtle, #E1E7EC)',
+            backgroundColor: 'var(--color-surface-soft, #FFF4EE)',
+            border: '1px solid var(--color-border, #E7E5E4)',
             borderRadius: '8px',
             flexShrink: 0,
             textAlign: 'center',
@@ -228,7 +228,7 @@ export default function EventCard({
             style={{
               fontSize: '11px',
               fontWeight: 800,
-              color: 'var(--brand-accent, #397C80)',
+              color: 'var(--color-secondary, #FF8A3D)',
               lineHeight: 1,
               letterSpacing: '0.04em',
               marginBottom: '2px',
@@ -240,7 +240,7 @@ export default function EventCard({
             style={{
               fontSize: '18px',
               fontWeight: 800,
-              color: 'var(--brand-primary, #0B1025)',
+              color: 'var(--color-text-primary, #292524)',
               lineHeight: 1,
             }}
           >
@@ -254,7 +254,7 @@ export default function EventCard({
             style={{
               fontSize: '15px',
               fontWeight: 700,
-              color: 'var(--brand-primary, #0B1025)',
+              color: 'var(--color-text-primary, #292524)',
               margin: '0 0 6px 0',
               lineHeight: 1.3,
               display: '-webkit-box',
@@ -272,7 +272,7 @@ export default function EventCard({
             <p
               style={{
                 fontSize: '13px',
-                color: 'var(--text-muted, #788394)',
+                color: 'var(--color-text-secondary, #57534E)',
                 margin: 0,
                 display: 'flex',
                 alignItems: 'center',
@@ -288,7 +288,7 @@ export default function EventCard({
             <p
               style={{
                 fontSize: '13px',
-                color: 'var(--text-muted, #788394)',
+                color: 'var(--color-text-secondary, #57534E)',
                 margin: 0,
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
@@ -306,7 +306,7 @@ export default function EventCard({
       <div
         style={{
           padding: '10px 16px 14px',
-          borderTop: '1px solid var(--border-subtle, #E1E7EC)',
+          borderTop: '1px solid var(--color-border, #E7E5E4)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
@@ -315,14 +315,14 @@ export default function EventCard({
       >
         {showPrice && (
           <div>
-            <span style={{ fontSize: '11px', color: 'var(--text-muted, #788394)', textTransform: 'uppercase', display: 'block', lineHeight: 1 }}>
+            <span style={{ fontSize: '11px', color: 'var(--color-text-muted, #78716C)', textTransform: 'uppercase', display: 'block', lineHeight: 1 }}>
               Price
             </span>
             <span
               style={{
                 fontSize: '14px',
                 fontWeight: 700,
-                color: priceDisplay === 'FREE' ? '#059669' : 'var(--brand-accent, #397C80)',
+                color: priceDisplay === 'FREE' ? '#16A34A' : 'var(--color-primary, #FF5A5F)',
               }}
             >
               {priceDisplay}
@@ -337,9 +337,9 @@ export default function EventCard({
             fontSize: '13px',
             borderRadius: '6px',
             marginLeft: 'auto',
-            color: isFreeEvent ? '#059669' : undefined,
-            borderColor: isFreeEvent ? '#A7F3D0' : undefined,
-            backgroundColor: isFreeEvent ? '#F0FDF4' : undefined,
+            color: isFreeEvent ? '#16A34A' : 'var(--color-primary, #FF5A5F)',
+            borderColor: isFreeEvent ? '#BBF7D0' : 'var(--color-primary, #FF5A5F)',
+            backgroundColor: isFreeEvent ? '#F0FDF4' : 'transparent',
           }}
           onClick={(e) => {
             e.stopPropagation();

@@ -6,79 +6,112 @@
 }
 
 :root {
-  /* ===== OFFICIAL TICKZA BRAND DESIGN SYSTEM (Sampled from Official Logo) ===== */
-  --brand-primary: #0B1025;      /* Midnight Navy (Dominant background from official logo) */
-  --brand-secondary: #111831;    /* Deep Navy (Elevated cards & dark panels) */
-  --brand-contrast: #E6F5F7;     /* Pale Ice (Logo mark & crisp brand highlight) */
-  --brand-soft-mist: #F3F7F8;    /* Soft Mist (Light page canvas background) */
-  --brand-white: #FFFFFF;        /* Clean White */
-  --brand-slate: #424B5D;        /* Slate text for comfortable body reading */
-  --brand-muted: #788394;        /* Muted secondary labels & metadata */
-  --brand-border: #E1E7EC;       /* Subtle border */
-  --brand-accent: #397C80;       /* Deep Teal Accent (Interactive emphasis & buttons) */
-  --brand-accent-hover: #2E6568; /* Hover state for teal */
-  --brand-accent-subtle: rgba(57, 124, 128, 0.12);
-  --brand-warm-accent: #D6BE92;  /* Warm Champagne Accent (Restrained premium details) */
-  --brand-warm-accent-subtle: rgba(214, 190, 146, 0.16);
+  /* ===== OFFICIAL TICKZA BRAND DESIGN SYSTEM (Coral Red #FF5A5F & Vibrant Orange #FF8A3D) ===== */
+  --color-primary: #FF5A5F;
+  --color-primary-hover: #E94B50;
+  --color-secondary: #FF8A3D;
+  --color-secondary-hover: #F2762A;
+  --color-surface-soft: #FFF4EE;
+  --color-surface: #FFFFFF;
+  --color-text-primary: #292524;
+  --color-text-secondary: #57534E;
+  --color-text-muted: #78716C;
+  --color-border: #E7E5E4;
+  --color-background-neutral: #FAFAF9;
 
-  /* Surface Tokens */
-  --surface-page: #F3F7F8;
-  --surface-card: #FFFFFF;
-  --surface-dark: #0B1025;
-  --surface-dark-elevated: #111831;
-  --border-subtle: #E1E7EC;
-  --border-dark: rgba(230, 245, 247, 0.12);
+  /* Primary & Accent brand tokens */
+  --brand-primary: #FF5A5F;        /* Coral Red (Primary call-to-action & brand identity) */
+  --brand-primary-hover: #E94B50;
+  --brand-primary-active: #D93B40;
+  --brand-primary-subtle: #FFF4EE; /* Soft Warm Cream */
+
+  --brand-secondary: #FF8A3D;      /* Vibrant Orange (Discovery highlights & promotional accents) */
+  --brand-secondary-hover: #F2762A;
+  --brand-secondary-active: #E06518;
+  --brand-secondary-subtle: #FFF0E6;
+
+  --brand-accent: #FF8A3D;
+  --brand-accent-hover: #F2762A;
+  --brand-accent-active: #E06518;
+  --brand-accent-subtle: #FFF0E6;
+
+  /* Surface & Canvas Tokens */
+  --surface-page: #FAFAF9;         /* Subtle neutral page background */
+  --surface-card: #FFFFFF;         /* White card surfaces */
+  --surface-soft: #FFF4EE;         /* Warm cream soft surface */
+  --surface-elevated: #FFFFFF;
+  --surface-dark: #292524;         /* Charcoal dark surface */
+  --brand-white: #FFFFFF;
+
+  /* Border Tokens */
+  --border-subtle: #E7E5E4;        /* Light border */
+  --border-focus: #FF5A5F;
+  --border-dark: rgba(255, 255, 255, 0.14);
 
   /* Typography Colors */
-  --text-primary: #172033;
-  --text-slate: #424B5D;
-  --text-secondary: #788394;
-  --text-muted: #94A3B8;
+  --text-primary: #292524;         /* Primary text */
+  --text-secondary: #57534E;       /* Secondary text */
+  --text-muted: #78716C;           /* Muted text */
   --text-inverse: #FFFFFF;
-  --text-ice: #E6F5F7;
+  --text-coral: #FF5A5F;
+  --text-orange: #FF8A3D;
+
+  /* Subtle background aliases */
+  --subtle-cream: #FFF4EE;
+  --subtle-orange: #FFF0E6;
+  --subtle-blue: #EFF6FF;
+
+  /* Semantic Status Tokens */
+  --state-success: #16A34A;        /* Readable Forest Green */
+  --state-success-light: #ECFDF5;
+  --state-error: #DC2626;          /* Readable Coral-Red Error */
+  --state-error-light: #FEF2F2;
+  --state-warning: #D97706;        /* Accessible Amber */
+  --state-warning-light: #FFFBEB;
+  --state-info: #2563EB;           /* Accessible Blue */
+  --state-info-light: #EFF6FF;
 
   /* Legacy aliases mapped to new brand identity */
-  --tm-blue: #0B1025;
-  --tm-blue-hover: #17203D;
-  --tm-blue-active: #050814;
-  --tm-blue-light: #E6F5F7;
-  --tm-blue-subtle: #F3F7F8;
+  --tm-blue: #FF5A5F;
+  --tm-blue-hover: #E94B50;
+  --tm-blue-active: #D93B40;
+  --tm-blue-light: #FFF4EE;
+  --tm-blue-subtle: #FAFAF9;
 
-  --tm-dark: #172033;
-  --tm-dark-secondary: #424B5D;
-  --tm-text-secondary: #788394;
-  --tm-text-muted: #94A3B8;
+  --tm-dark: #292524;
+  --tm-dark-secondary: #57534E;
+  --tm-text-secondary: #57534E;
+  --tm-text-muted: #78716C;
   --tm-white: #FFFFFF;
-  --tm-bg: #F3F7F8;
+  --tm-bg: #FAFAF9;
   --tm-bg-alt: #FFFFFF;
   --tm-card-bg: #FFFFFF;
-  --tm-border: #E1E7EC;
-  --tm-border-light: #F0F4F7;
-  --tm-border-focus: #397C80;
+  --tm-border: #E7E5E4;
+  --tm-border-light: #F5F5F4;
+  --tm-border-focus: #FF5A5F;
 
-  /* Status Tokens */
-  --tm-success: #059669;
+  --tm-success: #16A34A;
   --tm-success-light: #ECFDF5;
   --tm-warning: #D97706;
   --tm-warning-light: #FFFBEB;
   --tm-error: #DC2626;
   --tm-error-light: #FEF2F2;
-  --tm-info: #397C80;
-  --tm-info-light: #E6F5F7;
+  --tm-info: #2563EB;
+  --tm-info-light: #EFF6FF;
 
   /* Shadows */
-  --tm-shadow-sm: 0 1px 2px rgba(11, 16, 37, 0.05);
-  --tm-shadow-md: 0 4px 14px rgba(11, 16, 37, 0.08);
-  --tm-shadow-lg: 0 12px 36px rgba(11, 16, 37, 0.12);
-  --tm-shadow-card: 0 8px 28px rgba(11, 16, 37, 0.07);
-  --tm-shadow-ticket: 0 4px 20px rgba(11, 16, 37, 0.08);
-  --shadow-card: 0 8px 28px rgba(11, 16, 37, 0.07);
+  --tm-shadow-sm: 0 1px 2px rgba(41, 37, 36, 0.05);
+  --tm-shadow-md: 0 4px 14px rgba(255, 90, 95, 0.08);
+  --tm-shadow-lg: 0 12px 36px rgba(41, 37, 36, 0.08);
+  --tm-shadow-card: 0 2px 12px rgba(41, 37, 36, 0.04);
+  --tm-shadow-ticket: 0 4px 20px rgba(41, 37, 36, 0.06);
+  --shadow-card: 0 2px 12px rgba(41, 37, 36, 0.04);
 
   /* Radii */
   --radius-xs: 4px;
   --radius-sm: 8px;
-  --radius-md: 14px;
-  --radius-lg: 22px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
   --radius-xl: 28px;
   --radius-full: 9999px;
 
@@ -128,12 +161,12 @@ h3 { font-size: 1.25rem; font-weight: 700; }
 h4 { font-size: 1.1rem; font-weight: 600; }
 
 a {
-  color: var(--brand-accent);
+  color: var(--brand-primary);
   text-decoration: none;
   transition: color 0.15s ease;
 }
 a:hover {
-  color: var(--brand-accent-hover);
+  color: var(--brand-primary-hover);
   text-decoration: underline;
 }
 
@@ -143,14 +176,14 @@ a:hover {
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #EDEDED;
+  background: #F5F5F4;
 }
 ::-webkit-scrollbar-thumb {
-  background: #C4C4C4;
+  background: #D6D3D1;
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #A0A0A0;
+  background: #A8A29E;
 }
 
 /* ===== Layout Container ===== */
@@ -214,8 +247,8 @@ a:hover {
   justify-content: center;
   gap: 8px;
   background-color: var(--brand-primary);
-  color: var(--brand-contrast);
-  border: 1px solid var(--brand-secondary);
+  color: #FFFFFF;
+  border: 1px solid var(--brand-primary);
   border-radius: var(--radius-sm);
   padding: 12px 22px;
   font-size: 14.5px;
@@ -224,18 +257,19 @@ a:hover {
   transition: all 0.15s ease;
   font-family: inherit;
   line-height: 1.2;
-  box-shadow: 0 4px 12px rgba(11, 16, 37, 0.15);
+  box-shadow: 0 4px 14px rgba(255, 90, 95, 0.28);
   text-decoration: none !important;
   touch-action: manipulation;
 }
 .btn-primary:hover:not(:disabled) {
-  background-color: #17203D;
+  background-color: var(--brand-primary-hover);
+  border-color: var(--brand-primary-hover);
   color: #FFFFFF;
-  box-shadow: 0 6px 16px rgba(11, 16, 37, 0.22);
+  box-shadow: 0 6px 18px rgba(255, 90, 95, 0.36);
   transform: translateY(-1px);
 }
 .btn-primary:active:not(:disabled) {
-  background-color: #050814;
+  background-color: var(--brand-primary-active);
   transform: translateY(0);
 }
 .btn-primary:disabled {
@@ -244,13 +278,13 @@ a:hover {
   box-shadow: none;
 }
 
-/* Accent Button (Teal for high-priority interactive conversion) */
+/* Accent Button (Vibrant Orange for high-priority secondary action / highlights) */
 .btn-accent {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  background-color: var(--brand-accent);
+  background-color: var(--brand-secondary);
   color: #FFFFFF;
   border: none;
   border-radius: var(--radius-sm);
@@ -260,14 +294,18 @@ a:hover {
   cursor: pointer;
   transition: all 0.15s ease;
   font-family: inherit;
-  box-shadow: 0 4px 14px rgba(57, 124, 128, 0.25);
+  box-shadow: 0 4px 14px rgba(255, 138, 61, 0.28);
   text-decoration: none !important;
   touch-action: manipulation;
 }
 .btn-accent:hover:not(:disabled) {
-  background-color: var(--brand-accent-hover);
-  box-shadow: 0 6px 18px rgba(57, 124, 128, 0.35);
+  background-color: var(--brand-secondary-hover);
+  box-shadow: 0 6px 18px rgba(255, 138, 61, 0.36);
   transform: translateY(-1px);
+}
+.btn-accent:active:not(:disabled) {
+  background-color: var(--brand-secondary-active);
+  transform: translateY(0);
 }
 
 .btn-secondary {
@@ -275,9 +313,9 @@ a:hover {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  background-color: var(--tm-white);
-  color: var(--tm-dark);
-  border: 1px solid var(--tm-border);
+  background-color: var(--color-surface);
+  color: var(--text-primary);
+  border: 1px solid var(--border-subtle);
   border-radius: var(--radius-sm);
   padding: 12px 20px;
   font-size: 15px;
@@ -288,11 +326,11 @@ a:hover {
   text-decoration: none !important;
 }
 .btn-secondary:hover:not(:disabled) {
-  background-color: var(--tm-bg-alt);
-  border-color: #D1D5DB;
+  background-color: var(--color-surface-soft);
+  border-color: #D6D3D1;
 }
 .btn-secondary:active:not(:disabled) {
-  background-color: #F0F0F0;
+  background-color: #F5F5F4;
 }
 .btn-secondary:disabled {
   opacity: 0.5;
@@ -305,8 +343,8 @@ a:hover {
   justify-content: center;
   gap: 8px;
   background-color: transparent;
-  color: var(--tm-blue);
-  border: 1.5px solid var(--tm-blue);
+  color: var(--brand-primary);
+  border: 1.5px solid var(--brand-primary);
   border-radius: var(--radius-sm);
   padding: 10px 18px;
   font-size: 14px;
@@ -317,9 +355,9 @@ a:hover {
   text-decoration: none !important;
 }
 .btn-outline:hover:not(:disabled) {
-  background-color: var(--tm-blue-light);
-  color: var(--tm-blue-hover);
-  border-color: var(--tm-blue-hover);
+  background-color: var(--surface-soft);
+  color: var(--brand-primary-hover);
+  border-color: var(--brand-primary-hover);
 }
 .btn-outline:disabled {
   opacity: 0.5;
@@ -366,8 +404,8 @@ a:hover {
   color: var(--tm-text-muted);
 }
 .input:focus {
-  border-color: var(--tm-blue);
-  box-shadow: 0 0 0 3px rgba(2, 108, 223, 0.15);
+  border-color: var(--brand-primary);
+  box-shadow: 0 0 0 3px rgba(255, 90, 95, 0.18);
 }
 .input:disabled {
   background-color: #F8F8F8;
