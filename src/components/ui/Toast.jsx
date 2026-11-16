@@ -43,6 +43,8 @@ export function ToastProvider({ children }) {
     error:   (msg, dur) => show(msg, 'error', dur),
     info:    (msg, dur) => show(msg, 'info', dur),
     warning: (msg, dur) => show(msg, 'warning', dur),
+    addToast: (msg, type = 'info', dur) => show(msg, type, dur),
+    show,
     dismiss,
   };
 

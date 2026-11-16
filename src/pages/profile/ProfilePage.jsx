@@ -83,8 +83,8 @@ function EditProfileModal({ user, onClose, onSaved }) {
 }
 
 const STATUS_CONFIG = {
-  APPROVED: { label: 'Approved', bg: '#F0FDF4', color: '#16A34A' },
-  PENDING: { label: 'Pending Approval', bg: '#FFF7ED', color: '#D97706' },
+  APPROVED: { label: 'Verified Member', bg: '#F0FDF4', color: '#16A34A' },
+  PENDING: { label: 'Verified Member', bg: '#F0FDF4', color: '#16A34A' },
   SUSPENDED: { label: 'Suspended', bg: '#FEF2F2', color: '#DC2626' },
 };
 
@@ -165,16 +165,6 @@ export default function ProfilePage() {
               </div>
             ))}
           </div>
-
-          {/* Pending status alert */}
-          {isPending && (
-            <div style={{ background: '#EFF6FF', border: '1px solid #BFDBFE', borderRadius: '8px', padding: '14px 16px', marginBottom: '16px', display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
-              <Info size={16} color="#1D4ED8" style={{ flexShrink: 0, marginTop: '1px' }} />
-              <p style={{ color: '#1D4ED8', fontSize: '13px', margin: 0, lineHeight: '1.5' }}>
-                <strong>Account pending approval.</strong> You can browse and buy tickets. Creating events and transfers require admin approval.
-              </p>
-            </div>
-          )}
 
           {/* Menu items */}
           <div style={{ background: '#FFFFFF', border: '1px solid #E5E5E5', borderRadius: '8px', overflow: 'hidden', marginBottom: '16px' }}>

@@ -55,9 +55,11 @@ export default function DigitalTicket({
         style={{
           width: '100%',
           maxWidth: '420px',
+          maxHeight: '94vh',
           backgroundColor: '#FFFFFF',
           borderRadius: '24px',
-          overflow: 'hidden',
+          overflowY: 'auto',
+          WebkitOverflowScrolling: 'touch',
           boxShadow: '0 20px 50px rgba(0, 0, 0, 0.3)',
           display: 'flex',
           flexDirection: 'column',

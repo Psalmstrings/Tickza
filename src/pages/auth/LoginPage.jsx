@@ -12,6 +12,8 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [emailNotVerified, setEmailNotVerified] = useState(false);
+  const [unverifiedEmail, setUnverifiedEmail] = useState('');
   const [showForgot, setShowForgot] = useState(false);
   const [forgotEmail, setForgotEmail] = useState('');
   const [forgotSent, setForgotSent] = useState(false);
@@ -25,11 +27,18 @@ export default function LoginPage() {
     }
     setLoading(true);
     setError('');
+    setEmailNotVerified(false);
     try {
       await login(form.email.trim(), form.password);
       navigate('/home', { replace: true });
     } catch (err) {
-      setError(err.response?.data?.message || 'Login failed. Please check your credentials.');
+      if (err.response?.data?.code === 'EMAIL_NOT_VERIFIED') {
+        setEmailNotVerified(true);
+        setUnverifiedEmail(err.response.data.email || form.email.trim());
+        setError(err.response.data.message || 'Please verify your email address before logging in.');
+      } else {
+        setError(err.response?.data?.message || 'Login failed. Please check your credentials.');
+      }
     } finally {
       setLoading(false);
     }
@@ -141,17 +150,37 @@ export default function LoginPage() {
           {error && (
             <div
               style={{
-                backgroundColor: '#FEF2F2',
-                border: '1px solid #FCA5A5',
+                backgroundColor: emailNotVerified ? '#EFF6FF' : '#FEF2F2',
+                border: emailNotVerified ? '1px solid #BFDBFE' : '1px solid #FCA5A5',
                 borderRadius: '8px',
                 padding: '12px 14px',
                 marginBottom: '20px',
-                color: '#DC2626',
+                color: emailNotVerified ? '#1E40AF' : '#DC2626',
                 fontSize: '13px',
                 lineHeight: 1.45,
               }}
             >
-              {error}
+              <div style={{ marginBottom: emailNotVerified ? '8px' : 0 }}>{error}</div>
+              {emailNotVerified && (
+                <Link
+                  to={`/verify-email?email=${encodeURIComponent(unverifiedEmail || form.email)}`}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    backgroundColor: 'var(--brand-primary, #2457FF)',
+                    color: '#FFFFFF',
+                    fontSize: '12.5px',
+                    fontWeight: 700,
+                    textDecoration: 'none',
+                    padding: '6px 14px',
+                    borderRadius: '6px',
+                    marginTop: '4px',
+                  }}
+                >
+                  Verify Email Address Now →
+                </Link>
+              )}
             </div>
           )}
 
@@ -471,10 +500,10 @@ export default function LoginPage() {
                     style={{
                       width: '100%',
                       padding: '12px 14px',
-                      backgroundColor: 'rgba(230, 245, 247, 0.06)',
-                      border: '1px solid rgba(230, 245, 247, 0.16)',
+                      backgroundColor: '#FFFFFF',
+                      border: '1px solid var(--border-subtle, #E5E7EB)',
                       borderRadius: '8px',
-                      color: '#FFFFFF',
+                      color: 'var(--text-primary, #111827)',
                       fontSize: '14px',
                       outline: 'none',
                       boxSizing: 'border-box',
@@ -489,8 +518,8 @@ export default function LoginPage() {
                     style={{
                       flex: 1,
                       minHeight: '44px',
-                      backgroundColor: 'rgba(230, 245, 247, 0.08)',
-                      border: '1px solid rgba(230, 245, 247, 0.15)',
+                      backgroundColor: '#F3F4F6',
+                      border: '1px solid var(--border-subtle, #E5E7EB)',
                       borderRadius: '8px',
                       color: 'var(--text-primary, #111827)',
                       fontWeight: 600,

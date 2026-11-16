@@ -7,6 +7,7 @@ import {
   Users, Activity, Ticket, ArrowUpRight, Search,
   Radio, Clock, CheckCircle2, AlertTriangle, ShieldCheck
 } from 'lucide-react';
+import CameraQRScanner from '../../components/scan/CameraQRScanner.jsx';
 
 export default function OrganizerCheckInPage() {
   const [searchParams] = useSearchParams();
@@ -58,15 +59,15 @@ export default function OrganizerCheckInPage() {
   }, [selectedEventId]);
 
   // Handle Scan / Manual Validation
-  const handleValidate = async (e) => {
-    if (e) e.preventDefault();
-    if (!qrInput.trim()) return;
+  const executeValidate = async (tokenOverride) => {
+    const raw = (tokenOverride !== undefined ? tokenOverride : qrInput).trim();
+    if (!raw) return;
 
     setValidating(true);
     setScanResult(null);
 
     try {
-      const { data } = await api.post('/tickets/checkin/scan', { qrToken: qrInput.trim() });
+      const { data } = await api.post('/tickets/checkin/scan', { qrToken: raw });
       setScanResult({
         status: 'VALID',
         ticket: data.data?.ticket,
@@ -89,6 +90,18 @@ export default function OrganizerCheckInPage() {
     } finally {
       setValidating(false);
       if (inputRef.current) inputRef.current.focus();
+    }
+  };
+
+  const handleValidate = (e) => {
+    if (e) e.preventDefault();
+    executeValidate();
+  };
+
+  const handleCameraScan = (decodedText) => {
+    if (!validating && decodedText) {
+      setQrInput(decodedText);
+      executeValidate(decodedText);
     }
   };
 
@@ -183,7 +196,7 @@ export default function OrganizerCheckInPage() {
       </div>
 
       {/* Main Grid: Scanner Left, Feeds Right */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(320px, 460px) 1fr', gap: 24 }}>
+      <div className="org-checkin-grid">
         {/* Scanner Panel */}
         <div className="org-card" style={{ padding: 24 }}>
           <div style={{ textAlign: 'center', marginBottom: 20 }}>
@@ -193,16 +206,9 @@ export default function OrganizerCheckInPage() {
             </p>
           </div>
 
-          {/* Scanner Visual Frame */}
-          <div className="org-scanner-frame" style={{ marginBottom: 20 }}>
-            <div className="org-scanner-corner tl" />
-            <div className="org-scanner-corner tr" />
-            <div className="org-scanner-corner bl" />
-            <div className="org-scanner-corner br" />
-            <div className="org-scanline" />
-            <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#F8FAFC', borderRadius: 8 }}>
-              <QrCode size={72} color="#CBD5E1" />
-            </div>
+          {/* Live Device Camera Scanner */}
+          <div style={{ marginBottom: 20 }}>
+            <CameraQRScanner onScan={handleCameraScan} />
           </div>
 
           {/* Validation Result Box */}

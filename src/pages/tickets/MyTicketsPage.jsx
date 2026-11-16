@@ -118,7 +118,7 @@ export default function MyTicketsPage() {
           </h1>
 
           {/* Navigation Tabs */}
-          <div style={{ display: 'flex', gap: '24px', borderBottom: '1px solid #E5E5E5' }}>
+          <div style={{ display: 'flex', gap: '20px', borderBottom: '1px solid #E5E5E5', overflowX: 'auto', scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}>
             {TABS.map((t) => {
               const isActive = filter === t.key;
               return (
@@ -135,6 +135,8 @@ export default function MyTicketsPage() {
                     borderBottom: isActive ? '3px solid var(--brand-primary, #2457FF)' : '3px solid transparent',
                     cursor: 'pointer',
                     transition: 'all 0.15s ease',
+                    whiteSpace: 'nowrap',
+                    flexShrink: 0,
                   }}
                 >
                   {t.label}
@@ -200,17 +202,9 @@ export default function MyTicketsPage() {
                 ticket={t}
                 variant="wallet"
                 onTransfer={(ticket) => {
-                  if (!isApproved) {
-                    toast.error('Account approval required to transfer tickets.');
-                    return;
-                  }
                   setTransferTicketTarget(ticket);
                 }}
                 onResale={(ticket) => {
-                  if (!isApproved) {
-                    toast.error('Account approval required to resell tickets.');
-                    return;
-                  }
                   setResaleTicketTarget(ticket);
                 }}
               />

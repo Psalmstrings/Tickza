@@ -1087,3 +1087,17 @@
     border-radius: 12px 12px 0 0;
   }
 }
+
+/* ── Check-in Command Center Responsive Layout ── */
+.org-checkin-grid {
+  display: grid;
+  grid-template-columns: minmax(300px, 460px) 1fr;
+  gap: 24px;
+}
+
+@media (max-width: 960px) {
+  .org-checkin-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+}

@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronLeft, QrCode, Check, X, AlertCircle, RotateCcw, Loader } from 'lucide-react';
+import { ChevronLeft, QrCode, Check, X, AlertCircle, RotateCcw, ShieldCheck } from 'lucide-react';
 import api from '../../lib/axios.js';
 import AppLayout from '../../components/layout/AppLayout.jsx';
+import CameraQRScanner from '../../components/scan/CameraQRScanner.jsx';
 
 export default function QRScannerPage() {
   const navigate = useNavigate();
@@ -10,24 +11,29 @@ export default function QRScannerPage() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null); // { status: 'VALID'|'INVALID'|'USED', ticket, event, message }
 
-  const handleScan = async (e) => {
-    e.preventDefault();
-    if (!qrInput.trim()) return;
+  const executeValidation = async (token) => {
+    if (!token || !token.trim()) return;
     setLoading(true);
     setResult(null);
+
     try {
-      const { data } = await api.post('/tickets/checkin/scan', { qrToken: qrInput.trim() });
+      const { data } = await api.post('/tickets/checkin/scan', { qrToken: token.trim() });
       setResult({
         status: 'VALID',
         ticket: data.data?.ticket,
         event: data.data?.event,
-        message: data.message || 'Ticket is valid!',
+        message: data.message || 'Ticket checked in successfully!',
+        admittedCapacity: data.data?.ticket?.admittedCapacity || 1,
+        attendeesCheckedIn: data.data?.ticket?.attendeesCheckedIn || 1,
       });
+      setQrInput('');
     } catch (err) {
       const code = err.response?.data?.code;
-      const msg = err.response?.data?.message || 'Invalid ticket';
+      const msg = err.response?.data?.message || 'Ticket validation failed';
       setResult({
         status: code === 'ALREADY_CHECKED_IN' ? 'USED' : 'INVALID',
+        ticket: err.response?.data?.data?.ticket,
+        event: err.response?.data?.data?.event,
         message: msg,
       });
     } finally {
@@ -35,138 +41,197 @@ export default function QRScannerPage() {
     }
   };
 
-  const reset = () => { setResult(null); setQrInput(''); };
+  const handleCameraScan = (decodedText) => {
+    if (!loading && decodedText) {
+      setQrInput(decodedText);
+      executeValidation(decodedText);
+    }
+  };
+
+  const handleManualScan = (e) => {
+    e.preventDefault();
+    if (qrInput.trim()) {
+      executeValidation(qrInput.trim());
+    }
+  };
+
+  const reset = () => {
+    setResult(null);
+    setQrInput('');
+  };
 
   return (
     <AppLayout>
-      <style>{`
-        @keyframes scanline {
-          0%   { top: 0 }
-          50%  { top: calc(100% - 2px) }
-          100% { top: 0 }
-        }
-        @keyframes spin { to { transform: rotate(360deg) } }
-      `}</style>
-
-      <div style={{ background: '#F5F5F5', minHeight: '100vh', paddingBottom: '80px' }}>
-
-        {/* Header */}
-        <div style={{ background: '#FFFFFF', borderBottom: '1px solid #E5E5E5', padding: '16px 20px', display: 'flex', alignItems: 'center', gap: '12px', position: 'sticky', top: 0, zIndex: 10 }}>
-          <button onClick={() => navigate(-1)} style={{ background: '#F5F5F5', border: 'none', borderRadius: '50%', width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', flexShrink: 0 }}>
-            <ChevronLeft size={20} color="#1F1F1F" />
+      <div style={{ minHeight: '100vh', backgroundColor: '#F8FAFC', paddingBottom: '80px' }}>
+        {/* Header bar */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '16px 20px', borderBottom: '1px solid #E2E8F0', backgroundColor: '#FFFFFF' }}>
+          <button
+            onClick={() => navigate(-1)}
+            style={{ border: 'none', background: '#F1F5F9', borderRadius: '8px', width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#0F172A' }}
+          >
+            <ChevronLeft size={20} />
           </button>
           <div>
-            <h1 style={{ color: '#1F1F1F', fontSize: '18px', fontWeight: 800, margin: 0 }}>Ticket Scanner</h1>
-            <p style={{ color: '#6B6B6B', fontSize: '12px', margin: 0 }}>Gate check-in validation</p>
+            <h1 style={{ color: '#0F172A', fontSize: '18px', fontWeight: 800, margin: 0 }}>Gate Ticket Scanner</h1>
+            <p style={{ color: '#64748B', fontSize: '12px', margin: 0 }}>Verifiable attendance & gate check-in</p>
           </div>
         </div>
 
         <div style={{ padding: '20px 16px', maxWidth: '480px', margin: '0 auto' }}>
-
-          {/* Viewfinder card */}
-          <div style={{ background: '#FFFFFF', border: '1px solid #E5E5E5', borderRadius: '12px', padding: '32px 24px', textAlign: 'center', marginBottom: '16px', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
-            <div style={{ position: 'relative', width: '200px', height: '200px', margin: '0 auto 16px' }}>
-              {/* Corner brackets */}
-              {[
-                { top: 0, left: 0, borderTop: '3px solid var(--brand-primary, #2457FF)', borderLeft: '3px solid var(--brand-primary, #2457FF)', borderRadius: '4px 0 0 0' },
-                { top: 0, right: 0, borderTop: '3px solid var(--brand-primary, #2457FF)', borderRight: '3px solid var(--brand-primary, #2457FF)', borderRadius: '0 4px 0 0' },
-                { bottom: 0, left: 0, borderBottom: '3px solid var(--brand-primary, #2457FF)', borderLeft: '3px solid var(--brand-primary, #2457FF)', borderRadius: '0 0 0 4px' },
-                { bottom: 0, right: 0, borderBottom: '3px solid var(--brand-primary, #2457FF)', borderRight: '3px solid var(--brand-primary, #2457FF)', borderRadius: '0 0 4px 0' },
-              ].map((s, i) => (
-                <div key={i} style={{ position: 'absolute', width: '24px', height: '24px', ...s }} />
-              ))}
-
-              {/* Inner dashed border */}
-              <div style={{ position: 'absolute', inset: '8px', border: '1px dashed #E5E5E5', borderRadius: '4px' }} />
-
-              {/* Scanline animation */}
-              <div style={{
-                position: 'absolute',
-                left: '8px', right: '8px', height: '2px',
-                background: 'linear-gradient(90deg, transparent, var(--brand-primary, #2457FF), transparent)',
-                animation: 'scanline 2s ease-in-out infinite',
-                top: 0,
-              }} />
-
-              {/* QR icon center */}
-              <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <QrCode size={64} color="rgba(57,124,128,0.25)" />
-              </div>
-            </div>
-            <p style={{ color: '#6B6B6B', fontSize: '13px', margin: 0 }}>Point camera at QR code or enter code below</p>
+          {/* Camera Scanner Card */}
+          <div style={{ background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: '16px', padding: '24px 20px', textAlign: 'center', marginBottom: '16px', boxShadow: '0 4px 12px rgba(15, 23, 42, 0.05)' }}>
+            <CameraQRScanner onScan={handleCameraScan} />
           </div>
 
-          {/* Result card */}
+          {/* Validation Result Box */}
           {result && (
-            <div style={{
-              background: result.status === 'VALID' ? '#F0FDF4' : result.status === 'USED' ? '#FFFBEB' : '#FEF2F2',
-              border: `1px solid ${result.status === 'VALID' ? '#BBF7D0' : result.status === 'USED' ? '#FDE68A' : '#FECACA'}`,
-              borderRadius: '12px', padding: '24px', marginBottom: '16px', textAlign: 'center',
-            }}>
-              <div style={{
-                width: '56px', height: '56px', borderRadius: '50%', margin: '0 auto 14px',
-                background: result.status === 'VALID' ? '#DCFCE7' : result.status === 'USED' ? '#FEF3C7' : '#FEE2E2',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-              }}>
-                {result.status === 'VALID'
-                  ? <Check size={28} color="#16A34A" />
-                  : result.status === 'USED'
-                  ? <AlertCircle size={28} color="#D97706" />
-                  : <X size={28} color="#DC2626" />
-                }
+            <div
+              style={{
+                borderRadius: '16px',
+                padding: '24px 20px',
+                textAlign: 'center',
+                marginBottom: '16px',
+                border: '2px solid',
+                borderColor: result.status === 'VALID' ? '#10B981' : result.status === 'USED' ? '#F59E0B' : '#EF4444',
+                background: result.status === 'VALID' ? '#ECFDF5' : result.status === 'USED' ? '#FFFBEB' : '#FEF2F2',
+                boxShadow: '0 8px 24px rgba(0,0,0,0.06)',
+              }}
+            >
+              {/* Icon badge */}
+              <div
+                style={{
+                  width: '56px',
+                  height: '56px',
+                  borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  margin: '0 auto 12px',
+                  background: result.status === 'VALID' ? '#10B981' : result.status === 'USED' ? '#F59E0B' : '#EF4444',
+                  color: '#FFFFFF',
+                }}
+              >
+                {result.status === 'VALID' ? <Check size={32} /> : result.status === 'USED' ? <AlertCircle size={32} /> : <X size={32} />}
               </div>
-              <h3 style={{
-                fontWeight: 800, fontSize: '18px', margin: '0 0 6px',
-                color: result.status === 'VALID' ? '#16A34A' : result.status === 'USED' ? '#D97706' : '#DC2626',
-              }}>
-                {result.status === 'VALID' ? 'TICKET VALID' : result.status === 'USED' ? 'ALREADY USED' : 'INVALID TICKET'}
-              </h3>
-              <p style={{ color: result.status === 'VALID' ? '#15803D' : result.status === 'USED' ? '#B45309' : '#B91C1C', fontSize: '13px', margin: '0 0 8px', lineHeight: '1.5' }}>
+
+              {/* Status title */}
+              <h2
+                style={{
+                  fontSize: '20px',
+                  fontWeight: 900,
+                  margin: '0 0 6px',
+                  letterSpacing: '-0.4px',
+                  color: result.status === 'VALID' ? '#047857' : result.status === 'USED' ? '#B45309' : '#B91C1C',
+                }}
+              >
+                {result.status === 'VALID' ? 'VALID TICKET ✓' : result.status === 'USED' ? 'ALREADY CHECKED IN' : 'INVALID TICKET'}
+              </h2>
+
+              <p style={{ fontSize: '14px', margin: '0 0 16px', color: '#334155', fontWeight: 500 }}>
                 {result.message}
               </p>
-              {result.status === 'VALID' && result.event && (
-                <p style={{ color: '#6B6B6B', fontSize: '12px', margin: '0 0 4px' }}>Event: <strong style={{ color: '#1F1F1F' }}>{result.event?.title}</strong></p>
+
+              {/* Ticket Details summary */}
+              {result.ticket && (
+                <div style={{ background: '#FFFFFF', borderRadius: '10px', padding: '14px', textAlign: 'left', border: '1px solid #E2E8F0', marginBottom: '16px', fontSize: '13px' }}>
+                  {result.ticket.owner && (
+                    <div style={{ marginBottom: '6px' }}>
+                      <strong style={{ color: '#0F172A' }}>Guest:</strong> {result.ticket.owner.firstName} {result.ticket.owner.lastName} ({result.ticket.owner.email})
+                    </div>
+                  )}
+                  {result.event && (
+                    <div style={{ marginBottom: '6px' }}>
+                      <strong style={{ color: '#0F172A' }}>Event:</strong> {result.event.title}
+                    </div>
+                  )}
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
+                    <span><strong style={{ color: '#0F172A' }}>Tier:</strong> {result.ticket.ticketType || 'Standard'}</span>
+                    {result.ticket.format && result.ticket.format !== 'INDIVIDUAL' && (
+                      <span style={{ fontSize: '11px', background: '#EEF2FF', color: '#4F46E5', padding: '1px 8px', borderRadius: '4px', fontWeight: 700 }}>
+                        {result.ticket.format}
+                      </span>
+                    )}
+                  </div>
+                  {result.ticket.admittedCapacity > 1 && (
+                    <div style={{ color: '#059669', fontWeight: 600, marginBottom: '6px' }}>
+                      👥 Group Admission: {result.ticket.attendeesCheckedIn || result.ticket.admittedCapacity} of {result.ticket.admittedCapacity} Admitted
+                    </div>
+                  )}
+                  {result.ticket.tableNumber && (
+                    <div style={{ color: '#D97706', fontWeight: 600, marginBottom: '6px' }}>
+                      🍾 Reserved Table: {result.ticket.tableNumber}
+                    </div>
+                  )}
+                  <div style={{ fontFamily: 'monospace', color: '#64748B', fontSize: '12px' }}>
+                    #{result.ticket.ticketNumber || result.ticket.id}
+                  </div>
+                </div>
               )}
-              {result.status === 'VALID' && result.ticket && (
-                <p style={{ color: '#6B6B6B', fontSize: '12px', margin: 0, fontFamily: 'monospace' }}>#{result.ticket?.ticketNumber}</p>
-              )}
+
+              <button
+                type="button"
+                onClick={reset}
+                style={{
+                  background: 'none',
+                  border: '1.5px solid #CBD5E1',
+                  borderRadius: '8px',
+                  padding: '8px 16px',
+                  fontSize: '13px',
+                  fontWeight: 600,
+                  color: '#475569',
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                }}
+              >
+                <RotateCcw size={14} /> Scan Next Ticket
+              </button>
             </div>
           )}
 
-          {/* Input form */}
-          {!result ? (
-            <form onSubmit={handleScan}>
-              <div style={{ background: '#FFFFFF', border: '1px solid #E5E5E5', borderRadius: '12px', padding: '20px', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
-                <label style={{ display: 'block', color: '#1F1F1F', fontSize: '13px', fontWeight: 600, marginBottom: '8px' }}>QR Code / Ticket ID</label>
+          {/* Manual Entry Form */}
+          <div style={{ background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: '16px', padding: '20px', boxShadow: '0 2px 8px rgba(15, 23, 42, 0.04)' }}>
+            <h3 style={{ fontSize: '14px', fontWeight: 700, color: '#0F172A', margin: '0 0 4px' }}>Manual Token Input / Laser Gun</h3>
+            <p style={{ fontSize: '12px', color: '#64748B', margin: '0 0 12px' }}>Type or paste a ticket token, or connect an external barcode scanner.</p>
+            <form onSubmit={handleManualScan}>
+              <div style={{ display: 'flex', gap: '8px' }}>
                 <input
+                  type="text"
+                  placeholder="Paste QR token / Ticket ID..."
                   value={qrInput}
-                  onChange={e => setQrInput(e.target.value)}
-                  placeholder="Paste or type QR token here..."
-                  autoFocus
-                  style={{ width: '100%', padding: '12px 14px', background: '#FFFFFF', border: '1px solid #E5E5E5', borderRadius: '6px', color: '#1F1F1F', fontSize: '14px', outline: 'none', boxSizing: 'border-box', marginBottom: '12px', fontFamily: 'monospace' }}
-                  onFocus={e => e.target.style.borderColor = 'var(--brand-primary, #2457FF)'}
-                  onBlur={e => e.target.style.borderColor = '#E5E5E5'}
+                  onChange={(e) => setQrInput(e.target.value)}
+                  style={{
+                    flex: 1,
+                    padding: '10px 14px',
+                    borderRadius: '8px',
+                    border: '1px solid #CBD5E1',
+                    fontSize: '13px',
+                    fontFamily: 'monospace',
+                    outline: 'none',
+                  }}
                 />
                 <button
                   type="submit"
                   disabled={loading || !qrInput.trim()}
-                  style={{ width: '100%', padding: '13px', background: loading || !qrInput.trim() ? '#9CA3AF' : 'var(--brand-primary, #2457FF)', border: 'none', borderRadius: '6px', color: '#FFFFFF', fontWeight: 700, fontSize: '15px', cursor: loading ? 'wait' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
+                  style={{
+                    padding: '10px 18px',
+                    borderRadius: '8px',
+                    backgroundColor: 'var(--brand-primary, #2457FF)',
+                    color: '#FFFFFF',
+                    border: 'none',
+                    fontWeight: 700,
+                    fontSize: '13px',
+                    cursor: loading || !qrInput.trim() ? 'not-allowed' : 'pointer',
+                    whiteSpace: 'nowrap',
+                    opacity: loading || !qrInput.trim() ? 0.6 : 1,
+                  }}
                 >
-                  {loading
-                    ? <><div style={{ width: '18px', height: '18px', border: '2px solid rgba(255,255,255,0.4)', borderTopColor: '#fff', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} /> Validating…</>
-                    : 'Validate Ticket'
-                  }
+                  {loading ? 'Checking…' : 'Check In'}
                 </button>
               </div>
             </form>
-          ) : (
-            <button
-              onClick={reset}
-              style={{ width: '100%', padding: '13px', background: 'var(--brand-primary, #2457FF)', border: 'none', borderRadius: '6px', color: '#FFFFFF', fontWeight: 700, fontSize: '15px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
-            >
-              <RotateCcw size={16} /> Scan Another Ticket
-            </button>
-          )}
+          </div>
         </div>
       </div>
     </AppLayout>

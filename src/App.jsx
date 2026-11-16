@@ -8,6 +8,8 @@ import ErrorBoundary from './components/ui/ErrorBoundary.jsx';
 // Auth
 import LoginPage from './pages/auth/LoginPage.jsx';
 import RegisterPage from './pages/auth/RegisterPage.jsx';
+import VerifyEmailPage from './pages/auth/VerifyEmailPage.jsx';
+import ResetPasswordPage from './pages/auth/ResetPasswordPage.jsx';
 
 // Main pages
 import HomePage from './pages/home/HomePage.jsx';
@@ -70,6 +72,8 @@ export default function App() {
                 {/* Public routes */}
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/register" element={<RegisterPage />} />
+                <Route path="/verify-email" element={<VerifyEmailPage />} />
+                <Route path="/reset-password" element={<ResetPasswordPage />} />
 
                 {/* Root redirect */}
                 <Route path="/" element={<Navigate to="/home" replace />} />

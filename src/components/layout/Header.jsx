@@ -15,10 +15,12 @@ import {
   PlusCircle,
   LayoutDashboard,
   User,
+  Sparkles,
 } from 'lucide-react';
 import TickzaLogo from '../ui/TickzaLogo.jsx';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { formatNaira } from '../../lib/currency.js';
+import OrganizerRequestModal from '../organizer/OrganizerRequestModal.jsx';
 
 const CITIES = ['All Cities', 'Lagos', 'Abuja', 'Port Harcourt', 'Ibadan', 'Benin City', 'Enugu', 'Calabar'];
 const DATES = [
@@ -43,6 +45,7 @@ export default function Header() {
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [showHelpModal, setShowHelpModal] = useState(false);
+  const [isOrganizerModalOpen, setIsOrganizerModalOpen] = useState(false);
 
   const cityRef = useRef(null);
   const dateRef = useRef(null);
@@ -80,10 +83,11 @@ export default function Header() {
         setIsMobileSearchOpen(false);
         setIsUserMenuOpen(false);
         setShowHelpModal(false);
+        setIsOrganizerModalOpen(false);
       }
     };
 
-    if (isMobileMenuOpen || showHelpModal) {
+    if (isMobileMenuOpen || showHelpModal || isOrganizerModalOpen) {
       document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = '';
@@ -94,7 +98,7 @@ export default function Header() {
       document.body.style.overflow = '';
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [isMobileMenuOpen, showHelpModal]);
+  }, [isMobileMenuOpen, showHelpModal, isOrganizerModalOpen]);
 
   // Close mobile menus on route change
   useEffect(() => {
@@ -138,27 +142,6 @@ export default function Header() {
         boxShadow: '0 2px 10px rgba(41, 37, 36, 0.04)',
       }}
     >
-      {/* Pending Account Notice Banner */}
-      {user && isPending && (
-        <div
-          style={{
-            backgroundColor: '#1C1917',
-            borderBottom: '1px solid var(--brand-accent, #FF8A3D)',
-            color: '#FDE68A',
-            padding: '7px 16px',
-            fontSize: '12px',
-            fontWeight: 500,
-            textAlign: 'center',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '8px',
-          }}
-        >
-          <span>⏳ Your account is currently <strong>Pending Admin Review</strong>. Once approved, you can create and transfer tickets.</span>
-        </div>
-      )}
-
       {/* Main Top Navigation Row */}
       <div
         className="tm-container"
@@ -469,6 +452,41 @@ export default function Header() {
             </div>
           )}
 
+          {/* DESKTOP-ONLY: Start Organizing Button for Regular Attendees */}
+          {user && !isOrganizer && (
+            <div className="desktop-flex" style={{ display: 'none', alignItems: 'center' }}>
+              <button
+                type="button"
+                onClick={() => setIsOrganizerModalOpen(true)}
+                style={{
+                  fontSize: '13px',
+                  fontWeight: 600,
+                  color: 'var(--brand-primary, #FF5A5F)',
+                  backgroundColor: 'var(--color-surface-soft, #FFF4EE)',
+                  border: '1px solid rgba(255, 90, 95, 0.35)',
+                  borderRadius: '20px',
+                  padding: '6px 14px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  transition: 'all 0.15s ease',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = 'var(--brand-primary, #FF5A5F)';
+                  e.currentTarget.style.color = '#FFFFFF';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'var(--color-surface-soft, #FFF4EE)';
+                  e.currentTarget.style.color = 'var(--brand-primary, #FF5A5F)';
+                }}
+              >
+                <Sparkles size={14} />
+                <span>{user.organizerStatus === 'REQUESTED' ? 'Application Status' : 'Start Organizing'}</span>
+              </button>
+            </div>
+          )}
+
           {/* DESKTOP-ONLY: Help Center Modal Trigger */}
           <button
             onClick={() => setShowHelpModal(true)}
@@ -628,15 +646,32 @@ export default function Header() {
                       )}
 
                       {!isOrganizer && (
-                        <Link
-                          to="/create"
-                          onClick={() => setIsUserMenuOpen(false)}
-                          style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 16px', fontSize: '13px', color: 'var(--brand-accent, #FF8A3D)', fontWeight: 600, textDecoration: 'none' }}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setIsUserMenuOpen(false);
+                            setIsOrganizerModalOpen(true);
+                          }}
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            width: '100%',
+                            gap: '10px',
+                            padding: '10px 16px',
+                            fontSize: '13px',
+                            color: 'var(--brand-accent, #FF8A3D)',
+                            fontWeight: 600,
+                            background: 'none',
+                            border: 'none',
+                            cursor: 'pointer',
+                            textAlign: 'left',
+                          }}
                           onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--color-surface-soft, #FFF4EE)')}
                           onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
                         >
-                          <PlusCircle size={16} color="var(--brand-accent, #FF8A3D)" /> Start Organizing
-                        </Link>
+                          <Sparkles size={16} color="var(--brand-accent, #FF8A3D)" />
+                          <span>{user.organizerStatus === 'REQUESTED' ? 'Organizer Application Status' : 'Start Organizing'}</span>
+                        </button>
                       )}
 
                       {isAdmin && (
@@ -1000,7 +1035,7 @@ export default function Header() {
                       border: `1px solid ${isOrganizer ? '#A7F3D0' : '#FED7AA'}`,
                     }}
                   >
-                    {isAdmin ? 'ADMIN' : isOrganizer ? 'ORGANIZER' : isPending ? 'PENDING APPROVAL' : 'ATTENDEE'}
+                    {isAdmin ? 'ADMIN' : isOrganizer ? 'ORGANIZER' : 'ATTENDEE'}
                   </span>
                   <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--brand-primary, #FF5A5F)' }}>
                     {formatNaira(user.balance || 0)}
@@ -1141,9 +1176,12 @@ export default function Header() {
                 <User size={18} color="var(--brand-primary, #FF5A5F)" />
                 My Account & Settings
               </Link>
-              <Link
-                to="/create"
-                onClick={() => setIsMobileMenuOpen(false)}
+              <button
+                type="button"
+                onClick={() => {
+                  setIsMobileMenuOpen(false);
+                  setIsOrganizerModalOpen(true);
+                }}
                 style={{
                   minHeight: '44px',
                   display: 'flex',
@@ -1153,13 +1191,17 @@ export default function Header() {
                   fontSize: '15px',
                   fontWeight: 600,
                   color: 'var(--brand-accent, #FF8A3D)',
-                  textDecoration: 'none',
+                  background: 'none',
+                  border: 'none',
                   borderRadius: '8px',
+                  cursor: 'pointer',
+                  textAlign: 'left',
+                  width: '100%',
                 }}
               >
-                <PlusCircle size={18} color="var(--brand-accent, #FF8A3D)" />
-                Start Organizing Events
-              </Link>
+                <Sparkles size={18} color="var(--brand-accent, #FF8A3D)" />
+                <span>{user.organizerStatus === 'REQUESTED' ? 'Organizer Application Status' : 'Start Organizing Events'}</span>
+              </button>
             </div>
           )}
 
@@ -1445,6 +1487,12 @@ export default function Header() {
           </div>
         </div>
       )}
+
+      {/* Organizer Request Application Modal */}
+      <OrganizerRequestModal
+        isOpen={isOrganizerModalOpen}
+        onClose={() => setIsOrganizerModalOpen(false)}
+      />
     </header>
   );
 }

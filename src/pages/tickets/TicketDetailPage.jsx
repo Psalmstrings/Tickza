@@ -347,13 +347,6 @@ export default function TicketDetailPage() {
                 </button>
               )}
             </div>
-
-            {!isApproved && ticket.status === 'SOLD' && (
-              <div style={{ marginTop: '14px', padding: '10px 14px', backgroundColor: '#FFFBEB', border: '1px solid #FDE68A', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: '#92400E' }}>
-                <AlertCircle size={16} />
-                <span>Account approval is required by an administrator before transfers or resale are unlocked.</span>
-              </div>
-            )}
           </div>
         </div>
       </div>

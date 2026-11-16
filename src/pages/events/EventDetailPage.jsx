@@ -766,7 +766,9 @@ export default function EventDetailPage() {
               borderRadius: '20px',
               maxWidth: '480px',
               width: '100%',
-              overflow: 'hidden',
+              maxHeight: '92vh',
+              overflowY: 'auto',
+              WebkitOverflowScrolling: 'touch',
               boxShadow: '0 20px 50px rgba(0,0,0,0.25)',
             }}
           >
@@ -1083,7 +1085,9 @@ export default function EventDetailPage() {
               borderRadius: '20px',
               maxWidth: '480px',
               width: '100%',
-              overflow: 'hidden',
+              maxHeight: '92vh',
+              overflowY: 'auto',
+              WebkitOverflowScrolling: 'touch',
               boxShadow: '0 20px 50px rgba(0,0,0,0.25)',
             }}
           >

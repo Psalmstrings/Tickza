@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { User, Mail, Phone, Lock, Eye, EyeOff, CheckCircle, ArrowLeft, ShieldCheck, Sparkles } from 'lucide-react';
+import { User, Mail, Phone, Lock, Eye, EyeOff, CheckCircle, ArrowLeft, ShieldCheck, Sparkles, FileText } from 'lucide-react';
 import api from '../../lib/axios.js';
+import { useAuth } from '../../context/AuthContext.jsx';
 import TickzaLogo from '../../components/ui/TickzaLogo.jsx';
+import TermsModal from '../../components/auth/TermsModal.jsx';
 
 function Field({ label, icon, type = 'text', value, onChange, placeholder, required = true }) {
   return (
@@ -70,6 +72,7 @@ function Field({ label, icon, type = 'text', value, onChange, placeholder, requi
 
 export default function RegisterPage() {
   const navigate = useNavigate();
+  const { register } = useAuth();
   const [form, setForm] = useState({
     firstName: '',
     lastName: '',
@@ -83,6 +86,8 @@ export default function RegisterPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
+  const [showTermsModal, setShowTermsModal] = useState(false);
 
   const setF = (k, v) => setForm((p) => ({ ...p, [k]: v }));
 
@@ -90,6 +95,10 @@ export default function RegisterPage() {
     e.preventDefault();
     if (!form.firstName || !form.lastName || !form.email || !form.phone || !form.password) {
       setError('All fields are required.');
+      return;
+    }
+    if (!acceptedTerms) {
+      setError('You must read and accept the Terms and Conditions before registering.');
       return;
     }
     if (form.password !== form.confirmPassword) {
@@ -103,10 +112,13 @@ export default function RegisterPage() {
     setLoading(true);
     setError('');
     try {
-      const { data } = await api.post('/auth/register', form);
-      localStorage.setItem('tickapp_token', data.token);
-      setSuccess(true);
-      setTimeout(() => navigate('/home', { replace: true }), 2200);
+      const res = await register({ ...form, acceptedTerms: true });
+      if (res?.requiresVerification) {
+        navigate(`/verify-email?email=${encodeURIComponent(form.email.trim())}`, { replace: true });
+      } else {
+        setSuccess(true);
+        setTimeout(() => navigate('/home', { replace: true }), 2200);
+      }
     } catch (err) {
       setError(err.response?.data?.message || 'Registration failed. Please try again.');
     } finally {
@@ -323,7 +335,7 @@ export default function RegisterPage() {
             />
 
             {/* Password */}
-            <div style={{ marginBottom: '14px' }}>
+            <div style={{ marginBottom: '16px' }}>
               <label
                 style={{
                   display: 'block',
@@ -338,7 +350,7 @@ export default function RegisterPage() {
               <div style={{ position: 'relative' }}>
                 <Lock
                   size={16}
-                  color="rgba(230, 245, 247, 0.5)"
+                  color="var(--text-secondary, #64748B)"
                   style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }}
                 />
                 <input
@@ -350,10 +362,10 @@ export default function RegisterPage() {
                   style={{
                     width: '100%',
                     padding: '12px 46px 12px 42px',
-                    backgroundColor: 'rgba(230, 245, 247, 0.06)',
-                    border: '1px solid rgba(230, 245, 247, 0.16)',
+                    backgroundColor: '#FFFFFF',
+                    border: '1px solid var(--border-subtle, #E5E7EB)',
                     borderRadius: '8px',
-                    color: '#FFFFFF',
+                    color: 'var(--text-primary, #111827)',
                     fontSize: '14px',
                     outline: 'none',
                     boxSizing: 'border-box',
@@ -362,10 +374,10 @@ export default function RegisterPage() {
                   }}
                   onFocus={(e) => {
                     e.target.style.borderColor = 'var(--brand-primary, #2457FF)';
-                    e.target.style.boxShadow = '0 0 0 3px rgba(57, 124, 128, 0.25)';
+                    e.target.style.boxShadow = '0 0 0 3px rgba(36, 87, 255, 0.15)';
                   }}
                   onBlur={(e) => {
-                    e.target.style.borderColor = 'rgba(230, 245, 247, 0.16)';
+                    e.target.style.borderColor = 'var(--border-subtle, #E5E7EB)';
                     e.target.style.boxShadow = 'none';
                   }}
                 />
@@ -382,7 +394,7 @@ export default function RegisterPage() {
                     border: 'none',
                     cursor: 'pointer',
                     padding: '8px',
-                    color: 'rgba(230, 245, 247, 0.6)',
+                    color: 'var(--text-secondary, #64748B)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -391,6 +403,18 @@ export default function RegisterPage() {
                   {showPw ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
               </div>
+
+              {/* Live Password Visual Feedback */}
+              {form.password.length > 0 && (
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '6px', fontSize: '12px' }}>
+                  <span style={{ color: form.password.length >= 6 ? '#16A34A' : '#D97706', fontWeight: 600 }}>
+                    {form.password.length >= 6 ? '✓ Minimum length satisfied' : `• ${form.password.length}/6 characters typed`}
+                  </span>
+                  <span style={{ color: '#64748B', fontWeight: 500 }}>
+                    {form.password.length >= 10 ? '🔒 Strong password' : form.password.length >= 6 ? 'Good' : 'Keep typing…'}
+                  </span>
+                </div>
+              )}
             </div>
 
             {/* Confirm Password */}
@@ -409,7 +433,7 @@ export default function RegisterPage() {
               <div style={{ position: 'relative' }}>
                 <Lock
                   size={16}
-                  color="rgba(230, 245, 247, 0.5)"
+                  color="var(--text-secondary, #64748B)"
                   style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }}
                 />
                 <input
@@ -421,10 +445,10 @@ export default function RegisterPage() {
                   style={{
                     width: '100%',
                     padding: '12px 46px 12px 42px',
-                    backgroundColor: 'rgba(230, 245, 247, 0.06)',
-                    border: '1px solid rgba(230, 245, 247, 0.16)',
+                    backgroundColor: '#FFFFFF',
+                    border: '1px solid var(--border-subtle, #E5E7EB)',
                     borderRadius: '8px',
-                    color: '#FFFFFF',
+                    color: 'var(--text-primary, #111827)',
                     fontSize: '14px',
                     outline: 'none',
                     boxSizing: 'border-box',
@@ -433,10 +457,10 @@ export default function RegisterPage() {
                   }}
                   onFocus={(e) => {
                     e.target.style.borderColor = 'var(--brand-primary, #2457FF)';
-                    e.target.style.boxShadow = '0 0 0 3px rgba(57, 124, 128, 0.25)';
+                    e.target.style.boxShadow = '0 0 0 3px rgba(36, 87, 255, 0.15)';
                   }}
                   onBlur={(e) => {
-                    e.target.style.borderColor = 'rgba(230, 245, 247, 0.16)';
+                    e.target.style.borderColor = 'var(--border-subtle, #E5E7EB)';
                     e.target.style.boxShadow = 'none';
                   }}
                 />
@@ -453,7 +477,7 @@ export default function RegisterPage() {
                     border: 'none',
                     cursor: 'pointer',
                     padding: '8px',
-                    color: 'rgba(230, 245, 247, 0.6)',
+                    color: 'var(--text-secondary, #64748B)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -462,45 +486,100 @@ export default function RegisterPage() {
                   {showConfirmPw ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
               </div>
+
+              {/* Live Confirm Password Feedback */}
+              {form.confirmPassword.length > 0 && (
+                <div style={{ marginTop: '6px', fontSize: '12px' }}>
+                  <span style={{ color: form.password === form.confirmPassword ? '#16A34A' : '#DC2626', fontWeight: 600 }}>
+                    {form.password === form.confirmPassword ? '✓ Passwords match' : '✗ Passwords do not match'}
+                  </span>
+                </div>
+              )}
             </div>
 
-            {/* Informative Security & Access Note */}
+            {/* Terms and Conditions Checkbox & Agreement */}
             <div
               style={{
-                backgroundColor: 'rgba(214, 190, 146, 0.1)',
-                border: '1px solid rgba(214, 190, 146, 0.28)',
+                backgroundColor: 'rgba(230, 245, 247, 0.04)',
+                border: acceptedTerms
+                  ? '1px solid rgba(22, 163, 74, 0.4)'
+                  : '1px solid var(--border-subtle, #E5E7EB)',
                 borderRadius: '8px',
                 padding: '12px 14px',
                 marginBottom: '20px',
+                transition: 'all 0.2s ease',
               }}
             >
-              <p
+              <label
                 style={{
-                  color: 'var(--brand-accent, #FF6B35)',
-                  fontSize: '12.5px',
-                  margin: 0,
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  gap: '10px',
+                  cursor: 'pointer',
+                  fontSize: '13px',
+                  color: 'var(--text-primary, #111827)',
                   lineHeight: '1.5',
                 }}
               >
-                ✨ New accounts can instantly discover events and purchase tickets. Organizers can request event creation approval via the dashboard.
-              </p>
+                <input
+                  type="checkbox"
+                  checked={acceptedTerms}
+                  onChange={(e) => setAcceptedTerms(e.target.checked)}
+                  required
+                  style={{
+                    width: '18px',
+                    height: '18px',
+                    marginTop: '2px',
+                    cursor: 'pointer',
+                    accentColor: 'var(--brand-primary, #2457FF)',
+                    flexShrink: 0,
+                  }}
+                />
+                <span>
+                  I have read, understood, and accept the{' '}
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setShowTermsModal(true);
+                    }}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      padding: 0,
+                      color: 'var(--brand-primary, #2457FF)',
+                      fontWeight: 700,
+                      textDecoration: 'underline',
+                      cursor: 'pointer',
+                      fontSize: '13px',
+                    }}
+                  >
+                    Terms & Conditions of Service
+                  </button>{' '}
+                  and Privacy Policy.
+                </span>
+              </label>
             </div>
 
             {/* Submit Button */}
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || !acceptedTerms}
               style={{
                 width: '100%',
                 minHeight: '48px',
                 padding: '12px',
-                backgroundColor: loading ? 'rgba(36, 87, 255, 0.6)' : 'var(--brand-primary, #2457FF)',
+                backgroundColor:
+                  loading || !acceptedTerms
+                    ? 'rgba(36, 87, 255, 0.45)'
+                    : 'var(--brand-primary, #2457FF)',
                 border: 'none',
                 borderRadius: '8px',
                 color: '#FFFFFF',
                 fontWeight: 700,
                 fontSize: '15px',
-                cursor: loading ? 'wait' : 'pointer',
+                cursor: loading || !acceptedTerms ? 'not-allowed' : 'pointer',
                 transition: 'filter 0.15s ease, background-color 0.15s ease',
                 display: 'flex',
                 alignItems: 'center',
@@ -508,15 +587,25 @@ export default function RegisterPage() {
                 marginBottom: '16px',
               }}
               onMouseEnter={(e) => {
-                if (!loading) e.currentTarget.style.filter = 'brightness(1.12)';
+                if (!loading && acceptedTerms) e.currentTarget.style.filter = 'brightness(1.12)';
               }}
               onMouseLeave={(e) => {
-                if (!loading) e.currentTarget.style.filter = 'brightness(1)';
+                if (!loading && acceptedTerms) e.currentTarget.style.filter = 'brightness(1)';
               }}
             >
               {loading ? 'Creating Account…' : 'Create Account'}
             </button>
           </form>
+
+          {/* Terms Modal */}
+          <TermsModal
+            isOpen={showTermsModal}
+            onClose={() => setShowTermsModal(false)}
+            onAccept={() => {
+              setAcceptedTerms(true);
+              setShowTermsModal(false);
+            }}
+          />
 
           {/* Prompt to Sign In */}
           <p
