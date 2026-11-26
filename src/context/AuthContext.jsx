@@ -19,7 +19,13 @@ export function AuthProvider({ children }) {
   const fetchMe = async () => {
     try {
       const { data } = await api.get('/auth/me');
-      setUser(data.user);
+      if (data.user && !data.user.emailVerified) {
+        localStorage.removeItem('tickapp_token');
+        setToken(null);
+        setUser(null);
+      } else {
+        setUser(data.user);
+      }
     } catch (err) {
       localStorage.removeItem('tickapp_token');
       setToken(null);

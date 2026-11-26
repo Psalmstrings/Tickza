@@ -1,8 +1,30 @@
 {
-    "rewrites":[
+  "rewrites": [
+    {
+      "source": "/events/:id",
+      "has": [
         {
-            "source": "/(.*)",
-            "destination": "/index.html"
+          "type": "header",
+          "key": "user-agent",
+          "value": "(?i).*(facebookexternalhit|whatsapp|telegrambot|twitterbot|slackbot|discordbot|linkedinbot|pinterest|googlebot|bingbot|applebot|crawler|spider|bot).*"
         }
-    ]
+      ],
+      "destination": "/api/og?type=event&id=:id"
+    },
+    {
+      "source": "/tickets/:id",
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": "(?i).*(facebookexternalhit|whatsapp|telegrambot|twitterbot|slackbot|discordbot|linkedinbot|pinterest|googlebot|bingbot|applebot|crawler|spider|bot).*"
+        }
+      ],
+      "destination": "/api/og?type=ticket&id=:id"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
 }

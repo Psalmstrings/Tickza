@@ -12,6 +12,11 @@ export default function ProtectedRoute({ children, requireApproved = false, requ
   if (loading) return <LoadingSpinner />;
   if (!user) return <Navigate to="/login" replace />;
 
+  // Enforce email verification for all protected routes
+  if (!user.emailVerified) {
+    return <Navigate to={`/verify-email?email=${encodeURIComponent(user.email || '')}`} replace />;
+  }
+
   const isAdmin = user.role === 'ADMIN' || user.role === 'SUPER_ADMIN';
 
   if (requireAdmin && !isAdmin) return <Navigate to="/home" replace />;

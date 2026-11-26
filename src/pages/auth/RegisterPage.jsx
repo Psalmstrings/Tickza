@@ -112,13 +112,8 @@ export default function RegisterPage() {
     setLoading(true);
     setError('');
     try {
-      const res = await register({ ...form, acceptedTerms: true });
-      if (res?.requiresVerification) {
-        navigate(`/verify-email?email=${encodeURIComponent(form.email.trim())}`, { replace: true });
-      } else {
-        setSuccess(true);
-        setTimeout(() => navigate('/home', { replace: true }), 2200);
-      }
+      await register({ ...form, acceptedTerms: true });
+      navigate(`/verify-email?email=${encodeURIComponent(form.email.trim())}`, { replace: true });
     } catch (err) {
       setError(err.response?.data?.message || 'Registration failed. Please try again.');
     } finally {

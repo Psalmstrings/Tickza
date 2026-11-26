@@ -20,6 +20,7 @@ import {
   CheckCircle2,
   Share2,
 } from 'lucide-react';
+import { updateEventMeta, resetMeta } from '../../lib/seoHelper.js';
 
 export default function TicketDetailPage() {
   const { id } = useParams();
@@ -46,13 +47,18 @@ export default function TicketDetailPage() {
 
   useEffect(() => {
     fetchTicket();
+    return () => resetMeta();
   }, [id]);
 
   const fetchTicket = async () => {
     setLoading(true);
     try {
       const { data } = await api.get(`/tickets/${id}`);
-      setTicket(data.data || data);
+      const t = data.data || data;
+      setTicket(t);
+      if (t.eventId && typeof t.eventId === 'object') {
+        updateEventMeta(t.eventId);
+      }
     } catch (err) {
       toast.error('Ticket could not be loaded.');
       navigate('/tickets');

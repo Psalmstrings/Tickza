@@ -24,6 +24,7 @@ import {
   Tag,
 } from 'lucide-react';
 import { getEventImageUrl, handleImageFallback } from '../../lib/imageHelper.js';
+import { updateEventMeta, resetMeta } from '../../lib/seoHelper.js';
 
 export default function EventDetailPage() {
   const { id } = useParams();
@@ -63,6 +64,7 @@ export default function EventDetailPage() {
 
   useEffect(() => {
     fetchEvent();
+    return () => resetMeta();
   }, [id]);
 
   useEffect(() => {
@@ -83,6 +85,7 @@ export default function EventDetailPage() {
       const { data } = await api.get(`/events/${id}`);
       const ev = data.data || data.event || data;
       setEvent(ev);
+      updateEventMeta(ev);
       if (ev.ticketTypes && ev.ticketTypes.length > 0) {
         setSelectedType(ev.ticketTypes[0]);
       }
@@ -95,15 +98,19 @@ export default function EventDetailPage() {
   };
 
   const handleShare = () => {
+    const shareUrl = window.location.href;
+    const shareTitle = event?.title || 'Tickza Event';
+    const shareText = `🎟️ Check out ${shareTitle} on Tickza!\n📍 ${event?.venue || ''}\n`;
+
     if (navigator.share) {
       navigator.share({
-        title: event?.title,
-        text: `Check out tickets for ${event?.title} on Tickza!`,
-        url: window.location.href,
-      });
+        title: shareTitle,
+        text: shareText,
+        url: shareUrl,
+      }).catch(() => {});
     } else {
-      navigator.clipboard.writeText(window.location.href);
-      toast.success('Event link copied to clipboard!');
+      navigator.clipboard.writeText(shareUrl);
+      toast.success('Event link copied to clipboard! Ready to share on WhatsApp, Facebook, or X.');
     }
   };
 

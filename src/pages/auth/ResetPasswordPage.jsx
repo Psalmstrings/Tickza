@@ -192,20 +192,36 @@ export default function ResetPasswordPage() {
               <div
                 style={{
                   display: 'flex',
-                  alignItems: 'center',
+                  alignItems: 'flex-start',
                   gap: '8px',
-                  padding: '11px 14px',
+                  padding: '12px 14px',
                   borderRadius: '8px',
                   backgroundColor: '#FEF2F2',
                   border: '1px solid #FECACA',
                   color: '#DC2626',
                   fontSize: '13px',
+                  lineHeight: '1.45',
                   marginBottom: '18px',
                   textAlign: 'left',
                 }}
               >
-                <AlertCircle size={16} style={{ flexShrink: 0 }} />
-                <span>{error}</span>
+                <AlertCircle size={16} style={{ flexShrink: 0, marginTop: '2px' }} />
+                <div>
+                  <div>{error}</div>
+                  <div style={{ marginTop: '6px' }}>
+                    <Link
+                      to="/login"
+                      style={{
+                        color: 'var(--brand-primary, #2457FF)',
+                        fontWeight: 700,
+                        textDecoration: 'none',
+                        fontSize: '12.5px',
+                      }}
+                    >
+                      Request a new password reset link →
+                    </Link>
+                  </div>
+                </div>
               </div>
             )}
 
