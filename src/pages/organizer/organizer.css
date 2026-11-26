@@ -1091,13 +1091,125 @@
 /* ── Check-in Command Center Responsive Layout ── */
 .org-checkin-grid {
   display: grid;
-  grid-template-columns: minmax(300px, 460px) 1fr;
+  grid-template-columns: minmax(320px, 460px) 1fr;
   gap: 24px;
+  align-items: start;
+}
+
+/* Mobile Segmented View Tabs (Only visible <= 960px) */
+.org-checkin-mobile-tabs {
+  display: none;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  background: #F1F5F9;
+  padding: 4px;
+  border-radius: 12px;
+  margin-bottom: 18px;
+  border: 1px solid #E2E8F0;
+}
+
+.org-checkin-tab-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 8px;
+  border: none;
+  background: transparent;
+  color: #64748B;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  touch-action: manipulation;
+}
+
+.org-checkin-tab-btn.active {
+  background: #FFFFFF;
+  color: #0B1026;
+  font-weight: 700;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+.org-checkin-tab-badge {
+  font-size: 11px;
+  padding: 1px 6px;
+  border-radius: 99px;
+  background: #EEF2FF;
+  color: #4F46E5;
+  font-weight: 700;
+}
+
+/* Responsive checkin header */
+.org-checkin-controls {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+/* Card padding overrides for mobile check-in */
+.org-checkin-card {
+  padding: 24px;
+  border-radius: var(--org-radius-lg);
+  background: var(--org-card);
+  border: 1px solid var(--org-border);
+}
+
+/* Auto-advance timer bar */
+@keyframes orgCountdown {
+  from { width: 100%; }
+  to   { width: 0%; }
+}
+
+.org-autoadvance-bar {
+  height: 4px;
+  border-radius: 99px;
+  background: #10B981;
+  animation: orgCountdown 2.5s linear forwards;
 }
 
 @media (max-width: 960px) {
   .org-checkin-grid {
     grid-template-columns: 1fr;
-    gap: 20px;
+    gap: 16px;
+  }
+
+  .org-checkin-mobile-tabs {
+    display: grid;
+  }
+
+  .org-checkin-card {
+    padding: 16px 14px;
+  }
+}
+
+@media (max-width: 640px) {
+  .org-checkin-controls {
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .org-checkin-controls select,
+  .org-checkin-controls button {
+    width: 100% !important;
+  }
+
+  .org-checkin-tab-btn {
+    font-size: 12px;
+    padding: 8px 4px;
+    gap: 4px;
+  }
+}
+
+@media (max-width: 400px) {
+  .org-checkin-mobile-tabs {
+    gap: 4px;
+  }
+
+  .org-checkin-tab-btn {
+    font-size: 11px;
   }
 }
