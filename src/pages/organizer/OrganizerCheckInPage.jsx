@@ -122,6 +122,9 @@ export default function OrganizerCheckInPage() {
     try {
       const { data } = await api.post('/tickets/checkin/scan', {
         qrToken: raw,
+        ticketId: raw,
+        ticketNumber: raw,
+        token: raw,
         eventId: selectedEventId || undefined,
       });
 
@@ -253,15 +256,12 @@ export default function OrganizerCheckInPage() {
             value={selectedEventId}
             onChange={(e) => setSelectedEventId(e.target.value)}
           >
-            {events.length === 0 ? (
-              <option value="">No events found</option>
-            ) : (
-              events.map((ev) => (
-                <option key={ev._id} value={ev._id}>
-                  {ev.title}
-                </option>
-              ))
-            )}
+            <option value="">All Events (Auto-Detect Gate)</option>
+            {events.map((ev) => (
+              <option key={ev._id} value={ev._id}>
+                {ev.title}
+              </option>
+            ))}
           </select>
         </div>
       </div>

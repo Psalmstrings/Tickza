@@ -107,14 +107,7 @@ export default function CameraQRScanner({
     if (!scannerRef.current) {
       scannerRef.current = new Html5Qrcode(CONTAINER_ID, {
         verbose: false,
-        formatsToSupport: [
-          Html5QrcodeSupportedFormats.QR_CODE,
-          Html5QrcodeSupportedFormats.CODE_128,
-          Html5QrcodeSupportedFormats.CODE_39,
-          Html5QrcodeSupportedFormats.DATA_MATRIX,
-          Html5QrcodeSupportedFormats.AZTEC,
-          Html5QrcodeSupportedFormats.PDF_417,
-        ],
+        useBarCodeDetectorIfSupported: true,
       });
     }
     return scannerRef.current;
@@ -142,13 +135,11 @@ export default function CameraQRScanner({
         cameraConfig = { facingMode: targetFacing };
       }
 
+      // fps: 10 is the recommended standard for html5-qrcode.
+      // Omission of qrbox tells html5-qrcode to scan the entire camera video frame,
+      // which eliminates aspect ratio cropping issues and enables 360-degree detection!
       const qrConfig = {
-        fps: 20,
-        qrbox: (viewfinderWidth, viewfinderHeight) => {
-          const minEdge = Math.min(viewfinderWidth || 280, viewfinderHeight || 280);
-          const edge = Math.max(160, Math.floor(minEdge * 0.75));
-          return { width: edge, height: edge };
-        },
+        fps: 10,
       };
 
       await scanner.start(
@@ -353,17 +344,22 @@ export default function CameraQRScanner({
 
         {/* Global style override for html5-qrcode video */}
         <style>{`
+          #${CONTAINER_ID} {
+            width: 100% !important;
+            height: 100% !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+          }
           #${CONTAINER_ID} video {
             width: 100% !important;
             height: 100% !important;
-            object-fit: cover !important;
-            border-radius: 14px !important;
-          }
-          #${CONTAINER_ID} canvas {
-            display: none !important;
+            object-fit: contain !important;
+            border-radius: 14px;
           }
           #${CONTAINER_ID}__scan_region {
-            min-height: 100% !important;
+            width: 100% !important;
+            height: 100% !important;
             display: flex !important;
             align-items: center !important;
             justify-content: center !important;
