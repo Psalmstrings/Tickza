@@ -113,6 +113,40 @@ export default function CameraQRScanner({
     return scannerRef.current;
   };
 
+  // Helper to cleanly release all media tracks on video elements
+  const releaseMediaTracks = () => {
+    try {
+      const container = document.getElementById(CONTAINER_ID);
+      const videoEl = container?.querySelector('video');
+      if (videoEl && videoEl.srcObject) {
+        const stream = videoEl.srcObject;
+        if (stream && stream.getTracks) {
+          stream.getTracks().forEach((track) => {
+            try { track.stop(); } catch (e) {}
+          });
+        }
+        videoEl.srcObject = null;
+      }
+    } catch (e) {}
+  };
+
+  // Stop Camera Scanning
+  const stopCamera = async () => {
+    try {
+      if (scannerRef.current && isScanningRef.current) {
+        await scannerRef.current.stop();
+      }
+    } catch (err) {
+      console.warn('[Stop Camera Warning]', err);
+    } finally {
+      releaseMediaTracks();
+      isScanningRef.current = false;
+      setIsScanning(false);
+      setTorchOn(false);
+      setHasTorch(false);
+    }
+  };
+
   // Start Camera Scanning with Intelligent Multi-Stage Hardware Fallback
   const startCamera = async (overrideFacingMode, overrideCameraId) => {
     if (starting) return;
@@ -120,16 +154,25 @@ export default function CameraQRScanner({
     setStarting(true);
     setErrorMessage('');
 
-    // If an existing stream was running, cleanly stop it first
-    if (scannerRef.current) {
-      try {
-        if (scannerRef.current.isScanning) {
-          await scannerRef.current.stop();
-        }
-      } catch (e) {}
-    }
+    // If an existing stream was running, cleanly stop it and release tracks first
+    await stopCamera();
+    // Allow hardware pipeline to reset
+    await new Promise((r) => setTimeout(r, 200));
 
     const scanner = getScannerInstance();
+    const modeToUse = overrideFacingMode || facingMode || 'environment';
+
+    // Find if cameras list has an explicit camera for this mode
+    let targetCamId = overrideCameraId !== undefined ? overrideCameraId : selectedCameraId;
+    if (targetCamId && cameras.length > 0) {
+      const matched = cameras.find((c) => c.id === targetCamId);
+      if (matched && matched.label) {
+        const isBack = /back|rear|environment|wide|main/i.test(matched.label);
+        const isFront = /front|user|selfie|face/i.test(matched.label);
+        if (modeToUse === 'environment' && isFront) targetCamId = '';
+        if (modeToUse === 'user' && isBack) targetCamId = '';
+      }
+    }
 
     const attemptStartWithConfig = async (config) => {
       return await scanner.start(
@@ -155,44 +198,64 @@ export default function CameraQRScanner({
     let started = false;
     let lastError = null;
 
-    // Strategy 1: Explicit device ID if provided or previously selected
-    const targetCamId = overrideCameraId !== undefined ? overrideCameraId : selectedCameraId;
+    // Strategy 1: Explicit camera ID if matching
     if (targetCamId) {
       try {
         await attemptStartWithConfig(targetCamId);
         started = true;
       } catch (err) {
         lastError = err;
-        console.warn('[Camera ID failed, falling back]', err);
+        console.warn('[Strategy 1 Camera ID failed, falling back]', err);
       }
     }
 
-    // Strategy 2: Desired facingMode (environment / rear camera)
+    // Strategy 2: Exact facingMode configuration
     if (!started) {
-      const mode = overrideFacingMode || facingMode || 'environment';
       try {
-        await attemptStartWithConfig({ facingMode: mode });
+        await attemptStartWithConfig({ facingMode: modeToUse });
         started = true;
       } catch (err) {
         lastError = err;
-        console.warn(`[Camera facingMode ${mode} failed, falling back]`, err);
+        console.warn(`[Strategy 2 facingMode ${modeToUse} failed, falling back]`, err);
       }
     }
 
-    // Strategy 3: Alternative facingMode (user / front camera / laptop webcam)
+    // Strategy 3: Try finding camera by label in discovered devices
     if (!started) {
-      const altMode = facingMode === 'environment' ? 'user' : 'environment';
+      try {
+        const devices = await Html5Qrcode.getCameras();
+        if (devices && devices.length > 0) {
+          setCameras(devices);
+          const matcher = modeToUse === 'environment'
+            ? /back|rear|environment|wide|main/i
+            : /front|user|selfie|face/i;
+          const matchedDevice = devices.find((d) => matcher.test(d.label || ''));
+          if (matchedDevice) {
+            await attemptStartWithConfig(matchedDevice.id);
+            setSelectedCameraId(matchedDevice.id);
+            started = true;
+          }
+        }
+      } catch (err) {
+        lastError = err;
+        console.warn('[Strategy 3 Matched device failed]', err);
+      }
+    }
+
+    // Strategy 4: Fallback to opposite facingMode (e.g. laptop webcam)
+    if (!started) {
+      const altMode = modeToUse === 'environment' ? 'user' : 'environment';
       try {
         await attemptStartWithConfig({ facingMode: altMode });
         setFacingMode(altMode);
         started = true;
       } catch (err) {
         lastError = err;
-        console.warn(`[Camera alt facingMode ${altMode} failed, falling back]`, err);
+        console.warn(`[Strategy 4 alt facingMode ${altMode} failed]`, err);
       }
     }
 
-    // Strategy 4: Direct device enumeration fallback
+    // Strategy 5: Direct device enumeration first available device
     if (!started) {
       try {
         const devices = await Html5Qrcode.getCameras();
@@ -203,7 +266,7 @@ export default function CameraQRScanner({
         }
       } catch (err) {
         lastError = err;
-        console.warn('[Camera devices fallback failed]', err);
+        console.warn('[Strategy 5 devices[0] fallback failed]', err);
       }
     }
 
@@ -231,7 +294,7 @@ export default function CameraQRScanner({
         : (lastError?.message || lastError?.name || String(lastError || ''));
 
       if (errString.includes('NotAllowedError') || errString.includes('Permission') || errString.includes('denied')) {
-        setErrorMessage('Camera access was blocked by your browser. Please tap the lock / camera icon in your browser address bar and select "Allow", then click Start Camera.');
+        setErrorMessage('Camera access was blocked by your browser. Please tap the lock / camera icon in your browser address bar and select "Allow", then tap Start Camera.');
       } else if (errString.includes('NotFoundError') || errString.includes('DevicesNotFoundError')) {
         setErrorMessage('No camera hardware was detected on this device. You can type or paste the Ticket ID manually below.');
       } else if (errString.includes('NotReadableError') || errString.includes('TrackStartError')) {
@@ -239,7 +302,7 @@ export default function CameraQRScanner({
       } else {
         setErrorMessage(
           errString
-            ? `Camera notice: ${errString}. Please verify permissions or enter Ticket ID manually below.`
+            ? `Camera notice: ${errString}. You can also enter the Ticket ID manually below.`
             : 'Could not access device camera. Please check camera permissions in your browser address bar.'
         );
       }
@@ -248,37 +311,24 @@ export default function CameraQRScanner({
     setStarting(false);
   };
 
-  // Stop Camera Scanning
-  const stopCamera = async () => {
-    if (!scannerRef.current || !isScanningRef.current) {
-      setIsScanning(false);
-      return;
-    }
+  // Dedicated Switch Camera Mode (Back <-> Front)
+  const switchCameraMode = async (newMode) => {
+    if (newMode === facingMode && isScanning) return;
+    setFacingMode(newMode);
+    setSelectedCameraId(''); // Reset specific ID to honor requested mode
 
-    try {
-      await scannerRef.current.stop();
-    } catch (err) {
-      console.warn('[Stop Camera Warning]', err);
-    } finally {
-      isScanningRef.current = false;
-      setIsScanning(false);
-      setTorchOn(false);
-      setHasTorch(false);
+    if (isScanning || starting) {
+      await stopCamera();
+      setTimeout(() => {
+        startCamera(newMode, '');
+      }, 250);
     }
   };
 
-  // Flip Camera (Toggle environment <-> user)
+  // Quick Flip Camera (Toggle between Back and Front)
   const flipCamera = async () => {
     const nextFacing = facingMode === 'environment' ? 'user' : 'environment';
-    setFacingMode(nextFacing);
-    setSelectedCameraId(''); // reset specific ID so facingMode is honored
-
-    if (isScanning) {
-      await stopCamera();
-      setTimeout(() => {
-        startCamera(nextFacing, '');
-      }, 150);
-    }
+    await switchCameraMode(nextFacing);
   };
 
   // Switch specific camera
@@ -655,6 +705,67 @@ export default function CameraQRScanner({
           gap: '8px',
         }}
       >
+        {/* Dedicated Camera Selection: Back Camera (Rear) vs Front Camera (Selfie) */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+          <button
+            type="button"
+            onClick={() => switchCameraMode('environment')}
+            disabled={starting}
+            style={{
+              padding: '9px 12px',
+              borderRadius: '8px',
+              border: facingMode === 'environment' ? '2px solid #10B981' : '1px solid #CBD5E1',
+              backgroundColor: facingMode === 'environment' ? '#ECFDF5' : '#FFFFFF',
+              color: facingMode === 'environment' ? '#065F46' : '#64748B',
+              fontWeight: 700,
+              fontSize: '12.5px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '6px',
+              cursor: starting ? 'wait' : 'pointer',
+              boxShadow: facingMode === 'environment' ? '0 1px 3px rgba(16, 185, 129, 0.2)' : 'none',
+              touchAction: 'manipulation',
+              transition: 'all 0.15s ease',
+            }}
+          >
+            <Camera size={15} color={facingMode === 'environment' ? '#10B981' : '#64748B'} />
+            <span>Back Camera</span>
+            {facingMode === 'environment' && (
+              <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#10B981' }} />
+            )}
+          </button>
+
+          <button
+            type="button"
+            onClick={() => switchCameraMode('user')}
+            disabled={starting}
+            style={{
+              padding: '9px 12px',
+              borderRadius: '8px',
+              border: facingMode === 'user' ? '2px solid #10B981' : '1px solid #CBD5E1',
+              backgroundColor: facingMode === 'user' ? '#ECFDF5' : '#FFFFFF',
+              color: facingMode === 'user' ? '#065F46' : '#64748B',
+              fontWeight: 700,
+              fontSize: '12.5px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '6px',
+              cursor: starting ? 'wait' : 'pointer',
+              boxShadow: facingMode === 'user' ? '0 1px 3px rgba(16, 185, 129, 0.2)' : 'none',
+              touchAction: 'manipulation',
+              transition: 'all 0.15s ease',
+            }}
+          >
+            <SwitchCamera size={15} color={facingMode === 'user' ? '#10B981' : '#64748B'} />
+            <span>Front Camera</span>
+            {facingMode === 'user' && (
+              <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#10B981' }} />
+            )}
+          </button>
+        </div>
+
         {/* Primary Start / Stop Button */}
         <div style={{ display: 'flex', gap: '8px' }}>
           <button

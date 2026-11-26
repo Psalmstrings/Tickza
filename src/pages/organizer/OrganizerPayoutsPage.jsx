@@ -350,10 +350,10 @@ export default function OrganizerPayoutsPage() {
       </div>
 
       {/* Bank Account Callout & Pending Metrics */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1.8fr 1.2fr', gap: 20, marginBottom: 24 }}>
+      <div className="org-payouts-dual-grid">
         {/* Payout Bank Overview */}
         <div className="org-card" style={{ padding: 20 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12, flexWrap: 'wrap', gap: 10 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
               <div
                 style={{
@@ -365,6 +365,7 @@ export default function OrganizerPayoutsPage() {
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
+                  flexShrink: 0,
                 }}
               >
                 <Building2 size={18} />
@@ -386,7 +387,7 @@ export default function OrganizerPayoutsPage() {
               </div>
             </div>
 
-            <div style={{ display: 'flex', gap: 8 }}>
+            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
               {isBankVerified && (
                 <button
                   onClick={() => { setShowBankSetup(!showBankSetup); setBankSaveError(''); setBankResolveMsg(''); }}
@@ -410,19 +411,18 @@ export default function OrganizerPayoutsPage() {
           {/* Verified Bank Display */}
           {isBankVerified && !showBankSetup && (
             <div
+              className="org-bank-details-grid"
               style={{
                 background: '#F8FAFC',
                 borderRadius: 10,
                 padding: '14px 16px',
                 border: '1px solid #E2E8F0',
-                display: 'grid',
-                gridTemplateColumns: 'repeat(3, 1fr)',
-                gap: 12,
+                boxSizing: 'border-box',
               }}
             >
               <div>
                 <span style={{ fontSize: 11, color: '#64748B', fontWeight: 600 }}>Bank Name</span>
-                <p style={{ margin: '2px 0 0', fontSize: 13, fontWeight: 700, color: '#1E293B' }}>
+                <p style={{ margin: '2px 0 0', fontSize: 13, fontWeight: 700, color: '#1E293B', wordBreak: 'break-word' }}>
                   {bank.bankName}
                 </p>
               </div>
@@ -434,7 +434,7 @@ export default function OrganizerPayoutsPage() {
               </div>
               <div>
                 <span style={{ fontSize: 11, color: '#64748B', fontWeight: 600 }}>Beneficiary Name</span>
-                <p style={{ margin: '2px 0 0', fontSize: 13, fontWeight: 700, color: '#1E293B' }}>
+                <p style={{ margin: '2px 0 0', fontSize: 13, fontWeight: 700, color: '#1E293B', wordBreak: 'break-word' }}>
                   {bank.accountName}
                 </p>
               </div>
@@ -587,7 +587,7 @@ export default function OrganizerPayoutsPage() {
       </div>
 
       {/* Tabs Navigation */}
-      <div style={{ display: 'flex', gap: '8px', borderBottom: '2px solid #E2E8F0', marginBottom: 20 }}>
+      <div className="org-tabs-scroll-container">
         <button
           onClick={() => setActiveTab('payouts')}
           style={{
@@ -723,8 +723,8 @@ export default function OrganizerPayoutsPage() {
           <div className="org-card-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
             <h3 className="org-card-title">Auditable Double-Entry Ledger</h3>
 
-            <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-              <div style={{ position: 'relative', width: 200 }}>
+            <div className="org-ledger-filters">
+              <div style={{ position: 'relative', minWidth: 200, flex: 1 }}>
                 <Search size={14} style={{ position: 'absolute', left: 10, top: 11, color: '#94A3B8' }} />
                 <input
                   type="text"
@@ -737,6 +737,7 @@ export default function OrganizerPayoutsPage() {
                     borderRadius: 6,
                     border: '1px solid #CBD5E1',
                     fontSize: 12,
+                    boxSizing: 'border-box',
                   }}
                 />
               </div>

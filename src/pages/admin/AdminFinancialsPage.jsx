@@ -4,7 +4,7 @@ import { formatNaira } from '../../lib/currency.js';
 import { useToast } from '../../components/ui/Toast.jsx';
 import TickzaSpinner from '../../components/ui/TickzaSpinner.jsx';
 import {
-    TrendingUp,
+  TrendingUp,
   CreditCard,
   Building2,
   Clock,
@@ -20,6 +20,7 @@ import {
   ExternalLink,
   Shield,
   ArrowRight,
+  Wallet,
 } from 'lucide-react';
 
 export default function AdminFinancialsPage() {
@@ -177,6 +178,14 @@ export default function AdminFinancialsPage() {
     totalTransactionsCount: 0,
   };
 
+  if (loading && !data) {
+    return (
+      <div style={{ padding: '80px 20px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 14 }}>
+        <TickzaSpinner size="lg" message="Loading platform financials and settlement ledger..." />
+      </div>
+    );
+  }
+
   return (
     <div>
       {/* Header */}
@@ -212,9 +221,9 @@ export default function AdminFinancialsPage() {
             </div>
           </div>
           <p style={{ fontSize: 24, fontWeight: 900, color: '#1F1F1F', margin: '0 0 4px 0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-            ₦{metrics.totalGrossTicketSales.toLocaleString()}
+            ₦{(metrics?.totalGrossTicketSales || 0).toLocaleString()}
           </p>
-          <span style={{ fontSize: 11, color: '#059669', fontWeight: 600 }}>{metrics.totalTransactionsCount} paid orders</span>
+          <span style={{ fontSize: 11, color: '#059669', fontWeight: 600 }}>{metrics?.totalTransactionsCount || 0} paid orders</span>
         </div>
 
         <div style={{ backgroundColor: '#FFFFFF', borderRadius: 14, padding: 18, border: '2px solid var(--brand-primary, #2457FF)', boxShadow: '0 2px 8px rgba(36, 87, 255, 0.15)', minWidth: 0 }}>
@@ -225,7 +234,7 @@ export default function AdminFinancialsPage() {
             </div>
           </div>
           <p style={{ fontSize: 24, fontWeight: 900, color: 'var(--brand-primary, #2457FF)', margin: '0 0 4px 0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-            ₦{metrics.totalPlatformCommission.toLocaleString()}
+            ₦{(metrics?.totalPlatformCommission || 0).toLocaleString()}
           </p>
           <span style={{ fontSize: 11, color: '#6B6B6B' }}>Platform net revenue</span>
         </div>
@@ -238,9 +247,9 @@ export default function AdminFinancialsPage() {
             </div>
           </div>
           <p style={{ fontSize: 24, fontWeight: 900, color: '#059669', margin: '0 0 4px 0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-            ₦{metrics.totalVendorEarnings.toLocaleString()}
+            ₦{(metrics?.totalVendorEarnings || 0).toLocaleString()}
           </p>
-          <span style={{ fontSize: 11, color: '#6B6B6B' }}>Avail: ₦{metrics.totalVendorAvailable.toLocaleString()}</span>
+          <span style={{ fontSize: 11, color: '#6B6B6B' }}>Avail: ₦{(metrics?.totalVendorAvailable || 0).toLocaleString()}</span>
         </div>
 
         <div style={{ backgroundColor: '#FFFFFF', borderRadius: 14, padding: 18, border: '1px solid #E5E5E5', boxShadow: '0 1px 4px rgba(0,0,0,0.03)', minWidth: 0 }}>
@@ -251,9 +260,9 @@ export default function AdminFinancialsPage() {
             </div>
           </div>
           <p style={{ fontSize: 24, fontWeight: 900, color: '#D97706', margin: '0 0 4px 0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-            ₦{metrics.pendingPayoutRequestsAmount.toLocaleString()}
+            ₦{(metrics?.pendingPayoutRequestsAmount || 0).toLocaleString()}
           </p>
-          <span style={{ fontSize: 11, color: '#D97706', fontWeight: 600 }}>{metrics.pendingPayoutRequestsCount} request(s) awaiting approval</span>
+          <span style={{ fontSize: 11, color: '#D97706', fontWeight: 600 }}>{metrics?.pendingPayoutRequestsCount || 0} request(s) awaiting approval</span>
         </div>
 
         <div style={{ backgroundColor: '#FFFFFF', borderRadius: 14, padding: 18, border: '1px solid #E5E5E5', boxShadow: '0 1px 4px rgba(0,0,0,0.03)', minWidth: 0 }}>
@@ -264,7 +273,7 @@ export default function AdminFinancialsPage() {
             </div>
           </div>
           <p style={{ fontSize: 24, fontWeight: 900, color: '#1F1F1F', margin: '0 0 4px 0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-            ₦{metrics.completedPayoutsAmount.toLocaleString()}
+            ₦{(metrics?.completedPayoutsAmount || 0).toLocaleString()}
           </p>
           <span style={{ fontSize: 11, color: '#6B6B6B' }}>Paid via Paystack Transfers</span>
         </div>

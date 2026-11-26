@@ -6,11 +6,14 @@ import {
   QrCode, Check, X, AlertCircle, RotateCcw,
   Users, Activity, Ticket, ArrowUpRight, Search,
   Radio, Clock, CheckCircle2, AlertTriangle, ShieldCheck,
-  Volume2, VolumeX, Sparkles, ChevronRight, Hash, UserCheck
+  Volume2, VolumeX, Sparkles, ChevronRight, Hash, UserCheck,
+  RefreshCw
 } from 'lucide-react';
+import { useToast } from '../../components/ui/Toast.jsx';
 import CameraQRScanner from '../../components/scan/CameraQRScanner.jsx';
 
 export default function OrganizerCheckInPage() {
+  const toast = useToast();
   const [searchParams] = useSearchParams();
   const preselectedEvent = searchParams.get('event') || '';
 
@@ -29,6 +32,7 @@ export default function OrganizerCheckInPage() {
   const [soundEnabled, setSoundEnabled] = useState(true);
 
   const inputRef = useRef(null);
+  const resultRef = useRef(null);
   const autoResetTimerRef = useRef(null);
 
   // Play audio chime
@@ -109,7 +113,10 @@ export default function OrganizerCheckInPage() {
   // Handle Scan / Manual Validation
   const executeValidate = async (tokenOverride) => {
     const raw = (tokenOverride !== undefined ? tokenOverride : qrInput).trim();
-    if (!raw) return;
+    if (!raw) {
+      if (toast?.error) toast.error('Please enter or paste a Ticket ID or token.');
+      return;
+    }
 
     if (autoResetTimerRef.current) {
       clearTimeout(autoResetTimerRef.current);
@@ -138,10 +145,19 @@ export default function OrganizerCheckInPage() {
 
       setScanResult(result);
       playChime('VALID');
+      if (toast?.success) {
+        const guestName = result.ticket?.owner ? `${result.ticket.owner.firstName} ${result.ticket.owner.lastName}` : '';
+        toast.success(`✓ ADMITTED! ${guestName ? `${guestName} — ` : ''}${result.ticket?.ticketType || 'Valid Ticket'}`);
+      }
 
       // Refresh event manifest stats
       if (selectedEventId) fetchStats(selectedEventId);
       setQrInput('');
+
+      // Auto scroll to result so it's guaranteed visible in viewport
+      setTimeout(() => {
+        resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }, 50);
 
       // If Live Gate Mode is active, auto-clear after 2.5s for seamless high-throughput queue scanning
       if (liveMode) {
@@ -161,6 +177,13 @@ export default function OrganizerCheckInPage() {
         message: msg,
       });
       playChime(statusType);
+      if (toast?.error) {
+        toast.error(msg);
+      }
+
+      setTimeout(() => {
+        resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }, 50);
     } finally {
       setValidating(false);
     }
@@ -616,6 +639,154 @@ export default function OrganizerCheckInPage() {
               )}
             </button>
           </form>
+
+          {/* Immediate In-View Result Card (Guarantee visibility right under manual input) */}
+          {scanResult && (
+            <div
+              ref={resultRef}
+              style={{
+                marginTop: 16,
+                borderRadius: 12,
+                padding: '16px 14px',
+                border: '2px solid',
+                borderColor:
+                  scanResult.status === 'VALID'
+                    ? '#10B981'
+                    : scanResult.status === 'USED'
+                    ? '#F59E0B'
+                    : '#EF4444',
+                backgroundColor:
+                  scanResult.status === 'VALID'
+                    ? '#ECFDF5'
+                    : scanResult.status === 'USED'
+                    ? '#FFFBEB'
+                    : '#FEF2F2',
+                boxShadow: '0 4px 14px rgba(0, 0, 0, 0.08)',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
+                <div
+                  style={{
+                    width: 34,
+                    height: 34,
+                    borderRadius: '50%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    backgroundColor:
+                      scanResult.status === 'VALID'
+                        ? '#10B981'
+                        : scanResult.status === 'USED'
+                        ? '#F59E0B'
+                        : '#EF4444',
+                    color: '#FFFFFF',
+                    flexShrink: 0,
+                  }}
+                >
+                  {scanResult.status === 'VALID' ? (
+                    <Check size={20} strokeWidth={3} />
+                  ) : scanResult.status === 'USED' ? (
+                    <AlertTriangle size={18} strokeWidth={2.5} />
+                  ) : (
+                    <X size={20} strokeWidth={3} />
+                  )}
+                </div>
+
+                <div style={{ minWidth: 0, flex: 1 }}>
+                  <h4
+                    style={{
+                      margin: 0,
+                      fontSize: 14.5,
+                      fontWeight: 800,
+                      color:
+                        scanResult.status === 'VALID'
+                          ? '#047857'
+                          : scanResult.status === 'USED'
+                          ? '#B45309'
+                          : '#B91C1C',
+                    }}
+                  >
+                    {scanResult.status === 'VALID'
+                      ? 'VALID TICKET — ADMIT GUEST ✓'
+                      : scanResult.status === 'USED'
+                      ? 'ALREADY CHECKED IN'
+                      : 'INVALID TICKET / NOT FOUND'}
+                  </h4>
+                  <p style={{ margin: '3px 0 0', fontSize: 12.5, color: '#1F2937', fontWeight: 500 }}>
+                    {scanResult.message}
+                  </p>
+                </div>
+              </div>
+
+              {/* Guest & Tier Info */}
+              {scanResult.ticket && (
+                <div
+                  style={{
+                    background: '#FFFFFF',
+                    borderRadius: 8,
+                    padding: '10px 12px',
+                    border: '1px solid #E2E8F0',
+                    marginTop: 8,
+                    fontSize: 12,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 4,
+                  }}
+                >
+                  {scanResult.ticket.owner && (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <UserCheck size={14} color="#4F46E5" />
+                      <strong style={{ color: '#0F172A' }}>
+                        {scanResult.ticket.owner.firstName} {scanResult.ticket.owner.lastName}
+                      </strong>
+                      <span style={{ color: '#64748B', fontSize: 11 }}>
+                        ({scanResult.ticket.owner.email})
+                      </span>
+                    </div>
+                  )}
+
+                  <div style={{ display: 'flex', justifyContent: 'space-between', color: '#475569', marginTop: 2 }}>
+                    <span>Tier: <strong>{scanResult.ticket.ticketType || 'Standard'}</strong></span>
+                    <span style={{ fontFamily: 'monospace', color: '#64748B' }}>#{scanResult.ticket.ticketNumber || scanResult.ticket.id}</span>
+                  </div>
+
+                  {scanResult.ticket.tableNumber && (
+                    <div style={{ color: '#D97706', fontWeight: 600, fontSize: 11.5 }}>
+                      🍾 Table: #{scanResult.ticket.tableNumber}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Ready for Next Button */}
+              <button
+                type="button"
+                onClick={() => {
+                  handleResetScan();
+                  inputRef.current?.focus();
+                }}
+                style={{
+                  marginTop: 10,
+                  width: '100%',
+                  padding: '9px 12px',
+                  borderRadius: 8,
+                  border: 'none',
+                  backgroundColor: scanResult.status === 'VALID' ? '#10B981' : '#0B1026',
+                  color: '#FFFFFF',
+                  fontSize: 12.5,
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 6,
+                  touchAction: 'manipulation',
+                }}
+              >
+                <RotateCcw size={14} /> Ready for Next Ticket
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Right Column / Tabbed Panels: Tiers Breakdown & Live Activity Feed */}
