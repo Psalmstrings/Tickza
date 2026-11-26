@@ -113,97 +113,139 @@ export default function CameraQRScanner({
     return scannerRef.current;
   };
 
-  // Start Camera Scanning
+  // Start Camera Scanning with Intelligent Multi-Stage Hardware Fallback
   const startCamera = async (overrideFacingMode, overrideCameraId) => {
-    if (isScanningRef.current || starting) return;
+    if (starting) return;
 
     setStarting(true);
     setErrorMessage('');
 
-    try {
-      const scanner = getScannerInstance();
+    // If an existing stream was running, cleanly stop it first
+    if (scannerRef.current) {
+      try {
+        if (scannerRef.current.isScanning) {
+          await scannerRef.current.stop();
+        }
+      } catch (e) {}
+    }
 
-      // Determine camera config:
-      // On mobile devices, facingMode 'environment' is most reliable
-      const targetFacing = overrideFacingMode || facingMode;
-      const targetCamId = overrideCameraId !== undefined ? overrideCameraId : selectedCameraId;
+    const scanner = getScannerInstance();
 
-      let cameraConfig;
-      if (targetCamId && cameras.some((c) => c.id === targetCamId && c.label)) {
-        cameraConfig = { deviceId: { exact: targetCamId } };
-      } else {
-        cameraConfig = { facingMode: targetFacing };
-      }
-
-      // fps: 10 is the recommended standard for html5-qrcode.
-      // Omission of qrbox tells html5-qrcode to scan the entire camera video frame,
-      // which eliminates aspect ratio cropping issues and enables 360-degree detection!
-      const qrConfig = {
-        fps: 10,
-      };
-
-      await scanner.start(
-        cameraConfig,
-        qrConfig,
+    const attemptStartWithConfig = async (config) => {
+      return await scanner.start(
+        config,
+        { fps: 10 },
         (decodedText, decodedResult) => {
-          // If paused by parent (e.g. validating previous scan), ignore
           if (pausedRef.current) return;
-
-          // Debounce identical scans within 2.5 seconds
           const now = Date.now();
           if (decodedText === lastScanned && now - lastScanTimeRef.current < 2500) {
             return;
           }
-
           lastScanTimeRef.current = now;
           setLastScanned(decodedText);
           playFeedback(true);
-
           if (onScan) {
             onScan(decodedText, decodedResult);
           }
         },
-        () => {
-          // Frame processed without barcode detected (silent)
-        }
+        () => {}
       );
+    };
 
+    let started = false;
+    let lastError = null;
+
+    // Strategy 1: Explicit device ID if provided or previously selected
+    const targetCamId = overrideCameraId !== undefined ? overrideCameraId : selectedCameraId;
+    if (targetCamId) {
+      try {
+        await attemptStartWithConfig(targetCamId);
+        started = true;
+      } catch (err) {
+        lastError = err;
+        console.warn('[Camera ID failed, falling back]', err);
+      }
+    }
+
+    // Strategy 2: Desired facingMode (environment / rear camera)
+    if (!started) {
+      const mode = overrideFacingMode || facingMode || 'environment';
+      try {
+        await attemptStartWithConfig({ facingMode: mode });
+        started = true;
+      } catch (err) {
+        lastError = err;
+        console.warn(`[Camera facingMode ${mode} failed, falling back]`, err);
+      }
+    }
+
+    // Strategy 3: Alternative facingMode (user / front camera / laptop webcam)
+    if (!started) {
+      const altMode = facingMode === 'environment' ? 'user' : 'environment';
+      try {
+        await attemptStartWithConfig({ facingMode: altMode });
+        setFacingMode(altMode);
+        started = true;
+      } catch (err) {
+        lastError = err;
+        console.warn(`[Camera alt facingMode ${altMode} failed, falling back]`, err);
+      }
+    }
+
+    // Strategy 4: Direct device enumeration fallback
+    if (!started) {
+      try {
+        const devices = await Html5Qrcode.getCameras();
+        if (devices && devices.length > 0) {
+          await attemptStartWithConfig(devices[0].id);
+          setSelectedCameraId(devices[0].id);
+          started = true;
+        }
+      } catch (err) {
+        lastError = err;
+        console.warn('[Camera devices fallback failed]', err);
+      }
+    }
+
+    if (started) {
       isScanningRef.current = true;
       setIsScanning(true);
+      setErrorMessage('');
 
-      // Check for torch/flashlight support
+      // Refresh camera list now that permission is active
+      discoverCameras();
+
+      // Check for torch capability
       try {
         const capabilities = scanner.getRunningTrackCapabilities();
         setHasTorch(Boolean(capabilities && capabilities.torch));
       } catch (e) {
         setHasTorch(false);
       }
-
-      // Re-query cameras once permissions are granted so labels populate
-      discoverCameras();
-    } catch (err) {
-      console.error('[Start Camera Error]', err);
-      const isDenied = err?.name === 'NotAllowedError' || err?.message?.includes('Permission');
-      const isNotFound = err?.name === 'NotFoundError' || err?.message?.includes('Requested device not found');
-
-      if (isDenied) {
-        setErrorMessage('Camera access was denied. Please allow camera permission in your browser address bar.');
-      } else if (isNotFound) {
-        setErrorMessage('No compatible camera found. You can enter the ticket code manually or upload a ticket photo.');
-      } else {
-        // Fallback: If environment facingMode failed, attempt user facingMode
-        if (overrideFacingMode !== 'user') {
-          console.warn('[Camera] Falling back to front camera or default...');
-          setStarting(false);
-          return startCamera('user');
-        }
-        setErrorMessage(err?.message || 'Could not access device camera.');
-      }
+    } else {
       isScanningRef.current = false;
       setIsScanning(false);
-    } finally {
-      setStarting(false);
+
+      const errString = typeof lastError === 'string'
+        ? lastError
+        : (lastError?.message || lastError?.name || String(lastError || ''));
+
+      if (errString.includes('NotAllowedError') || errString.includes('Permission') || errString.includes('denied')) {
+        setErrorMessage('Camera access was blocked by your browser. Please tap the lock / camera icon in your browser address bar and select "Allow", then click Start Camera.');
+      } else if (errString.includes('NotFoundError') || errString.includes('DevicesNotFoundError')) {
+        setErrorMessage('No camera hardware was detected on this device. You can type or paste the Ticket ID manually below.');
+      } else if (errString.includes('NotReadableError') || errString.includes('TrackStartError')) {
+        setErrorMessage('Camera is currently in use by another tab or app. Please close other camera apps and retry.');
+      } else {
+        setErrorMessage(
+          errString
+            ? `Camera notice: ${errString}. Please verify permissions or enter Ticket ID manually below.`
+            : 'Could not access device camera. Please check camera permissions in your browser address bar.'
+        );
+      }
     }
+
+    setStarting(false);
   };
 
   // Stop Camera Scanning
